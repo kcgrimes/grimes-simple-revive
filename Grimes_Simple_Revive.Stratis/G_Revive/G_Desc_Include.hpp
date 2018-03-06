@@ -3,7 +3,7 @@
 Respawn = 3;
 respawnDelay = 5;
 RespawnDialog = false;
-respawnOnStart = 1;
+respawnOnStart = 0; //CHANGE TO 1 IF G_Init_Start AND G_JIP_Start = 2
 
 class CfgRespawnTemplates
 {

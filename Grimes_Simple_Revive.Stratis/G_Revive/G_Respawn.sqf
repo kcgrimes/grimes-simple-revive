@@ -1,9 +1,9 @@
-if ((G_JIP) and (G_Num_Respawns_Base == G_Num_Respawns) and (G_JIP_Start == 1) and !(G_Revive_Has_Died_Once)) exitWith {G_Revive_Has_Died_Once = true;};
-if ((!G_JIP) and (G_Num_Respawns_Base == G_Num_Respawns) and (G_Init_Start == 1) and !(G_Revive_Has_Died_Once)) exitWith {G_Revive_Has_Died_Once = true;};
-
 disableserialization;
 _unit = [_this,0,objnull,[objnull]] call bis_fnc_param;
 _respawnDelay = [_this,3,0,[0]] call bis_fnc_param;
+
+if ((G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_JIP_Start == 0) and (G_Revive_FirstSpawn)) exitWith {G_Revive_FirstSpawn = false;};
+if ((!G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_Init_Start == 0) and (G_Revive_FirstSpawn)) exitWith {G_Revive_FirstSpawn = false;};
 
 private ["_respawn"];
 if (alive _unit) then {
@@ -57,31 +57,49 @@ if (alive _unit) then {
 	};
 };
 
-if ((G_JIP) and (G_Num_Respawns_Base == G_Num_Respawns) and (G_JIP_Start == 0) and !(G_Revive_Has_Died_Once)) then {
+_unit setVariable ["G_Unconscious",false,true];
+_unit setVariable ["G_Dragged",false,true];
+_unit setVariable ["G_Carried",false,true];
+_unit setVariable ["G_Dragging",false,true];
+_unit setVariable ["G_Carrying",false,true];
+_unit setVariable ["G_getRevived",false,true];
+_unit setVariable ["G_Reviving",false,true];
+_unit setVariable ["G_Reviver",objNull,true];
+_unit setVariable ["G_Loaded",false,true];
+_unit setVariable ["G_byVehicle",false,true];
+
+[[_unit, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+_unit setCaptive false;
+_unit enableAI "MOVE";
+_unit allowDamage true;
+
+if ((G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_JIP_Start == 0) and (G_Revive_FirstSpawn)) then {
 	_unit setPos G_Unit_Start_Pos;
 };
 
-if ((!G_JIP) and (G_Num_Respawns_Base == G_Num_Respawns) and (G_Init_Start == 0) and !(G_Revive_Has_Died_Once)) then {
+if ((!G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_Init_Start == 0) and (G_Revive_FirstSpawn)) then {
 	_unit setPos G_Unit_Start_Pos;
 };
 
-if (G_Group_Leader_Spawn) then {
-	if (G_Player_Group_Leader_Var isEqualTo _respawn) then {
-		_stance = animationState G_Player_Group_Leader_Var;
+if (G_Squad_Leader_Spawn) then {
+	if (isNil "G_Player_Squad_Leader_Var") exitWith {};
+	if (G_Player_Squad_Leader_Var isEqualTo _respawn) then {
+		_stance = animationState G_Player_Squad_Leader_Var;
 		[[_unit, _stance], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
 	};
 };
 
 if (G_Custom_Exec_3 != "") then {
-	execVM G_Custom_Exec_3;
+	[] execVM G_Custom_Exec_3;
 };
 
 sleep 2;
 
-if (G_Num_Respawns >= 0) then {
-	titleText [format["You have %1 lives remaining!",G_Num_Respawns],"PLAIN",2];
+_lives = _unit getVariable "G_Lives";
+if ((_lives >= 0) and !(G_Revive_FirstSpawn)) then {
+	titleText [format["You have %1 lives remaining!",_lives],"PLAIN",2];
 	sleep 3;
 	titleFadeOut 3;
 };
 
-G_Revive_Has_Died_Once = true;
+G_Revive_FirstSpawn = false;

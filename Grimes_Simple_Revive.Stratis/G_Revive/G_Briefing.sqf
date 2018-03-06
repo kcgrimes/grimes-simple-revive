@@ -9,9 +9,9 @@ player createDiaryRecord ["G_Revive",
 	<br/>
 	<br/>* Bohemia Interactive Studio – For providing an amazing game and location for a fan base, in addition to provided assistance.
 	<br/>* BIS Forum Users – For providing an active location for anyone to receive assistance and education about ArmA.
-	<br/>* Honorable Mention: brians200, Das Attorney
+	<br/>* Honorable Mention: norrin, brians200, Das Attorney, PtPau, Imperator_Pete, csk222, maximumvmo, and any whom I have failed to mention.
 	<br/>* 3rd Infantry Division – For providing everything that is indescribable in a single mention, but specifically for testing assistance.
-	<br/>  * Honorable Mention: Taylor, Ski, Foondle, and any whom I have failed to mention.
+	<br/>  * Honorable Mention: Taylor, Ski, Foondle, Robertson, Townsend, and any whom I have failed to mention.
 	<br/>
 	"
 ]];
@@ -41,13 +41,13 @@ player createDiaryRecord ["G_Revive",
 	<br/>
 	<br/>* To Revive an Unconscious teammate, simply approach them and use the Action Menu.
 	<br/>
-	<br/>* To Drag or Carry any Unconscious unit (doesn't have to be a teammate!), simply approach them and use the Action Menu.
+	<br/>* To Drag or Carry any Unconscious unit (doesn't have to be a teammate!), simply approach them and use the Action Menu. NOTE: Sometimes the animation will force a certain position. If you are in Drag and not moving, simply press Q, W, or E in addition to S and you will be able to move again (the issue is the game's Walk mechanic).
 	<br/>
-	<br/>* To Load a wounded teammate into a vehicle, simply move them or the vehicle within range and use the Action Menu on the Unconscious unit.
+	<br/>* To Load a wounded teammate into a vehicle, simply move them or the vehicle within range and use the Action Menu on the Unconscious unit. If a unit is killed in a vehicle, they will have to be Unloaded first.
 	<br/>
 	<br/>* If the Mobile Respawn Vehicle system is being used, simply approach the team's MRV and use the Action Menu to Deploy/Undeploy the vehicle. This allows for teammates to spawn on it.
 	<br/>
-	<br/>* If the Unit Tag System is enabled, you will either always see teammate's name tags, see them when you cursor over them, or see them after pressing a defined key (Default is Left Alt).
+	<br/>* If the Unit Tag System is enabled, you will either always see teammate's name tags, see them when you cursor over them, or see them after pressing a defined key (Default is Left Alt, but can be edited by mission maker).
 	<br/>
 	"
 ]];

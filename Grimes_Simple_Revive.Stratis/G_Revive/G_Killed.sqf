@@ -1,40 +1,15 @@
-private ["_noLives","_noMenu"];
+private ["_unit","_respawnDelay","_noLives"];
 
-_noMenu = false;
-if (!G_Revive_Has_Died_Once) then {
-	if (G_JIP) then {
-		if (G_JIP_Start != 2) then {
-			_noMenu = true;
-		};
-	}
-	else
-	{
-		if (G_Init_Start != 2) then {
-			_noMenu = true;
-		};
-	};
-};
-if (_noMenu) exitWith {setPlayerRespawnTime 0};
-
-if (!G_Revive_Has_Died_Once) then {
+if (G_Revive_FirstSpawn) then {
 	setPlayerRespawnTime 2;
-	G_Num_Respawns = G_Num_Respawns + 1;
 }
 else
 {
-	setPlayerRespawnTime G_Respawn_Time; 
+	setPlayerRespawnTime G_Respawn_Time;
 };
 
 if (G_Custom_Exec_2 != "") then {
-	execVM G_Custom_Exec_2;
-};
-
-_noLives = false;
-if !(G_Num_Respawns == -1) then {
-	G_Num_Respawns = G_Num_Respawns - 1;
-	if (G_Num_Respawns < 0) then {
-		_noLives = true;
-	};
+	[] execVM G_Custom_Exec_2;
 };
 
 disableserialization;
@@ -42,6 +17,16 @@ disableserialization;
 _unit = [_this,0,objnull,[objnull]] call bis_fnc_param;
 _respawnDelay = [_this,3,0,[0]] call bis_fnc_param;
 
+_noLives = false;
+if !((G_Num_Respawns == -1) || (G_Revive_FirstSpawn)) then {
+	_lives = _unit getVariable "G_Lives";
+	_lives = _lives - 1;
+	if (_lives < 0) then {
+		_noLives = true;
+	};
+	_unit setVariable ["G_Lives",_lives,true];
+};
+	
 if (_noLives) exitWith {
 	if (G_Spectator) then {
 		[_unit,_respawnDelay] execVM "G_Revive\G_Spectator.sqf";
@@ -56,7 +41,7 @@ if (_noLives) exitWith {
 //MENU POSITION
 
 if (!alive _unit) then {
-	if (playerrespawntime < 1 || !isplayer _unit) exitwith {hint "the problem";};
+	if (playerrespawntime < 1 || !isplayer _unit) exitwith {};
 	if (simulationenabled _unit) then {
 		if (playerrespawntime < 3) then {setplayerrespawntime (playerrespawntime + 3);};
 
