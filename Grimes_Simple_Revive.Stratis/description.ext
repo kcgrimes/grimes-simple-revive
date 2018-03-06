@@ -1,0 +1,18 @@
+class Header
+{
+	gameType = Sandbox;
+	minPlayers = 1;
+	maxPlayers = 4;
+};
+
+author = KC Grimes;
+onLoadName = Grimes' Simple Revive;
+onLoadMission = Simple revive script that utilizes all in-game functions in a simple, user friendly, and quality manner.;
+onLoadIntroTime = false;
+onLoadMissionTime = false;
+
+enableDebugConsole = true;
+
+////THE FOLLOWING LINE IS NEEDED FOR GRIMES' SIMPLE REVIVE SCRIPT. DO NOT INCLUDE ANYTHING RESPAWN RELATED EXCEPT THE FOLLOWING LINE.
+#include "G_Revive\G_Desc_Include.hpp"
+////
