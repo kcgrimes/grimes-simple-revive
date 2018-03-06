@@ -27,7 +27,7 @@ At this time, there is no “installer” for the script, and it is instead a si
 	```
 	#include "G_Revive\G_Desc_Include.hpp"
 	```
-	1. If you haven’t already created an init.sqf file, simply copy mine into your mission folder and you are set. If you already have your own init.sqf, simply copy and paste the following lines into it. 
+	2. If you haven’t already created an init.sqf file, simply copy mine into your mission folder and you are set. If you already have your own init.sqf, simply copy and paste the following lines into it. 
 	```
 	G_Server = false;
 	G_Client = false;
@@ -40,7 +40,7 @@ At this time, there is no “installer” for the script, and it is instead a si
 
 	execVM "G_Revive_init.sqf";
 	```
-	1. Copy and Paste the G_Revive_init.sqf file and the G_Revive folder into your mission folder. 
+	3. Copy and Paste the G_Revive_init.sqf file and the G_Revive folder into your mission folder. 
 4. That is all that is required for the file implementation! Depending on your settings, you will still need make some edits in the in-game editor. 
 	1. If using respawn, create markers named “respawn_west_0”, “respawn_west_1”, etc., for the desired side.
 	1. If using the mobile respawn vehicle, be sure to name your vehicle in the Name field when you double-click on the vehicle in the editor.
