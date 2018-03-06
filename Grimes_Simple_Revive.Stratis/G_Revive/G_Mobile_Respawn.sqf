@@ -1,6 +1,7 @@
 //Mobile respawn
 
 _initVars = {
+	private ["_deployActionID", "_undeployActionID"];
 	_side = _this select 0;
 	_MRV = _this select 1;
 	if (local _MRV) then {
@@ -8,15 +9,22 @@ _initVars = {
 		_hp setVariable ["G_MRV_Dir",getDir _MRV,true];
 		_hp setVariable ["G_MRV_Pos",getPos _MRV,true];
 		_hp setVariable ["G_MRV_Type",typeOf _MRV,true];
-		_hp setVariable ["G_MRV_Side",_side,true];
+		_hp setVariable ["G_Side",_side,true];
 		_hp setVariable ["G_MRV_Name",vehicleVarName _MRV,true];
 		_hp setVariable ["G_MRV_Deployed",false,true];
 		_MRV setVariable ["G_MRV_Logic",_hp,true];
 	};
 	waitUntil {(!isNil {_MRV getVariable "G_MRV_Logic"})};
 	_MRV_Logic = _MRV getVariable "G_MRV_Logic";
-	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", format["((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and (side _this == %1)", _side]];
-	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", format["((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and (side _this == %1)", _side]];	
+	if (G_Mobile_Respawn_Moveable) then {
+		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
+		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
+	}
+	else
+	{
+		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
+		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
+	};
 	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
 	_MRV setVariable ["G_MRV_Undeploy_ID",_undeployActionID,true];
 };
@@ -37,19 +45,43 @@ if !(count G_Mobile_Respawn_EAST == 0) then {
 
 if !(count G_Mobile_Respawn_GUER == 0) then {
 	{
-		_side = GUER;
+		_side = RESISTANCE;
 		[_side, _x] call _initVars;
 	} forEach G_Mobile_Respawn_GUER;
 };
 
 if !(count G_Mobile_Respawn_CIV == 0) then {
 	{
-		_side = CIV;
+		_side = CIVILIAN;
 		[_side, _x] call _initVars;
 	} forEach G_Mobile_Respawn_CIV;
 };
 
 _MRV_Array = G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER + G_Mobile_Respawn_CIV;
+
+G_fnc_MRV_Lock = {
+	_MRV = _this select 0;
+	_MRV_Logic = _this select 1;
+	_MRV addEventHandler ["GetIn", {
+		_MRV = _this select 0;
+		_unit = _this select 2;
+		_MRV_Logic = _MRV getVariable "G_MRV_Logic";
+		if ((_MRV_Logic getVariable "G_Side") != (_unit getVariable "G_Side")) then {
+			_fuel = fuel _MRV;
+			_MRV setFuel 0;
+			_unit action ["eject", _MRV];
+			[_unit,_MRV,_fuel] spawn {
+				_unit = _this select 0;
+				_MRV = _this select 1;
+				_fuel = _this select 2;
+				titleText [format["You are not on the right team to enter %1!",typeOf _MRV],"PLAIN",1]; 
+				titleFadeOut 4;
+				waitUntil {sleep 1; vehicle _unit == _unit};
+				_MRV setFuel _fuel;
+			};
+		};
+	}];
+};
 
 G_fnc_MRV_onKilled = {
 	_MRV = _this select 0;
@@ -82,6 +114,7 @@ G_fnc_MRV_onKilled_EH = {
 };
 
 G_fnc_MRV_onRespawn = {
+	private ["_deployActionID", "_undeployActionID"];
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	
@@ -92,13 +125,23 @@ G_fnc_MRV_onRespawn = {
 	};
 	_mrvDir = _MRV_Logic getVariable "G_MRV_Dir";
 	_MRV setDir _mrvDir;
-	_side = _MRV_Logic getVariable "G_MRV_Side";
-	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", format["((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and (side _this == %1)", _side]];
-	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", format["((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and (side _this == %1)", _side]];
+	_side = _MRV_Logic getVariable "G_Side";
+	if (G_Mobile_Respawn_Moveable) then {
+		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
+		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
+	}
+	else
+	{
+		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
+		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
+	};
 	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
 	_MRV setVariable ["G_MRV_Undeploy_ID",_undeployActionID,true];
 	[_MRV, _MRV_Logic] spawn G_fnc_MRV_Marker_Creation;
 	[_MRV, _MRV_Logic] spawn G_fnc_MRV_onKilled_EH;
+	if (G_Mobile_Respawn_Locked) then {
+		[_MRV, _MRV_Logic] spawn G_fnc_MRV_Lock;
+	};
 	if (G_Custom_Exec_4 != "") then {
 		[_MRV] execVM G_Custom_Exec_4;
 	};
@@ -176,7 +219,7 @@ G_fnc_MRV_Marker_Creation = {
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	if (G_PvP and G_isClient) then {
-		if ((player getVariable "G_Side") == (_MRV_Logic getVariable "G_MRV_Side")) then {
+		if ((player getVariable "G_Side") == (_MRV_Logic getVariable "G_Side")) then {
 			_MRV_mkr = createMarkerLocal [format["G_MRV_mkr_%1",_MRV], getPos _MRV];
 			_MRV_mkr setMarkerColorLocal G_Mobile_Respawn_Mkr_Color;
 			_MRV_mkr setMarkerTextLocal G_Mobile_Respawn_Mkr_Text;
@@ -200,4 +243,7 @@ G_fnc_MRV_Marker_Creation = {
 	_MRV_Logic = _x getVariable "G_MRV_Logic";
 	[_x, _MRV_Logic] spawn G_fnc_MRV_Marker_Creation;
 	[_x, _MRV_Logic] spawn G_fnc_MRV_onKilled_EH;
+	if (G_Mobile_Respawn_Locked) then {
+		[_x, _MRV_Logic] spawn G_fnc_MRV_Lock;
+	};
 } forEach _MRV_Array; 

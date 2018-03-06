@@ -2,16 +2,19 @@
 //Generic
 if (typeName G_PvP != "BOOL") exitWith {player sideChat "G_Revive_Init - G_PvP must be true/false!"};
 if (typeName G_Enemy_AI_Unconscious != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Enemy_AI_Unconscious must be true/false!"};
-if (!(G_Enemy_AI_Unconscious) and (typeName G_Friendly_Side != "SIDE")) exitWith {player sideChat "G_Revive_Init - G_Friendly_Side must be WEST, EAST, GUER, or CIV!"};
+if (!(G_Enemy_AI_Unconscious) and (typeName G_Friendly_Side != "SIDE")) exitWith {player sideChat "G_Revive_Init - G_Friendly_Side must be WEST, EAST, RESISTANCE, or CIVILIAN!"};
 if (typeName G_Briefing != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Briefing must be true/false!"};
 
 //Revive
 if (typeName G_Revive_System != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Revive_System must be true/false!"};
 if ((typeName G_Revive_Time_Limit != "SCALAR") || (G_Revive_Time_Limit < -1)) exitWith {player sideChat "G_Revive_Init - G_Revive_Time_Limit must be a number greater than or equal to -1!"};
+if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) exitWith {player sideChat "G_Revive_Init - G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
 if ((typeName G_Revive_Time_To != "SCALAR") || (G_Revive_Time_To < 0)) exitWith {player sideChat "G_Revive_Init - G_Revive_Time_To must be an integer greater than or equal to 0!"};
 if ((typeName G_Revive_Requirement != "SCALAR") || (G_Revive_Requirement < 0)) exitWith {player sideChat "G_Revive_Init - G_Revive_Requirement must be an integer greater than or equal to 0!"};
 if ((typeName G_Revive_Black_Screen != "SCALAR") || !((G_Revive_Black_Screen == 0) || (G_Revive_Black_Screen == 1))) exitWith {player sideChat "G_Revive_Init - G_Revive_Black_Screen must be defined as 0 or 1!"};
 if (typeName G_Revive_Action_Color != "STRING") exitWith {player sideChat "G_Revive_Init - G_Revive_Action_Color must be an HTML Color Code in string."};
+if (typeName G_Eject_Occupants != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Eject_Occupants must be true/false!"};
+if (typeName G_Explosion_Eject_Occupants != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Explosion_Eject_Occupants must be true/false!"};
 if ((typeName G_Revive_Reward != "SCALAR") || (G_Revive_Reward < 0)) exitWith {player sideChat "G_Revive_Init - G_Revive_Reward must be a number greater than or equal to 0!"};
 if ((typeName G_TK_Penalty != "SCALAR") || (G_TK_Penalty > 0)) exitWith {player sideChat "G_Revive_Init - G_TK_Penalty must be a number less than or equal to 0!"};
 
@@ -30,6 +33,7 @@ if (typeName G_AI_Fixed_Spawn != "BOOL") exitWith {player sideChat "G_Revive_Ini
 if ((typeName G_AI_Fixed_Spawn_WEST != "STRING") || (typeName G_AI_Fixed_Spawn_EAST != "STRING") || (typeName G_AI_Fixed_Spawn_GUER != "STRING") || (typeName G_AI_Fixed_Spawn_CIV != "STRING")) exitWith {player sideChat "G_Revive_Init - G_AI_Fixed_Spawn_SIDEHERE must all be strings. If not in use, still have empty quotes."};
 
 //Mobile Respawn Vehicle
+if (typeName G_Mobile_Respawn_Locked != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Mobile_Respawn_Locked must be true/false!"};
 if (typeName G_Mobile_Respawn_Moveable != "BOOL") exitWith {player sideChat "G_Revive_Init - G_Mobile_Respawn_Moveable must be true/false!"};
 if ((typeName G_Mobile_Respawn_Wreck != "SCALAR") || (G_Mobile_Respawn_Wreck < 0)) exitWith {player sideChat "G_Revive_Init - G_Mobile_Respawn_Wreck must be a number greater than or equal to 0!"};
 if ((typeName G_Mobile_Respawn_RespTimer != "SCALAR") || (G_Mobile_Respawn_RespTimer < 0)) exitWith {player sideChat "G_Revive_Init - G_Mobile_Respawn_RespTimer must be a number greater than or equal to 0!"};
@@ -71,12 +75,16 @@ if (G_Unit_Tag) then {
 	if (G_isJIP) then {
 		waitUntil {alive player};
 		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
+		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, player];
+		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
+		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
 		G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
 		publicVariable "G_Unit_Tag_Num_List";
+		sleep 1;
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
 			waitUntil {scriptDone _handle};
-			[[player, (player getVariable "G_Unit_Tag_Number")], "G_fnc_Unit_Marker_ReExec", true, true] spawn BIS_fnc_MP;
+			[[player, (player getVariable "G_Unit_Tag_Number")], "G_fnc_Unit_Tag_Exec", true, true] spawn BIS_fnc_MP;
 		};
 	}
 	else
@@ -159,8 +167,10 @@ G_fnc_moveInCargoToUnloadAction = {
 	
 	_unit assignAsCargo _vehicle;
 	_unit moveInCargo _vehicle;
+	_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
 	
-	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", format["(side _this == %1) and ((_target distance _this) < 5) and ((speed _target) < 1)",_side]];
+	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and ((_target distance _this) < 5) and ((speed _target) < 1)"];
+
 	
 	[_unit, _vehicle, _unloadActionID] spawn {
 		_unit = _this select 0;
@@ -182,4 +192,55 @@ G_fnc_enableSimulation = {
 	_unit = _this select 0;
 	_bool = _this select 1;
 	_unit enableSimulation _bool;
+};
+
+if ((G_isClient) and (G_Revive_System)) then {
+	G_fnc_Dialog_Rescuer_Text = {
+		[_this select 0] spawn {
+			private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
+			while {player getVariable "G_Unconscious"} do {
+				_array = nearestObjects [player, ["CAManBase"], 500];
+				_arrayDistance = [];
+				{
+					if ((_x != player) and ((player getVariable "G_Side") == (_x getVariable "G_Side")) and (((typeOf _x) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and (alive _x) and !(_x getVariable "G_Unconscious")) then {
+						_arrayDistance = _arrayDistance + [[_x, ceil(_x distance player)]];
+					};
+				} forEach _array;
+				
+				_unit0 = "";
+				_unit1 = "";
+				_unit2 = "";
+				_unit3 = "";
+				_unit4 = "";
+				
+				for "_i" from 0 to (((count _arrayDistance) - 1) min 4) do {
+					call compile format["_unit%1 = format[""%2  (%3m)"",name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];",_i,"%1","%2"];
+				};
+
+				_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5",_unit0,_unit1,_unit2,_unit3,_unit4];
+				((_this select 0) displayCtrl 1001) ctrlSetText _text;
+				sleep 5;
+			};
+		};
+	};
+
+	G_fnc_Dialog_Downs_Text = {
+		private ["_downs", "_lives"];
+		if (G_Revive_DownsPerLife > 0) then {
+			_downs = (G_Revive_DownsPerLife) - (player getVariable "G_Downs");
+		}
+		else
+		{
+			_downs = "Unlimited";
+		};
+		if (G_Num_Respawns == -1) then {
+			_lives = "Unlimited";
+		}
+		else
+		{
+			_lives = player getVariable "G_Lives";
+		};
+		_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2",_downs,_lives];
+		((_this select 0) displayCtrl 1002) ctrlSetText _text;
+	};
 };

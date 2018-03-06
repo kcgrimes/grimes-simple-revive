@@ -64,12 +64,15 @@ G_Briefing = true; //true = information, how to, and credits will be displayed o
 //Revive
 G_Revive_System = true; //Whether the revive system will be used or not. True = enabled, false = disabled.
 G_Revive_Time_Limit = 300; //Amount of time (in seconds) before unit is available to be revived, before being forced to respawn. If -1, no time limit.
+G_Revive_DownsPerLife = 0; //Number of times unit can go Unconscious in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
 G_Revive_Time_To = 10; //Time (in seconds) required for revive to complete
 G_Revive_Requirement = 0; //1 or greater = number of FAKs (single use) or Medikit (unlimited use) needed to revive (and treat still). 0 = Those items only needed to treat, not revive (stock).
 G_Revive_Black_Screen = 0; //1 = While Unconscious/waiting for revive, screen stays black. 0 = Screen goes black at death then fades back in, with surroundings visible.
 G_Revive_Action_Color = "#FFCC00"; //HTML color code that will be the color of the Revive, Drag, Carry, and Load/Unload action text
 G_Revive_Load_Types = ["Car","Tank","Helicopter","Truck"]; //Add or remove strings of types of units that wounded can be loaded into
+G_Eject_Occupants = true; //If killed while in a vehicle, the unit is ejected from the vehicle. True = enabled, false = disabled.
+G_Explosion_Eject_Occupants = true; //Once the wreck of an exploded vehicle comes to a stop (air or land), the occupants will be ejected and revivable. True to enable, false to disable (units will bypass revive and be forced to respawn).
 G_Revive_Reward = 0; //0 = No lives rewarded for revive. 1 and up = number of lives rewarded for reviving. (CAN be a decimal)
 G_TK_Penalty = 0; //Amount of lives a Team Killer loses per team kill. Note, must be negative to be negative result. (Value of -2 means 2 lives lost per TK) (CAN be a decimal)
 
@@ -87,9 +90,9 @@ G_Squad_Leader_Marker = true; //Displays marker on map indicating squad leader's
 	G_Squad_Leader_Mkr_Text = "Squad Leader"; //Text beside marker
 	G_Squad_Leader_Mkr_Refresh = 1; //Time (in seconds) between refreshes in marker location. Must be a number greater than 0.
 G_AI_Fixed_Spawn = true; //Upon respawn, the AI will spawn at the marker defined below for their respective side
-	G_AI_Fixed_Spawn_WEST = "respawn_west";
-	G_AI_Fixed_Spawn_EAST = "respawn_east";
-	G_AI_Fixed_Spawn_GUER = "";
+	G_AI_Fixed_Spawn_WEST = "respawn_west_0";
+	G_AI_Fixed_Spawn_EAST = "respawn_east_0";
+	G_AI_Fixed_Spawn_GUER = "respawn_guerrila_0";
 	G_AI_Fixed_Spawn_CIV = "";
 	
 //Mobile Respawn Vehicle
@@ -97,11 +100,12 @@ G_AI_Fixed_Spawn = true; //Upon respawn, the AI will spawn at the marker defined
 //Note - The side that can use the specific Mobile Respawn is determined by which array the MRV is put in below.
 G_Mobile_Respawn_WEST = [MobileRespawnWEST]; 
 G_Mobile_Respawn_EAST = [MobileRespawnEAST];
-G_Mobile_Respawn_GUER = [];
+G_Mobile_Respawn_GUER = [MobileRespawnGUER];
 G_Mobile_Respawn_CIV = [];
+G_Mobile_Respawn_Locked = true; //Lock enemy MRVs so MRVs can only be accessed by their own team. True = enabled, false = disabled.
 G_Mobile_Respawn_Moveable = false; //true = Deployed mobile respawn can be moved while remaining deployed. false = Deployed mobile respawn is immobile. 
-G_Mobile_Respawn_Wreck = 5; //Time (in seconds) after mobile respawn is destroyed before the wreck is deleted
-G_Mobile_Respawn_RespTimer = 10; //Time (in seconds) for mobile respawn to respawn at starting position/direction
+G_Mobile_Respawn_Wreck = 10; //Time (in seconds) after mobile respawn is destroyed before the wreck is deleted
+G_Mobile_Respawn_RespTimer = 20; //Time (in seconds) for mobile respawn to respawn at starting position/direction
 G_Mobile_Respawn_Marker = true; //Displays marker on map indicating MRV's position. True = enabled, false = disabled.
 	G_Mobile_Respawn_Mkr_Type = "respawn_motor"; //Shape of marker
 	G_Mobile_Respawn_Mkr_Color = "ColorBlack"; //Color of marker

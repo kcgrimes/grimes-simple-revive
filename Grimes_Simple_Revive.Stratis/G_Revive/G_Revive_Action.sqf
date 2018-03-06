@@ -12,28 +12,34 @@ _unit setVariable ["G_getRevived",true,true];
 _rescuer setVariable ["G_Reviving",true,true];
 
 _hasItem = 0;
-if (G_Revive_Requirement == 1) then {
+if (G_Revive_Requirement > 0) then {
 	_rescitemsArray = items _rescuer;
-	{
-		switch (_x) do {
-			case "Medikit":
-			{
-				if (_hasItem == 0) then {
-					_hasItem = _hasItem + G_Revive_Requirement;
+	if ("Medikit" in (_rescitemsArray)) then {
+		_hasItem = _hasItem + G_Revive_Requirement;
+	};
+	if (_hasItem < G_Revive_Requirement) then {
+		{
+			if (_x isEqualTo "FirstAidKit") then {
+				if (_hasItem < G_Revive_Requirement) then {
+					_hasItem = _hasItem + 1;
 				};
 			};
-			case "FirstAidKit":
-			{
-				if (_hasItem == 0) then {
-					_hasItem = _hasItem + 1;
-					_rescuer removeItem "FirstAidKit";
-				};
+		} forEach _rescitemsArray;
+		if (_hasItem >= G_Revive_Requirement) then {
+			for "_i" from 1 to G_Revive_Requirement do {
+				_rescuer removeItem "FirstAidKit";
 			};
 		};
-	} forEach _rescitemsArray;
+	};
 };
 
-if ((G_Revive_Requirement > 0) and (_hasItem < G_Revive_Requirement)) exitWith {titleText [format["You require either %2 First Aid Kit(s) or a single Medikit to revive %1!",name _unit,G_Revive_Requirement],"PLAIN",1]; sleep 1; titleFadeOut 4;};
+if ((G_Revive_Requirement > 0) and (_hasItem < G_Revive_Requirement)) exitWith {
+	titleText [format["You require either %2 First Aid Kit(s) or a single Medikit to revive %1!",name _unit,G_Revive_Requirement],"PLAIN",1]; 
+	_unit setVariable ["G_getRevived",false,true];
+	_rescuer setVariable ["G_Reviving",false,true];
+	sleep 1; 
+	titleFadeOut 4;
+};
 
 _unit setVariable ["G_Reviver",_rescuer,true];
 

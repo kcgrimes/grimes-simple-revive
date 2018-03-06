@@ -25,6 +25,9 @@ if (G_isServer || _specialJIP) then {
 	if (isNil {_unit getVariable "G_Side"}) then {
 		_unit setVariable ["G_Side",side _unit,true];
 	};
+	if ((G_Revive_DownsPerLife > 0) and (isNil {_unit getVariable "G_Downs"})) then {
+		_unit setVariable ["G_Downs",0,true];
+	};
 	if (isNil {_unit getVariable "G_Lives"}) then {
 			_unit setVariable ["G_Lives",G_Num_Respawns,true];
 	};
@@ -74,10 +77,10 @@ if (G_Revive_System) then {
 	G_fnc_Revive_Actions = {
 		_unit = _this select 0;
 		_side = _unit getVariable "G_Side";
-		_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>",G_Revive_Action_Color],"G_Revive\G_Revive_Action.sqf",[],1.5,true,true,"", format["!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and (%1 == side _this) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and !(_target getVariable ""G_Loaded"")",_side]];
+		_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>",G_Revive_Action_Color],"G_Revive\G_Revive_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and !(_target getVariable ""G_Loaded"")"];
 		_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>",G_Revive_Action_Color],"G_Revive\G_Drag_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and !(_target getVariable ""G_Loaded"")"];
 		_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>",G_Revive_Action_Color],"G_Revive\G_Carry_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Carried"") and !(_target getVariable ""G_Dragged"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and !(_target getVariable ""G_Loaded"")"];
-		_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>",G_Revive_Action_Color],"G_Revive\G_Load_Action.sqf",[_side],1.5,true,true,"", format["!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and (%1 == side _this) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (count(nearestObjects [_target, %2, 10]) != 0) and !(_target getVariable ""G_Loaded"")",_side,G_Revive_Load_Types]];
+		_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>",G_Revive_Action_Color],"G_Revive\G_Load_Action.sqf",[_side],1.5,true,true,"", format["!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (count(nearestObjects [_target, %1, 10]) != 0) and !(_target getVariable ""G_Loaded"")",G_Revive_Load_Types]];
 	};
 	
 	[_unit] call G_fnc_Revive_Actions;
@@ -86,7 +89,9 @@ if (G_Revive_System) then {
 	[	"Respawn",
 		{
 			_unit = _this select 0;
+			_old = _this select 1;
 			[[_unit],"G_fnc_Revive_Actions", true, true] spawn BIS_fnc_MP; 
+			[[_old, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
 		}
 	];
 
@@ -105,8 +110,10 @@ if (G_Revive_System) then {
 				_unit setVariable ["G_Reviver",objNull,true];
 				_unit setVariable ["G_Loaded",false,true];
 				_unit setVariable ["G_byVehicle",false,true];
+				_unit setVariable ["G_Downs",0,true];
 				[[_unit, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
 				_unit setCaptive false;
+				_unit setVariable ["G_Side",side _unit,true];
 				_unit enableAI "MOVE";
 				_unit allowDamage true;
 			}
@@ -132,12 +139,12 @@ if (G_AI_Fixed_Spawn) then {
 							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_EAST; 
 						};
 					};
-					case GUER: {
+					case RESISTANCE: {
 						if (G_AI_Fixed_Spawn_GUER != "") then {
 							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_GUER; 
 						};
 					};
-					case CIV: {
+					case CIVILIAN: {
 						if (G_AI_Fixed_Spawn_CIV != "") then {
 							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_CIV; 
 						};
@@ -150,12 +157,25 @@ if (G_AI_Fixed_Spawn) then {
 	};
 };
 
-if ((G_Unit_Tag) and (G_Unit_Tag_Display != 0)) then {
+if (G_Unit_Tag) then {
 	_unit addEventHandler 
 	[	"Respawn",
 		{
 			_unit = _this select 0;
-			[[_unit, _unit getVariable "G_Unit_Tag_Number"], "G_fnc_Unit_Marker_ReExec", true, true] spawn BIS_fnc_MP;
+			_old = _this select 1;
+			_num = _old getVariable "G_Unit_Tag_Number";
+			_unit setVariable ["G_Unit_Tag_Number",_num,true];
+			(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [_num, _unit];
+			_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
+			G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
+			if (G_Unit_Tag_Display != 0) then {
+				[_unit, _num] spawn {
+					_unit = _this select 0;
+					_num = _this select 1;
+					sleep 1;
+					[[_unit, _num], "G_fnc_Unit_Tag_Exec", true, true] spawn BIS_fnc_MP;
+				};
+			};
 		}
 	];
 };
