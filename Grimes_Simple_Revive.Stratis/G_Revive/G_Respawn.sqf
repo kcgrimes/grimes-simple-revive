@@ -2,8 +2,9 @@ disableserialization;
 _unit = [_this,0,objnull,[objnull]] call bis_fnc_param;
 _respawnDelay = [_this,3,0,[0]] call bis_fnc_param;
 
-if ((G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_JIP_Start == 0) and (G_Revive_FirstSpawn)) exitWith {G_Revive_FirstSpawn = false;};
-if ((!G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_Init_Start == 0) and (G_Revive_FirstSpawn)) exitWith {G_Revive_FirstSpawn = false;};
+if ((G_Revive_FirstSpawn) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (((G_JIP_Start == 0) and (G_isJIP)) || ((G_Init_Start == 0) and (!G_isJIP)))) exitWith {
+	G_Revive_FirstSpawn = false;
+};
 
 private ["_respawn"];
 if (alive _unit) then {
@@ -74,11 +75,7 @@ _unit setVariable ["G_Side",side _unit,true];
 _unit enableAI "MOVE";
 _unit allowDamage true;
 
-if ((G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_JIP_Start == 0) and (G_Revive_FirstSpawn)) then {
-	_unit setPos G_Unit_Start_Pos;
-};
-
-if ((!G_isJIP) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (G_Init_Start == 0) and (G_Revive_FirstSpawn)) then {
+if ((G_Revive_FirstSpawn) and ((_unit getVariable "G_Lives") == G_Num_Respawns) and (((G_JIP_Start == 0) and (G_isJIP)) || ((G_Init_Start == 0) and (!G_isJIP)))) then {
 	_unit setPos G_Unit_Start_Pos;
 };
 
