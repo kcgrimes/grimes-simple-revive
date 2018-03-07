@@ -1,4 +1,4 @@
-player createDiarySubject ["G_Revive", "Grimes' Revive"];
+player createDiarySubject ["G_Revive", "Grimes Simple Revive"];
 
 player createDiaryRecord ["G_Revive", 
 [
@@ -22,12 +22,12 @@ player createDiaryRecord ["G_Revive",
 	"
 	<br/><font size='18'>Editor: KC Grimes (Grimes [3rd ID])</font>
 	<br/>
-	<br/>   Thank you so much for choosing to use Grimes' Simple Revive Script in your mission. I am proud to contribute to the ArmA/BIS community. 
+	<br/>   Thank you so much for choosing to use Grimes Simple Revive Script in your mission. I am proud to contribute to the ArmA/BIS community. 
 	<br/>
 	<br/>   If you have suggestions, comments, or bug reports, please feel free to find me on the BIS Forums as Grimes [3rd ID] or visit my project page below.
 	<br/>   http://dev.withsix.com/projects/grimesrevive
 	<br/>
-	<br/>   Again, thank you for choosing Grimes' Simple Revive Script for your revive needs. Enjoy your game!
+	<br/>   Again, thank you for choosing Grimes Simple Revive Script for your revive needs. Enjoy your game!
 	<br/>
 	"
 ]];
@@ -37,7 +37,7 @@ player createDiaryRecord ["G_Revive",
 	"How To Use", 
 	"
 	<br/><font size='18'>How To Use</font>
-	<br/>     Below is some information relating to the in-game utilization of Grimes' Simple Revive Script. 
+	<br/>     Below is some information relating to the in-game utilization of Grimes Simple Revive Script. 
 	<br/>
 	<br/>* To Revive an Unconscious teammate, simply approach them and use the Action Menu.
 	<br/>
