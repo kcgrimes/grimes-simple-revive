@@ -51,7 +51,7 @@ if ((typeName G_Unit_Tag_Distance != "SCALAR") || (G_Unit_Tag_Distance <= 0)) ex
 if (typeName G_Unit_Tag_ShowDistance != "BOOL") exitWith {systemChat "G_Revive_Init - G_Unit_Tag_ShowDistance must be true/false!"};
 
 //Custom Executions
-if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING")) exitWith {systemChat "G_Revive_Init - G_Custom_Exec_# must all be strings except. If not in use, still have empty quotes."};
+if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING")) exitWith {systemChat "G_Revive_Init - G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
 //Various defines
 G_Revive_FirstSpawn = true;
