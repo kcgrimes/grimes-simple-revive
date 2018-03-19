@@ -17,4 +17,4 @@ class CfgRespawnTemplates
 	};
 };
 
-respawnTemplates[] = {"G_Revive"};
+respawnTemplates[] = {"G_Revive", "MenuPosition"};
