@@ -54,23 +54,32 @@ if (typeName G_Unit_Tag_ShowDistance != "BOOL") exitWith {systemChat "G_Revive_I
 if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING")) exitWith {systemChat "G_Revive_Init - G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
 //Various defines
+//bug - Why is G_Revive_FirstSpawn needed?
 G_Revive_FirstSpawn = true;
+//Define starting position of player
+//bug - Why is G_Unit_Start_Pos needed?
 if (G_isClient) then {
 	G_Unit_Start_Pos = getPos player;
 };
 
-if ((G_Briefing) and (G_isClient)) then {
-	execVM "G_Revive\G_Briefing.sqf";
+//Execute briefing for player if enabled
+if ((G_Briefing) && (G_isClient)) then {
+	[] execVM "G_Revive\G_Briefing.sqf";
 };
 
+//If MRVs are in use, execute MRV script
+//bug - does this need to be more specifically localized?
 if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER + G_Mobile_Respawn_CIV) > 0) then {
 	[] execVM "G_Revive\G_Mobile_Respawn.sqf";
 };
 
-if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) and (G_isClient)) then {
+//If Squad Leader spawn or markers are enabled, execute associated script for player
+if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
 	[] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
 };
 
+//If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
+//bug - does this need to be more specifically localized?
 if (G_Unit_Tag) then {
 	if (G_isJIP) then {
 		waitUntil {alive player};
@@ -96,9 +105,13 @@ if (G_Unit_Tag) then {
 	};
 };
 
+//Define EH to handle revive/respawn system
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
+//Execute G_fnc_EH on one or both or friendly and enemy AI
+//bug - does this need to be more specifically localized?
 if (G_Enemy_AI_Unconscious) then {
+	//Can revive enemy AI, so execute on all AI
 	{
 		if (_x isKindOf "CAManBase") then {
 			[_x] spawn G_fnc_EH;
@@ -108,12 +121,15 @@ if (G_Enemy_AI_Unconscious) then {
 else
 {
 	{
+	//Cannot revive enemy AI, so execute on only friendly AI
+	//bug - better way to do this, without needing to define friendly side?
 		if ((_x isKindOf "CAManBase") and (side _x == G_Friendly_Side)) then {
 			[_x] spawn G_fnc_EH;
 		};
 	} forEach allUnits;
 };
 
+//Handle loading game as JIP into an unconscious unit
 if (G_isJIP) then {
 	if (player getVariable "G_Unconscious") then {
 		_revive_factors = player getVariable "G_Revive_Factors";
@@ -121,8 +137,10 @@ if (G_isJIP) then {
 	};
 };
 
+//If revive system is enabled, create handler for key strokes
 if (G_Revive_System) then {
 	G_fnc_ReviveKeyDownAbort = {
+		//bug - what are each of these, and is this all necessary?
 		switch (_this select 0) do {
 			case 17: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
 			case 30: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
@@ -136,6 +154,7 @@ if (G_Revive_System) then {
 	};
 };
 
+//If player's respawn button is disabled by script, execute loop that prevents use of it
 if (!(G_Respawn_Button) and (G_isClient)) then {
 	[] spawn {
 		while {true} do {
@@ -147,18 +166,23 @@ if (!(G_Respawn_Button) and (G_isClient)) then {
 };
 
 
+//Define function for switchMove
+//bug - is this necessary? If so, make it smaller
 G_fnc_switchMove = {
 	_unit = _this select 0;
 	_animation = _this select 1;
 	_unit switchMove _animation;
 };
 
+//Define function for playMoveNow
+//bug - is this necessary? If so, make it smaller
 G_fnc_playMoveNow = {
 	_unit = _this select 0;
 	_animation = _this select 1;
 	_unit playMoveNow _animation;
 };
 
+//Define function that handles Load/Unload of player
 G_fnc_moveInCargoToUnloadAction = {
 	waitUntil {!isNull player};
 	_unit = _this select 0;
@@ -182,18 +206,23 @@ G_fnc_moveInCargoToUnloadAction = {
 	};
 };
 
+//Define function for setDir
+//bug - is this necessary? If so, make it smaller
 G_fnc_setDir = {
 	_unit = _this select 0;
 	_dir = _this select 1;
 	_unit setDir _dir; 
 };
 
+//Define function for enableSimulation
+//bug - is this necessary? If so, make it smaller
 G_fnc_enableSimulation = {
 	_unit = _this select 0;
 	_bool = _this select 1;
 	_unit enableSimulation _bool;
 };
 
+//Define revive system text for player if revive is enabled
 if ((G_isClient) and (G_Revive_System)) then {
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
