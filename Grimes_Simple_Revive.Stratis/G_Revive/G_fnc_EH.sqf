@@ -15,7 +15,7 @@ if (G_isClient) then {
 //If is server or client's own player, define system variables and broadcast them
 if (G_isServer || _specialJIP) then {
 	if (G_Revive_System) then {
-		//Define revive factor
+		//Define revive-related variables
 		_vars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying", "G_getRevived", "G_Reviving", "G_Loaded", "G_byVehicle"];
 		{
 			if (isNil {_unit getVariable _x}) then {
