@@ -108,10 +108,10 @@ if (G_Unit_Tag) then {
 //Define EH to handle revive/respawn system
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
-//Execute G_fnc_EH on one or both or friendly and enemy AI
+//Execute G_fnc_EH on self, friendly units, and enemy units if enabled
 //bug - does this need to be more specifically localized?
 if (G_Enemy_AI_Unconscious) then {
-	//Can revive enemy AI, so execute on all AI
+	//Can revive enemy units, so execute on all units
 	{
 		if (_x isKindOf "CAManBase") then {
 			[_x] spawn G_fnc_EH;
@@ -121,7 +121,7 @@ if (G_Enemy_AI_Unconscious) then {
 else
 {
 	{
-	//Cannot revive enemy AI, so execute on only friendly AI
+	//Cannot revive enemy units, so execute on only friendly units (including self)
 	//bug - better way to do this, without needing to define friendly side?
 		if ((_x isKindOf "CAManBase") and (side _x == G_Friendly_Side)) then {
 			[_x] spawn G_fnc_EH;
