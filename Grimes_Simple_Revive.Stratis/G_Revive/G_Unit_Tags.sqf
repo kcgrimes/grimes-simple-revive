@@ -58,12 +58,13 @@ if (G_isClient) then {
 					_color = [1,0,0,_alpha];
 				} else {
 					if (_unit in units player) then {
-						_color = G_Unit_Tag_SquadColor + [_alpha];
+						_color = +G_Unit_Tag_SquadColor;
 					}
 					else
 					{
-						_color = G_Unit_Tag_Color + [_alpha];
+						_color = +G_Unit_Tag_Color;
 					};
+					_color pushBack _alpha;
 				};
 				_height = 0.0053*(_distp)+2;
 				drawIcon3D ['', _color, [(visiblePosition _unit) select 0, (visiblePosition _unit) select 1, ((visiblePosition _unit) select 2) + _height], 0, 0, 0, call compile G_Unit_Tag_Text, 0, 0.03, 'EtelkaMonospacePro'];
