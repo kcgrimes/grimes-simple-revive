@@ -1,4 +1,4 @@
-private ["_reviveTimer","_byCar","_bypass"];
+private ["_reviveTimer","_bypass"];
 	
 _unit = _this select 0;
 _source = _this select 1;
