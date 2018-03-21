@@ -186,7 +186,7 @@ waitUntil {(animationState _unit) == "DeadState"};
 sleep 1.5;
 //Disable unit movement
 //bug - what is simulation status at this point anyway?
-[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
+[_unit, false] remoteExec ["enableSimulation", 0, true];
 
 //Wait for game to catch up
 //bug - why sleep here?
@@ -250,7 +250,7 @@ else
 	//bug - this is done anyway, so add it before the if/then for optimization?
 	_unit setVariable ["G_Unconscious", false, true];
 	//Enable simulation of unit
-	[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
+	[_unit, true] remoteExec ["enableSimulation", 0, true];
 	//Cleanly move unit to prone animation
 	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 	//Forcefully move unit to prone animation

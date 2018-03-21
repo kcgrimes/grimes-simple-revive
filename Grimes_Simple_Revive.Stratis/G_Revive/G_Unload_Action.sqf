@@ -6,7 +6,7 @@ _unit = _this select 3 select 0;
 
 _unit setVariable ["G_Loaded",false,true];
 
-[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
+[_unit, true] remoteExec ["enableSimulation", 0, true];
 
 unassignVehicle _unit;
 _unit action ["EJECT", _vehicle];
@@ -16,4 +16,4 @@ sleep 1;
 
 sleep 2.75;
 
-[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
+[_unit, false] remoteExec ["enableSimulation", 0, true];

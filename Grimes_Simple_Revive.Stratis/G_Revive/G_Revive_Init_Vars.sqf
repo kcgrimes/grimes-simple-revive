@@ -189,14 +189,6 @@ G_fnc_moveInCargoToUnloadAction = {
 	};
 };
 
-//Define function for enableSimulation
-//bug - is this necessary? If so, make it smaller
-G_fnc_enableSimulation = {
-	_unit = _this select 0;
-	_bool = _this select 1;
-	_unit enableSimulation _bool;
-};
-
 //Define revive system text for player if revive is enabled
 if ((G_isClient) and (G_Revive_System)) then {
 	G_fnc_Dialog_Rescuer_Text = {

@@ -20,7 +20,7 @@ if (_unit getVariable "G_Dragged") then {
 	};
 	detach _unit;
 	sleep 3;
-	[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
+	[_unit, false] remoteExec ["enableSimulation", 0, true];
 	_unit setVariable ["G_Dragged",false,true];
 	_rescuer setVariable ["G_Dragging",false,true];
 }
@@ -41,7 +41,7 @@ else
 	};
 	_rescuer forceWalk false;
 	detach _unit;
-	[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
+	[_unit, false] remoteExec ["enableSimulation", 0, true];
 	_unit setVariable ["G_Carried",false,true];
 	_rescuer setVariable ["G_Carrying",false,true];
 };

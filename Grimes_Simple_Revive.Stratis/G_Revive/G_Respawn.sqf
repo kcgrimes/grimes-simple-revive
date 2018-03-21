@@ -18,7 +18,7 @@ _unit setVariable ["G_Reviver",objNull,true];
 _unit setVariable ["G_Loaded",false,true];
 _unit setVariable ["G_byVehicle",false,true];
 _unit setVariable ["G_Downs",0,true];
-[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
+[_unit, true] remoteExec ["enableSimulation", 0, true];
 _unit setCaptive false;
 _unit setVariable ["G_Side",side _unit,true];
 _unit enableAI "MOVE";

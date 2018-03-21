@@ -82,7 +82,7 @@ G_Revive_Time_To_Var = 0;
 waitUntil {!(G_Revive_Time_To_Var < G_Revive_Time_To) || (G_Revive_Abort)};
 if (G_Revive_Abort) exitWith {};
 
-[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
+[_unit, true] remoteExec ["enableSimulation", 0, true];
 
 (findDisplay 46) displayRemoveEventHandler ["KeyDown",G_Revive_Global_KeyDown_EH];
 

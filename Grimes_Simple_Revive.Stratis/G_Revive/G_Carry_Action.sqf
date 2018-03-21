@@ -6,7 +6,7 @@ _rescuer = _this select 1;
 _unit setVariable ["G_Carried",true,true];
 _rescuer setVariable ["G_Carrying",true,true];
 
-[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, false];
+[_unit, true] remoteExec ["enableSimulation", 0, false];
 _rescuer forceWalk true;
 
 [_unit, (getDir _rescuer) + 180] remoteExec ["setDir", 0, false];
