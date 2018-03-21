@@ -32,7 +32,7 @@ if (G_Squad_Leader_Spawn) then {
 	if ((isNil "G_Player_Squad_Leader_Var") || (isNil "_identity")) exitWith {};
 	if (G_Player_Squad_Leader_Var isEqualTo _identity) then {
 		_stance = animationState G_Player_Squad_Leader_Var;
-		[_unit, _stance] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_unit, _stance] remoteExecCall ["switchMove", 0, true];
 	};
 };
 

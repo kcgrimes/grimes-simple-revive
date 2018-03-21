@@ -10,7 +10,7 @@ if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitW
 _unit setVariable ["G_Unconscious", true, true];
 
 //Broadcast unconscious-state animation
-[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 
 //If killed units should be ejected, detect if in a vehicle
 if (G_Eject_Occupants) then {
@@ -24,10 +24,10 @@ if (G_Eject_Occupants) then {
 		//Give the game a second
 		sleep 1;
 		//Force unconscious-state animation and broadcast
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
 		//Attempt clean unconscious-state animation and broadcast
 		//bug - are both executions necessary?
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 		//Allow time for animation to get set
 		sleep 0.5;
 		//Allow more time for animation if coming from Air vehicle
@@ -152,10 +152,10 @@ if (vehicle _unit != _unit) then {
 		//Wait for game to catch up
 		sleep 1;
 		//Force unconscious-state animation
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
 		//Cleaner unconscious-state animation
 		//bug - is this necessary?
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 		//Wait for animation to get set
 		sleep 0.5;
 		//If coming from Air vehicle, give animation a little more time
@@ -252,9 +252,9 @@ else
 	//Enable simulation of unit
 	[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
 	//Cleanly move unit to prone animation
-	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 	//Forcefully move unit to prone animation
-	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["G_fnc_switchMove", 0, true];
+	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
 	//Allow unit to be engaged by AI
 	_unit setCaptive false;
 	//Allow AI unit to move

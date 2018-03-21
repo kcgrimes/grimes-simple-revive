@@ -11,8 +11,8 @@ _unit setVariable ["G_Loaded",false,true];
 unassignVehicle _unit;
 _unit action ["EJECT", _vehicle];
 sleep 1;
-[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
-[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
+[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 
 sleep 2.75;
 

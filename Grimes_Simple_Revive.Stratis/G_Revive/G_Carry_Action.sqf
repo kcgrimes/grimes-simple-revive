@@ -12,12 +12,12 @@ _rescuer forceWalk true;
 [_unit, (getDir _rescuer) + 180] remoteExec ["G_fnc_setDir", 0, false];
 _unitPos = getPos _unit;
 
-[_unit, "AidlPpneMstpSnonWnonDnon_AI"] remoteExecCall ["G_fnc_switchMove", 0, false];
-[_unit, "AinjPfalMstpSnonWnonDf_carried_dead"] remoteExecCall ["G_fnc_playMoveNow", 0, false];
+[_unit, "AidlPpneMstpSnonWnonDnon_AI"] remoteExecCall ["switchMove", 0, false];
+[_unit, "AinjPfalMstpSnonWnonDf_carried_dead"] remoteExecCall ["playMoveNow", 0, false];
 
 sleep 2;
 
-[_rescuer, "AcinPknlMstpSrasWrflDnon_AcinPercMrunSrasWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, false];
+[_rescuer, "AcinPknlMstpSrasWrflDnon_AcinPercMrunSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, false];
 
 waitUntil {animationState _unit == "AinjPfalMstpSnonWnonDf_carried_dead"};
 

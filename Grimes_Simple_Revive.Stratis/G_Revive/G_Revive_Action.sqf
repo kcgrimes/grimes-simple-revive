@@ -72,11 +72,11 @@ G_Revive_Time_To_Var = 0;
 [_rescuer] spawn {
 	_rescuer = _this select 0;
 	while {(G_Revive_Time_To_Var < G_Revive_Time_To) and (!G_Revive_Abort)} do {
-		[_rescuer, "AinvPknlMstpSnonWrflDr_medic3"] remoteExec ["G_fnc_playMoveNow", 0, false];
+		[_rescuer, "AinvPknlMstpSnonWrflDr_medic3"] remoteExec ["playMoveNow", 0, false];
 		waitUntil {sleep 0.1; (!(G_Revive_Time_To_Var < G_Revive_Time_To) || (G_Revive_Abort) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"));};
 	};
-	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["G_fnc_switchMove", 0, true];
+	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
+	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
 };
 
 waitUntil {!(G_Revive_Time_To_Var < G_Revive_Time_To) || (G_Revive_Abort)};
@@ -86,8 +86,8 @@ if (G_Revive_Abort) exitWith {};
 
 (findDisplay 46) displayRemoveEventHandler ["KeyDown",G_Revive_Global_KeyDown_EH];
 
-[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["G_fnc_switchMove", 0, true];
+[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
+[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
 
 _unit setVariable ["G_Unconscious",false,true];
 _unit setVariable ["G_getRevived",false,true];

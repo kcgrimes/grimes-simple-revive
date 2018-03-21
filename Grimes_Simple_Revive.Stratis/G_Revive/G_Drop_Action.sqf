@@ -8,15 +8,15 @@ _unit removeAction _dropActionID;
 
 if (_unit getVariable "G_Dragged") then {
 	if (_rescuer getVariable "G_Unconscious") then {
-		[_rescuer, "DeadState"] remoteExec ["G_fnc_switchMove", 0, true];
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_rescuer, "DeadState"] remoteExec ["switchMove", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
 	}
 	else
 	{
-		[_rescuer, "AcinPknlMstpSrasWrflDnon_AmovPknlMstpSrasWrflDnon"] remoteExec ["G_fnc_switchMove", 0, true];
-		[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-		[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_rescuer, "AcinPknlMstpSrasWrflDnon_AmovPknlMstpSrasWrflDnon"] remoteExec ["switchMove", 0, true];
+		[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["playMoveNow", 0, true];
+		[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["switchMove", 0, true];
 	};
 	detach _unit;
 	sleep 3;
@@ -27,16 +27,16 @@ if (_unit getVariable "G_Dragged") then {
 else
 {
 	if (_rescuer getVariable "G_Unconscious") then {
-		[_rescuer, "DeadState"] remoteExec ["G_fnc_switchMove", 0, true];
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_rescuer, "DeadState"] remoteExec ["switchMove", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
 		sleep 4;
 	}
 	else
 	{
-		[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
-		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["G_fnc_switchMove", 0, true];
+		[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
+		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["playMoveNow", 0, true];
+		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["switchMove", 0, true];
 		sleep 5;
 	};
 	_rescuer forceWalk false;

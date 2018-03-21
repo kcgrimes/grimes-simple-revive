@@ -165,23 +165,6 @@ if (!(G_Respawn_Button) and (G_isClient)) then {
 	};  
 };
 
-
-//Define function for switchMove
-//bug - is this necessary? If so, make it smaller
-G_fnc_switchMove = {
-	_unit = _this select 0;
-	_animation = _this select 1;
-	_unit switchMove _animation;
-};
-
-//Define function for playMoveNow
-//bug - is this necessary? If so, make it smaller
-G_fnc_playMoveNow = {
-	_unit = _this select 0;
-	_animation = _this select 1;
-	_unit playMoveNow _animation;
-};
-
 //Define function that handles Load/Unload of player
 G_fnc_moveInCargoToUnloadAction = {
 	waitUntil {!isNull player};
