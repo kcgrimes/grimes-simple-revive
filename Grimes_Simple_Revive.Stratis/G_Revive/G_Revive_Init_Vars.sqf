@@ -194,27 +194,37 @@ if ((G_isClient) and (G_Revive_System)) then {
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
 			private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
+			//Continue cycling while player is unconscious
 			while {player getVariable "G_Unconscious"} do {
+				//Get array of all "men" within 500m, including player
 				_array = nearestObjects [player, ["CAManBase"], 500];
 				_arrayDistance = [];
 				{
-					if ((_x != player) and ((player getVariable "G_Side") == (_x getVariable "G_Side")) and (((typeOf _x) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and (alive _x) and !(_x getVariable "G_Unconscious")) then {
-						_arrayDistance = _arrayDistance + [[_x, ceil(_x distance player)]];
+					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not unconscious
+					if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
+						//Add to array with distance from player
+						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
 					};
 				} forEach _array;
 				
+				//Define empty variables for unit names
 				_unit0 = "";
 				_unit1 = "";
 				_unit2 = "";
 				_unit3 = "";
 				_unit4 = "";
 				
+				//Define unit variables with unit name and distanace if available
 				for "_i" from 0 to (((count _arrayDistance) - 1) min 4) do {
-					call compile format["_unit%1 = format[""%2  (%3m)"",name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];",_i,"%1","%2"];
+					call compile format["_unit%1 = format[""%2  (%3m)"", name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];", _i, "%1", "%2"];
 				};
-
-				_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5",_unit0,_unit1,_unit2,_unit3,_unit4];
+				
+				//Format nearest rescuers
+				_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
+				//Output nearest rescuers
+				//bug - where does this displayCtrl # come from?
 				((_this select 0) displayCtrl 1001) ctrlSetText _text;
+				//Update list every 5 seconds
 				sleep 5;
 			};
 		};
