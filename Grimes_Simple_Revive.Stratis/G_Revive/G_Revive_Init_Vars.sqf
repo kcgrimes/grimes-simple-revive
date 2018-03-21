@@ -191,7 +191,7 @@ G_fnc_moveInCargoToUnloadAction = {
 
 //Define function for setDir
 //bug - is this necessary? If so, make it smaller
-G_fnc_setDir = {
+setDir = {
 	_unit = _this select 0;
 	_dir = _this select 1;
 	_unit setDir _dir; 

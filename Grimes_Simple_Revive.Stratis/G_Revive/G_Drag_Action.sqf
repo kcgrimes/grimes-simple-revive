@@ -14,7 +14,7 @@ sleep 0.3;
 
 [_rescuer, "AcinPknlMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, false];
 
-[_unit, 180] remoteExec ["G_fnc_setDir", 0, false];
+[_unit, 180] remoteExec ["setDir", 0, false];
 
 [_unit, "AinjPpneMrunSnonWnonDb_still"] remoteExecCall ["playMoveNow", 0, false];
 [_unit, "AinjPpneMrunSnonWnonDb_still"] remoteExecCall ["switchMove", 0, false];

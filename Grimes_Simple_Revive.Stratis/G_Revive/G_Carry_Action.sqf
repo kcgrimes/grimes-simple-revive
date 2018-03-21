@@ -9,7 +9,7 @@ _rescuer setVariable ["G_Carrying",true,true];
 [_unit, true] remoteExec ["G_fnc_enableSimulation", 0, false];
 _rescuer forceWalk true;
 
-[_unit, (getDir _rescuer) + 180] remoteExec ["G_fnc_setDir", 0, false];
+[_unit, (getDir _rescuer) + 180] remoteExec ["setDir", 0, false];
 _unitPos = getPos _unit;
 
 [_unit, "AidlPpneMstpSnonWnonDnon_AI"] remoteExecCall ["switchMove", 0, false];
