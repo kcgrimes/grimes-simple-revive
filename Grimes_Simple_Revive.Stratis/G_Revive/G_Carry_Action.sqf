@@ -6,18 +6,18 @@ _rescuer = _this select 1;
 _unit setVariable ["G_Carried",true,true];
 _rescuer setVariable ["G_Carrying",true,true];
 
-[[_unit, true], "G_fnc_enableSimulation", true, false] spawn BIS_fnc_MP;
+[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, false];
 _rescuer forceWalk true;
 
-[[_unit, (getDir _rescuer) + 180], "G_fnc_setDir", true, false] spawn BIS_fnc_MP; 
+[_unit, (getDir _rescuer) + 180] remoteExec ["G_fnc_setDir", 0, false];
 _unitPos = getPos _unit;
 
-[[_unit, "AidlPpneMstpSnonWnonDnon_AI"], "G_fnc_switchMove", true, false, true] call BIS_fnc_MP;
-[[_unit, "AinjPfalMstpSnonWnonDf_carried_dead"], "G_fnc_playMoveNow", true, false, true] call BIS_fnc_MP;
+[_unit, "AidlPpneMstpSnonWnonDnon_AI"] remoteExecCall ["G_fnc_switchMove", 0, false];
+[_unit, "AinjPfalMstpSnonWnonDf_carried_dead"] remoteExecCall ["G_fnc_playMoveNow", 0, false];
 
 sleep 2;
 
-[[_rescuer, "AcinPknlMstpSrasWrflDnon_AcinPercMrunSrasWrflDnon"], "G_fnc_playMoveNow", true, false, true] call BIS_fnc_MP;
+[_rescuer, "AcinPknlMstpSrasWrflDnon_AcinPercMrunSrasWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, false];
 
 waitUntil {animationState _unit == "AinjPfalMstpSnonWnonDf_carried_dead"};
 

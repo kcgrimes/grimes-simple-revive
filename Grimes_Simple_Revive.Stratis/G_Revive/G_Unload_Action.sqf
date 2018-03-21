@@ -6,14 +6,14 @@ _unit = _this select 3 select 0;
 
 _unit setVariable ["G_Loaded",false,true];
 
-[[_unit, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
 
 unassignVehicle _unit;
 _unit action ["EJECT", _vehicle];
 sleep 1;
-[[_unit, "DeadState"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
-[[_unit, "DeadState"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
+[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
+[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
 
 sleep 2.75;
 
-[[_unit, false], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];

@@ -123,8 +123,8 @@ if (G_Revive_System) then {
 		{
 			_unit = _this select 0;
 			_old = _this select 1;
-			[[_unit], "G_fnc_Revive_Actions", true, true] spawn BIS_fnc_MP; 
-			[[_old, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+			[_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
+			[_old, true] remoteExec ["G_fnc_enableSimulation", 0, true];
 		}
 	];
 
@@ -146,7 +146,7 @@ if (G_Revive_System) then {
 				_unit setVariable ["G_Loaded",false,true];
 				_unit setVariable ["G_byVehicle",false,true];
 				_unit setVariable ["G_Downs",0,true];
-				[[_unit, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+				[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
 				_unit setCaptive false;
 				_unit setVariable ["G_Side",side _unit,true];
 				_unit enableAI "MOVE";
@@ -212,7 +212,7 @@ if (G_Unit_Tag) then {
 					_unit = _this select 0;
 					_num = _this select 1;
 					sleep 1;
-					[[_unit, _num], "G_fnc_Unit_Tag_Exec", true, true] spawn BIS_fnc_MP;
+					[_unit, _num] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
 				};
 			};
 		}

@@ -98,7 +98,7 @@ G_fnc_MRV_onKilled_EH = {
 		{
 			_MRV = _this select 0;
 			_MRV_Logic = _MRV getVariable "G_MRV_Logic";
-			[[_MRV], "G_fnc_MRV_onKilled",true,true,true] call BIS_fnc_MP;
+			[_MRV] remoteExecCall ["G_fnc_MRV_onKilled", 0, true];
 			if (_MRV_Logic getVariable "G_MRV_Deployed") then {
 				(_MRV getVariable "G_MRV_SpawnID") call BIS_fnc_removeRespawnPosition; 
 				_MRV_Logic setVariable ["G_MRV_Deployed",true,true];
@@ -153,7 +153,7 @@ G_fnc_MRV_onRespawn_EH = {
 	sleep G_Mobile_Respawn_RespTimer;
 	_MRV = (_MRV_Logic getVariable "G_MRV_Type") createVehicle (_MRV_Logic getVariable "G_MRV_Pos");
 	_MRV setVariable ["G_MRV_Logic",_MRV_Logic,true];
-	[[_MRV, _MRV_Logic], "G_fnc_MRV_onRespawn", true, true] spawn BIS_fnc_MP;
+	[_MRV, _MRV_Logic] remoteExec ["G_fnc_MRV_onRespawn", 0, true];
 };
 
 G_fnc_MRV_Marker_Process = {

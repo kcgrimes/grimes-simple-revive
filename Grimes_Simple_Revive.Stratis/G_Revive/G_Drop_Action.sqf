@@ -8,40 +8,40 @@ _unit removeAction _dropActionID;
 
 if (_unit getVariable "G_Dragged") then {
 	if (_rescuer getVariable "G_Unconscious") then {
-		[[_rescuer, "DeadState"], "G_fnc_switchMove", true, true] spawn BIS_fnc_MP;
-		[[_unit, "DeadState"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
-		[[_unit, "DeadState"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_rescuer, "DeadState"] remoteExec ["G_fnc_switchMove", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
 	}
 	else
 	{
-		[[_rescuer, "AcinPknlMstpSrasWrflDnon_AmovPknlMstpSrasWrflDnon"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
-		[[_unit, "AinjPpneMrunSnonWnonDb_release"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
-		[[_unit, "AinjPpneMrunSnonWnonDb_release"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_rescuer, "AcinPknlMstpSrasWrflDnon_AmovPknlMstpSrasWrflDnon"] remoteExec ["G_fnc_switchMove", 0, true];
+		[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["G_fnc_switchMove", 0, true];
 	};
 	detach _unit;
 	sleep 3;
-	[[_unit, false], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+	[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
 	_unit setVariable ["G_Dragged",false,true];
 	_rescuer setVariable ["G_Dragging",false,true];
 }
 else
 {
 	if (_rescuer getVariable "G_Unconscious") then {
-		[[_rescuer, "DeadState"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
-		[[_unit, "DeadState"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
-		[[_unit, "DeadState"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_rescuer, "DeadState"] remoteExec ["G_fnc_switchMove", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
 		sleep 4;
 	}
 	else
 	{
-		[[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
-		[[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
-		[[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
+		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["G_fnc_switchMove", 0, true];
 		sleep 5;
 	};
 	_rescuer forceWalk false;
 	detach _unit;
-	[[_unit, false], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+	[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
 	_unit setVariable ["G_Carried",false,true];
 	_rescuer setVariable ["G_Carrying",false,true];
 };

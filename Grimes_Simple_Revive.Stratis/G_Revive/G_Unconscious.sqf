@@ -10,7 +10,7 @@ if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitW
 _unit setVariable ["G_Unconscious", true, true];
 
 //Broadcast unconscious-state animation
-[[_unit, "DeadState"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
+[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
 
 //If killed units should be ejected, detect if in a vehicle
 if (G_Eject_Occupants) then {
@@ -24,10 +24,10 @@ if (G_Eject_Occupants) then {
 		//Give the game a second
 		sleep 1;
 		//Force unconscious-state animation and broadcast
-		[[_unit, "DeadState"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
 		//Attempt clean unconscious-state animation and broadcast
 		//bug - are both executions necessary?
-		[[_unit, "DeadState"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
 		//Allow time for animation to get set
 		sleep 0.5;
 		//Allow more time for animation if coming from Air vehicle
@@ -134,7 +134,7 @@ if (vehicle _unit != _unit) then {
 	if (alive _vehicle) then {
 		//Vehicle is alive, so unit is already "Loaded", so set accordingly
 		_unit setVariable ["G_Loaded", true, true];
-		[[_unit, _vehicle, _side], "G_fnc_moveInCargoToUnloadAction", true, true, true] call BIS_fnc_MP; 
+		[_unit, _vehicle, _side] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
 	}
 	else
 	{
@@ -152,10 +152,10 @@ if (vehicle _unit != _unit) then {
 		//Wait for game to catch up
 		sleep 1;
 		//Force unconscious-state animation
-		[[_unit, "DeadState"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_switchMove", 0, true];
 		//Cleaner unconscious-state animation
 		//bug - is this necessary?
-		[[_unit, "DeadState"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
+		[_unit, "DeadState"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
 		//Wait for animation to get set
 		sleep 0.5;
 		//If coming from Air vehicle, give animation a little more time
@@ -186,7 +186,7 @@ waitUntil {(animationState _unit) == "DeadState"};
 sleep 1.5;
 //Disable unit movement
 //bug - what is simulation status at this point anyway?
-[[_unit, false], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+[_unit, false] remoteExec ["G_fnc_enableSimulation", 0, true];
 
 //Wait for game to catch up
 //bug - why sleep here?
@@ -250,11 +250,11 @@ else
 	//bug - this is done anyway, so add it before the if/then for optimization?
 	_unit setVariable ["G_Unconscious", false, true];
 	//Enable simulation of unit
-	[[_unit, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+	[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
 	//Cleanly move unit to prone animation
-	[[_unit, "AmovPpneMstpSrasWrflDnon"], "G_fnc_playMoveNow", true, true, true] call BIS_fnc_MP;
+	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["G_fnc_playMoveNow", 0, true];
 	//Forcefully move unit to prone animation
-	[[_unit, "AmovPpneMstpSrasWrflDnon"], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["G_fnc_switchMove", 0, true];
 	//Allow unit to be engaged by AI
 	_unit setCaptive false;
 	//Allow AI unit to move

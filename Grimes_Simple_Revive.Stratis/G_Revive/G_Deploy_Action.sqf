@@ -11,7 +11,7 @@ _mobile setVariable ["G_MRV_SpawnID",_mobileRespawnID,true];
 if !(G_Mobile_Respawn_Moveable) then {
 	_hp = "Land_HelipadEmpty_F" createVehicle (getPos _mobile);
 	_hp setDir (getDir _mobile);
-	[[_hp, getDir _mobile], "G_fnc_setDir", true, false] spawn BIS_fnc_MP; 
+	[_hp, getDir _mobile] remoteExec ["G_fnc_setDir", 0, false];
 	_mobile attachTo [_hp];
 };
 

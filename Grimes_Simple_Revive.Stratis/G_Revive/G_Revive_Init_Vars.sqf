@@ -93,7 +93,7 @@ if (G_Unit_Tag) then {
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
 			waitUntil {scriptDone _handle};
-			[[player, (player getVariable "G_Unit_Tag_Number")], "G_fnc_Unit_Tag_Exec", true, true] spawn BIS_fnc_MP;
+			[player, (player getVariable "G_Unit_Tag_Number")] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
 		};
 	}
 	else

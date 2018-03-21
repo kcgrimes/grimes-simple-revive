@@ -17,5 +17,4 @@ if ((_vehicle emptyPositions "cargo") < 1) exitWith {
 };
 
 _unit setVariable ["G_Loaded",true,true];
-
-[[_unit, _vehicle, _side], "G_fnc_moveInCargoToUnloadAction", true, true, true] call BIS_fnc_MP; 
+[_unit, _vehicle, _side] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];

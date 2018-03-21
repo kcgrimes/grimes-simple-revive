@@ -18,7 +18,7 @@ _unit setVariable ["G_Reviver",objNull,true];
 _unit setVariable ["G_Loaded",false,true];
 _unit setVariable ["G_byVehicle",false,true];
 _unit setVariable ["G_Downs",0,true];
-[[_unit, true], "G_fnc_enableSimulation", true, true] spawn BIS_fnc_MP;
+[_unit, true] remoteExec ["G_fnc_enableSimulation", 0, true];
 _unit setCaptive false;
 _unit setVariable ["G_Side",side _unit,true];
 _unit enableAI "MOVE";
@@ -32,7 +32,7 @@ if (G_Squad_Leader_Spawn) then {
 	if ((isNil "G_Player_Squad_Leader_Var") || (isNil "_identity")) exitWith {};
 	if (G_Player_Squad_Leader_Var isEqualTo _identity) then {
 		_stance = animationState G_Player_Squad_Leader_Var;
-		[[_unit, _stance], "G_fnc_switchMove", true, true, true] call BIS_fnc_MP;
+		[_unit, _stance] remoteExecCall ["G_fnc_switchMove", 0, true];
 	};
 };
 
