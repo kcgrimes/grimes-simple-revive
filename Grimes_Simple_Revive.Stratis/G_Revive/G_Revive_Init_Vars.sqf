@@ -178,12 +178,11 @@ G_fnc_moveInCargoToUnloadAction = {
 	
 	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and ((_target distance _this) < 5) and ((speed _target) < 1)"];
 
-	
 	[_unit, _vehicle, _unloadActionID] spawn {
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_unloadActionID = _this select 2;
-		waitUntil {sleep 0.25; (!(_unit getVariable "G_Loaded"))};
+		waitUntil {sleep 0.25; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
 	
 		_vehicle removeAction _unloadActionID;
 	};

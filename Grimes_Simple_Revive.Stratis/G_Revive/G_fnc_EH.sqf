@@ -16,15 +16,19 @@ if (G_isClient) then {
 if (G_isServer || _specialJIP) then {
 	if (G_Revive_System) then {
 		//Define revive-related variables
-		_vars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying", "G_getRevived", "G_Reviving", "G_Loaded", "G_byVehicle"];
+		//bug - this foreach needs to be used elsewhere, so do that, and make it a function!
+		_vars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying", "G_getRevived", "G_Reviving", "G_byVehicle"];
 		{
 			if (isNil {_unit getVariable _x}) then {
 				_unit setVariable [_x, false, true];
 			};
 		} forEach _vars;
-		if (isNil {_unit getVariable "G_Reviver"}) then {
-			_unit setVariable ["G_Reviver", objNull, true];
-		};
+		_objVars = ["G_Reviver", "G_Loaded"];
+		{
+			if (isNil {_unit getVariable _x}) then {
+				_unit setVariable [_x, objNull, true];
+			};
+		} forEach _objVars;
 	};
 	//Define unit side
 	if (isNil {_unit getVariable "G_Side"}) then {
@@ -107,10 +111,10 @@ if (G_Revive_System) then {
 	G_fnc_Revive_Actions = {
 		_unit = _this select 0;
 		_side = _unit getVariable "G_Side";
-		_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>",G_Revive_Action_Color],"G_Revive\G_Revive_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and !(_target getVariable ""G_Loaded"")"];
-		_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>",G_Revive_Action_Color],"G_Revive\G_Drag_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and !(_target getVariable ""G_Loaded"")"];
-		_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>",G_Revive_Action_Color],"G_Revive\G_Carry_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Carried"") and !(_target getVariable ""G_Dragged"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and !(_target getVariable ""G_Loaded"")"];
-		_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>",G_Revive_Action_Color],"G_Revive\G_Load_Action.sqf",[_side],1.5,true,true,"", format["!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (count(nearestObjects [_target, %1, 10]) != 0) and !(_target getVariable ""G_Loaded"")",G_Revive_Load_Types]];
+		_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>",G_Revive_Action_Color],"G_Revive\G_Revive_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and (isNull (_target getVariable ""G_Loaded""))"];
+		_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>",G_Revive_Action_Color],"G_Revive\G_Drag_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (isNull (_target getVariable ""G_Loaded""))"];
+		_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>",G_Revive_Action_Color],"G_Revive\G_Carry_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Carried"") and !(_target getVariable ""G_Dragged"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (isNull (_target getVariable ""G_Loaded""))"];
+		_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>",G_Revive_Action_Color],"G_Revive\G_Load_Action.sqf",[_side],1.5,true,true,"", format["!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !(_target getVariable ""G_getRevived"") and !(_this getVariable ""G_Reviving"") and (count(nearestObjects [_target, %1, 10]) != 0) and (isNull (_target getVariable ""G_Loaded""))",G_Revive_Load_Types]];
 	};
 	
 	//Execute function to add revive actions to unit
@@ -134,6 +138,7 @@ if (G_Revive_System) then {
 		_unit addEventHandler
 		[	"Respawn",
 			{
+				//bug - foreach loop these like in init_vars
 				_unit = _this select 0;
 				_unit setVariable ["G_Unconscious",false,true];
 				_unit setVariable ["G_Dragged",false,true];
@@ -143,7 +148,7 @@ if (G_Revive_System) then {
 				_unit setVariable ["G_getRevived",false,true];
 				_unit setVariable ["G_Reviving",false,true];
 				_unit setVariable ["G_Reviver",objNull,true];
-				_unit setVariable ["G_Loaded",false,true];
+				_unit setVariable ["G_Loaded",objNull,true];
 				_unit setVariable ["G_byVehicle",false,true];
 				_unit setVariable ["G_Downs",0,true];
 				[_unit, true] remoteExec ["enableSimulation", 0, true];

@@ -7,6 +7,7 @@ if ((G_Revive_FirstSpawn) and ((_unit getVariable "G_Lives") == G_Num_Respawns) 
 
 //BIS_fnc_respawnMenuPosition running in parallel
 
+//bug - forEach loop these like in init_vars
 _unit setVariable ["G_Unconscious",false,true];
 _unit setVariable ["G_Dragged",false,true];
 _unit setVariable ["G_Carried",false,true];
@@ -15,7 +16,7 @@ _unit setVariable ["G_Carrying",false,true];
 _unit setVariable ["G_getRevived",false,true];
 _unit setVariable ["G_Reviving",false,true];
 _unit setVariable ["G_Reviver",objNull,true];
-_unit setVariable ["G_Loaded",false,true];
+_unit setVariable ["G_Loaded",objNull,true];
 _unit setVariable ["G_byVehicle",false,true];
 _unit setVariable ["G_Downs",0,true];
 [_unit, true] remoteExec ["enableSimulation", 0, true];

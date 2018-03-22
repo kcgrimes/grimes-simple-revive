@@ -1,4 +1,4 @@
-private ["_reviveTimer","_bypass"];
+private ["_reviveTimer"];
 	
 _unit = _this select 0;
 _source = _this select 1;
@@ -12,21 +12,65 @@ _unit setVariable ["G_Unconscious", true, true];
 //Broadcast unconscious-state animation
 [_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 
-//If killed units should be ejected, detect if in a vehicle
-if (G_Eject_Occupants) then {
-	//Killed units should be ejected, so detect if in a vehicle
-	if (vehicle _unit != _unit) then {
-		//Define the vehicle unit is in
+//Handle unit if inside vehicle
+_bypass = false;
+//If already Loaded, define vehicle that unit is in
+_vehicle = _unit getVariable "G_Loaded";
+if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
+	//Unit is unconscious inside a vehicle
+	//If not yet Loaded, define vehicle that unit is going unconscious in
+	if (isNull _vehicle) then {
 		_vehicle = vehicle _unit;
+	};
+	
+	//Check if vehicle is alive
+	if (alive _vehicle) then {
+		//Vehicle is alive, so unit is already "Loaded", so set accordingly
+		_unit setVariable ["G_Loaded", _vehicle, true];
+		[_unit, _vehicle, side _unit] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
+		
+		//If killed units should be ejected, handle accordingly
+		if (G_Eject_Occupants) then {
+			//Remove unit from vehicle
+			_unit setVariable ["G_Loaded", objNull, true];
+			unassignVehicle _unit;
+			_unit action ["EJECT", _vehicle];
+			//Give the game a second
+			sleep 1;
+			//Force unconscious-state animation and broadcast
+			[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
+			//Attempt clean unconscious-state animation and broadcast
+			//bug - are both executions necessary?
+			[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+			//Allow time for animation to get set
+			sleep 0.5;
+			//Allow more time for animation if coming from Air vehicle
+			//bug - why?
+			if (_vehicle isKindOf "Air") then {
+				sleep 1.5;
+			};
+		};
+	}
+	else
+	{
+		//Vehicle is destroyed
+		//If eject on explosion is disabled, exit this scope and kill
+		if (!G_Explosion_Eject_Occupants) exitWith {_bypass = true};
+		//Eject on explosion is enabled, so eject
+		//If in Air vehicle, wait for it to be nearly stopped and nearly crashed
+		if (_vehicle isKindOf "Air") then {
+			waitUntil {(((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
+		};
 		//Remove unit from vehicle
+		_unit setVariable ["G_Loaded", objNull, true];
 		unassignVehicle _unit;
 		_unit action ["EJECT", _vehicle];
-		//Give the game a second
+		//Wait for game to catch up
 		sleep 1;
-		//Force unconscious-state animation and broadcast
+		//Force unconscious-state animation
 		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
-		//Attempt clean unconscious-state animation and broadcast
-		//bug - are both executions necessary?
+		//Cleaner unconscious-state animation
+		//bug - is this necessary?
 		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 		//Allow time for animation to get set
 		sleep 0.5;
@@ -36,6 +80,32 @@ if (G_Eject_Occupants) then {
 			sleep 1.5;
 		};
 	};
+}
+else
+{
+	//Unit unconscious outside vehicle, give time for game to catch up
+	//bug - why the magic 2 seconds? 
+	sleep 2;
+};
+
+//Handle bypassing Unconscious based on downs per life
+//bug - should this be done in the HandleDamage EH before Unconscious is even executed? Probably.
+if (G_Revive_DownsPerLife > 0) then {
+	//Add 1 to current down count
+	_downCount = (_unit getVariable "G_Downs") + 1;
+	//Activate bypass if DownsPerLife is exceeded
+	if (_downCount > G_Revive_DownsPerLife) exitWith {
+		_bypass = true;
+	};
+	//Set new down count and broadcast
+	_unit setVariable ["G_Downs", _downCount, true];
+};
+
+//If bypass is activated, set not Unconscious, kill, and proceed to onKilled
+if (_bypass) exitWith {
+	_unit setVariable ["G_Loaded", objNull, true];
+	_unit setVariable ["G_Unconscious", false, true];
+	_unit setDamage 1;
 };
 
 //Killed by vehicle strike, not by a man or weapon or fall
@@ -68,26 +138,6 @@ if (isPlayer _unit) then {
 //Define revive factors
 _unit setVariable ["G_Revive_Factors", [_unit, _source, _projectile], true];
 
-//Handle bypassing Unconscious based on downs per life
-//bug - should this be done in the HandleDamage EH before Unconscious is even executed? Probably.
-_bypass = false;
-if (G_Revive_DownsPerLife > 0) then {
-	//Add 1 to current down count
-	_downCount = (_unit getVariable "G_Downs") + 1;
-	//Activate bypass if DownsPerLife is exceeded
-	if (_downCount > G_Revive_DownsPerLife) exitWith {
-		_bypass = true;
-	};
-	//Set new down count and broadcast
-	_unit setVariable ["G_Downs", _downCount, true];
-};
-
-//If bypass is activated, set not Unconscious, kill, and proceed to onKilled
-if (_bypass) exitWith {
-	_unit setVariable ["G_Unconscious", false, true];
-	_unit setDamage 1;
-};
-
 //Create unconscious dialog for player
 //bug - check locality for this, make sure only be executed on one machine
 if (isPlayer _unit) then {
@@ -98,7 +148,7 @@ if (isPlayer _unit) then {
 		G_Revive_Unc_Global_KeyDown_EH = (findDisplay -1) displayAddEventHandler ["KeyDown","if ((_this select 1) == 1) then {(findDisplay -1) displayRemoveEventHandler [""KeyDown"",G_Revive_Unc_Global_KeyDown_EH];closeDialog 0;player setVariable [""G_Unconscious"",false,true];}; false;"]; 
 	};
 };
-	
+
 if (_byVeh) then {
 	_unit setVariable ["G_byVehicle", true, true];
 	sleep 9;
@@ -115,7 +165,6 @@ if (isPlayer _unit) then {
 
 //Prevent AI movement
 _unit disableAI "MOVE";
-_side = side _unit;
 //Prevent being further engaged by enemies
 _unit setCaptive true;
 
@@ -124,63 +173,10 @@ if (G_Custom_Exec_1 != "") then {
 	[] execVM G_Custom_Exec_1;
 };
 
-//Check if unit is inside a vehicle
-//bug - can this be combined with previous in-vehicle checking?
-if (vehicle _unit != _unit) then {
-	//Unit is unconscious inside a vehicle
-	//Define vehicle that unit is in
-	_vehicle = vehicle _unit;
-	//Check if vehicle is alive
-	if (alive _vehicle) then {
-		//Vehicle is alive, so unit is already "Loaded", so set accordingly
-		_unit setVariable ["G_Loaded", true, true];
-		[_unit, _vehicle, _side] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
-	}
-	else
-	{
-		//Vehicle is destroyed
-		//If eject on explosion is disabled, exit this scope
-		if (!G_Explosion_Eject_Occupants) exitWith {_bypass = true};
-		//Eject on explosion is enabled
-		//If in Air vehicle, wait for it to be nearly stopped and nearly crashed
-		if (_vehicle isKindOf "Air") then {
-			waitUntil {(((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
-		};
-		//Remove unit from vehicle
-		unassignVehicle _unit;
-		_unit action ["EJECT", _vehicle];
-		//Wait for game to catch up
-		sleep 1;
-		//Force unconscious-state animation
-		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
-		//Cleaner unconscious-state animation
-		//bug - is this necessary?
-		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
-		//Wait for animation to get set
-		sleep 0.5;
-		//If coming from Air vehicle, give animation a little more time
-		if (_vehicle isKindOf "Air") then {
-			sleep 1.5;
-		};
-	};
-}
-else
-{
-	//Unit unconscious outside vehicle, give time for game to catch up
-	//bug - why the magic 2 seconds? 
-	sleep 2;
-};
-
-//If ejection on explosion is disabled, kill unit
-//bug - this kills them... is that intended?
-//bug - is _bypass conflicting with other use of bypass?
-if (_bypass) exitWith {
-	_unit setVariable ["G_Unconscious", false, true];
-	_unit setDamage 1;
-};
-
 //Wait for unconscious animation to be set
-waitUntil {(animationState _unit) == "DeadState"};
+//bug - are there any time issues with this commented out in order to allow unconscious in veh?
+//waitUntil {(animationState _unit) == "DeadState"};
+
 //Wait for game to catch up
 //bug - why sleep here?
 sleep 1.5;
@@ -203,6 +199,46 @@ if (_reviveTimer > -1) then {
 		if !(_unit getVariable "G_getRevived") then {
 			_reviveTimer = _reviveTimer - 1;
 		};
+		//Handle vehicle if unit is in one
+		_breakOut = false;
+		if (!isNull (_unit getVariable "G_Loaded")) then {
+			//Unit in a vehicle
+			if (!alive (_unit getVariable "G_Loaded")) then {
+				//Vehicle is destroyed
+				if (G_Explosion_Eject_Occupants) then {
+					//Eject on explosion is enabled, so eject
+					//If in Air vehicle, wait for it to be nearly stopped and nearly crashed
+					if (_vehicle isKindOf "Air") then {
+						waitUntil {(((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
+					};
+					//Remove unit from vehicle
+					_unit setVariable ["G_Loaded", objNull, true];
+					unassignVehicle _unit;
+					_unit action ["EJECT", _vehicle];
+					//Wait for game to catch up
+					sleep 1;
+					[_unit, true] remoteExecCall ["enableSimulation", 0, true];
+					//Force unconscious-state animation
+					[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
+					//Cleaner unconscious-state animation
+					//bug - is this necessary?
+					[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+					//Allow time for animation to get set
+					sleep 0.5;
+					//Allow more time for animation if coming from Air vehicle
+					//bug - why?
+					if (_vehicle isKindOf "Air") then {
+						sleep 1.5;
+					};
+					[_unit, false] remoteExecCall ["enableSimulation", 0, true];
+				}
+				else
+				{
+					_breakOut = true;
+				};
+			};
+		};
+		if (_breakOut) exitWith {};
 		//Show counter text for player
 		if (isPlayer _unit) then {
 			//Check environment only if black screen is disabled
@@ -220,23 +256,38 @@ if (_reviveTimer > -1) then {
 else
 {
 	//Revive timer is unlimited
-	//Wait for unit to be revived, respawn, or not be local to executor
+	//Cycle in unconscious state so long as unit is unconscious, is alive, and is still local to the executor
 	//bug - why the local check?
-	waitUntil {(!(_unit getVariable "G_Unconscious") || (!alive _unit) || !(local _unit))};
+	while {(_unit getVariable "G_Unconscious") && (alive _unit) && (local _unit)} do 
+	{
+		//Handle vehicle if unit is in one
+		_vehicleLoop = _unit getVariable "G_Loaded";
+		_breakOut = false;
+		if (!isNull _vehicleLoop) then {
+			//Unit in a vehicle
+			if ((!alive _vehicleLoop) && (!G_Explosion_Eject_Occupants)) then {
+				//Vehicle is destroyed, cannot eject, break out to kill the unit
+				_breakOut = true;
+			};
+		};
+		if (_breakOut) exitWith {};
+		sleep 0.25;
+	};
 };
 
 //If unit no longer local, exit scope
 //bug - why the local check?
 if (!local _unit) exitWith {};
-
 //No longer unconscious, and still local
 
 //Close the unconscious dialog
 closeDialog 0;
+
 //Determine how to proceed based on status change
-if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit)) then {
+if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded"))) then {
 	//Unit did not get revived (timer ran out or aborted), or is dead
 	//Remove from Unconscious, and kill unit
+	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
 	_unit setDamage 1;
 }

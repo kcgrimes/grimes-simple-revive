@@ -4,7 +4,7 @@ _vehicle = _this select 0;
 _unloadActionID = _this select 2;
 _unit = _this select 3 select 0;
 
-_unit setVariable ["G_Loaded",false,true];
+_unit setVariable ["G_Loaded", objNull, true];
 
 [_unit, true] remoteExec ["enableSimulation", 0, true];
 

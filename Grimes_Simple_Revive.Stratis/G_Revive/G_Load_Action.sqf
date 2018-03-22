@@ -16,5 +16,5 @@ if ((_vehicle emptyPositions "cargo") < 1) exitWith {
 	titleText [format["You cannot load %1 into %2 because there is no more space!",name _unit,typeOf _vehicle],"PLAIN", 1]; sleep 1; titleFadeOut 4;
 };
 
-_unit setVariable ["G_Loaded",true,true];
+_unit setVariable ["G_Loaded", _vehicle, true];
 [_unit, _vehicle, _side] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
