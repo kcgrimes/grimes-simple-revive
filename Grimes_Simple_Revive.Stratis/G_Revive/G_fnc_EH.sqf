@@ -155,6 +155,7 @@ if (G_Revive_System) then {
 				_unit setCaptive false;
 				_unit setVariable ["G_Side",side _unit,true];
 				_unit enableAI "MOVE";
+				_unit enableAI "FSM";
 				_unit allowDamage true;
 			}
 		];

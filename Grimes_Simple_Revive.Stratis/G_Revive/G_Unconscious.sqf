@@ -165,6 +165,8 @@ if (isPlayer _unit) then {
 
 //Prevent AI movement
 _unit disableAI "MOVE";
+//Prevent scripted AI responses (such as exiting immobile vehicle)
+_unit disableAI "FSM";
 //Prevent being further engaged by enemies
 _unit setCaptive true;
 
@@ -310,6 +312,8 @@ else
 	_unit setCaptive false;
 	//Allow AI unit to move
 	_unit enableAI "MOVE";
+	//Allow scripted AI responses
+	_unit enableAI "FSM";
 	//Allow unit to take damage
 	_unit allowDamage true;
 	_rescuer = _unit getVariable "G_Reviver";
