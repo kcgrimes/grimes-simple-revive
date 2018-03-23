@@ -1,9 +1,15 @@
 //Mobile respawn
 
+//Define function for MRV init
+//bug - locality?
 _initVars = {
 	private ["_deployActionID", "_undeployActionID"];
 	_side = _this select 0;
 	_MRV = _this select 1;
+	//Only execute locally, since all broadcasted
+	//Create a game logic for MRV identity to persist on
+	//Define MRV-specific variables on game logic
+	//bug - local check earlier? depends on if other things can be broadcasted
 	if (local _MRV) then {
 		_hp = "Land_HelipadEmpty_F" createVehicle [0,0,0];
 		_hp setVariable ["G_MRV_Dir",getDir _MRV,true];
@@ -14,8 +20,13 @@ _initVars = {
 		_hp setVariable ["G_MRV_Deployed",false,true];
 		_MRV setVariable ["G_MRV_Logic",_hp,true];
 	};
+	//System variables only being defined on server, so all other clients need to wait for definitions
 	waitUntil {(!isNil {_MRV getVariable "G_MRV_Logic"})};
+	//Define logic from MRV (on all machines now)
+	//bug - all this vs remoteExec?
 	_MRV_Logic = _MRV getVariable "G_MRV_Logic";
+	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
+	//bug - make this a function
 	if (G_Mobile_Respawn_Moveable) then {
 		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
 		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
@@ -25,107 +36,123 @@ _initVars = {
 		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
 		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
 	};
+	//Broadcast the action variables for remote manipulation
+	//bug - WOAH. Locality check. This is being broadcasted by everyone. Doesn't make sense. This needs to change.
 	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
 	_MRV setVariable ["G_MRV_Undeploy_ID",_undeployActionID,true];
 };
 
-if !(count G_Mobile_Respawn_WEST == 0) then {
+//Define array of MRVs and associated side
+_MRV_Array = [[G_Mobile_Respawn_WEST, WEST], [G_Mobile_Respawn_EAST, EAST], [G_Mobile_Respawn_GUER, RESISTANCE], [G_Mobile_Respawn_CIV, CIVILIAN]];
+
+//Execute init function for each MRV based on its side
+{
+	//_x = [[MRV], Side]
+	_side = _x select 1;
 	{
-		_side = WEST;
+		//_x = MRV
 		[_side, _x] call _initVars;
-	} forEach G_Mobile_Respawn_WEST;
-};
+	} forEach (_x select 0);
+} forEach _MRV_Array;
 
-if !(count G_Mobile_Respawn_EAST == 0) then {
-	{
-		_side = EAST;
-		[_side, _x] call _initVars;
-	} forEach G_Mobile_Respawn_EAST;
-};
-
-if !(count G_Mobile_Respawn_GUER == 0) then {
-	{
-		_side = RESISTANCE;
-		[_side, _x] call _initVars;
-	} forEach G_Mobile_Respawn_GUER;
-};
-
-if !(count G_Mobile_Respawn_CIV == 0) then {
-	{
-		_side = CIVILIAN;
-		[_side, _x] call _initVars;
-	} forEach G_Mobile_Respawn_CIV;
-};
-
-_MRV_Array = G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER + G_Mobile_Respawn_CIV;
-
+//Define function to handle vehicle locked to enemy
 G_fnc_MRV_Lock = {
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
+	//On unit getting in, kick them back out if they are not friendly
 	_MRV addEventHandler ["GetIn", {
 		_MRV = _this select 0;
 		_unit = _this select 2;
+		//Obtain MRV logic from MRV
 		_MRV_Logic = _MRV getVariable "G_MRV_Logic";
+		//If the MRV and unit side are different, prevent entry
+		//bug - way to make inde friendly, if appropriate? If so, that may be used elsewhere too
 		if ((_MRV_Logic getVariable "G_Side") != (_unit getVariable "G_Side")) then {
+			//Prevent engine from turning on
 			_fuel = fuel _MRV;
 			_MRV setFuel 0;
+			//Remove unit from vehicle
 			_unit action ["eject", _MRV];
+			//Announce kick out and wait for unit to be out of vehicle before adding fuel back
+			//bug - does this need to be spawn'd?
 			[_unit,_MRV,_fuel] spawn {
 				_unit = _this select 0;
 				_MRV = _this select 1;
 				_fuel = _this select 2;
-				titleText [format["You are not on the right team to enter %1!",typeOf _MRV],"PLAIN",1]; 
+				//Announce kick out using MRV's display name
+				titleText [format["You are not on the right team to enter %1!", getText (configFile >> "CfgVehicles" >> typeOf _MRV >> "displayName")],"PLAIN",1]; 
 				titleFadeOut 4;
+				//Wait for unit to be out of the vehicle
 				waitUntil {sleep 1; vehicle _unit == _unit};
+				//Add fuel back to MRV
 				_MRV setFuel _fuel;
 			};
 		};
 	}];
 };
 
+//Define function for handling MRV actions onKilled
+//bug - does this have to be outside of the actual EH?
+	//until locality is corrected, probably yes
 G_fnc_MRV_onKilled = {
 	_MRV = _this select 0;
-	_deployActionID = _MRV getVariable "G_MRV_Action_ID";
-	_undeployActionID = _MRV getVariable "G_MRV_Undeploy_ID";
-	_MRV removeAction _deployActionID;
-	_MRV removeAction _undeployActionID;
+	//Remove Deploy and Undeploy actions from MRV
+	_MRV removeAction (_MRV getVariable "G_MRV_Action_ID");
+	_MRV removeAction (_MRV getVariable "G_MRV_Undeploy_ID");
 };
 
+//Define function for handling MRV onKilled
 G_fnc_MRV_onKilled_EH = {
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
+	//Define onKilled EH for MRV to manage respawn position, actions, and its own respawn
 	_MRV_killed_EH = _MRV addEventHandler ["Killed",
 		{
 			_MRV = _this select 0;
+			//Get MRV Logic from MRV
 			_MRV_Logic = _MRV getVariable "G_MRV_Logic";
+			//Remove Deploy and Undeploy actions on all machines
 			[_MRV] remoteExecCall ["G_fnc_MRV_onKilled", 0, true];
+			//If MRV is deployed, Undeploy it
+			//bug - Once that process is made a function, use it here for consistency
 			if (_MRV_Logic getVariable "G_MRV_Deployed") then {
 				(_MRV getVariable "G_MRV_SpawnID") call BIS_fnc_removeRespawnPosition; 
-				_MRV_Logic setVariable ["G_MRV_Deployed",true,true];
+				_MRV_Logic setVariable ["G_MRV_Deployed",false,true];
 			};
+			//Manage MRV wreck in parallel
 			[_MRV] spawn {
 				_oldMRV = _this select 0;
+				//Wait for set wreck deletion time
 				sleep G_Mobile_Respawn_Wreck;
+				//Delete old MRV wreck
 				deleteVehicle _oldMRV;
 			};
+			//Handle MRV respawn
 			[_MRV_Logic] spawn G_fnc_MRV_onRespawn_EH;
 		}
 	];
 };
 
+//Define function for handling MRV onRespawn
+//bug - a lot of this is done on init, so consider making a function
 G_fnc_MRV_onRespawn = {
 	private ["_deployActionID", "_undeployActionID"];
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	
+	//Set new MRV name
 	_MRV setVehicleVarName (_MRV_Logic getVariable "G_MRV_Name");
+	//Broadcast the new MRV name and non-Deployed status from local machine
 	if (local _MRV) then {
 		_MRV call compile format ["%1 = _this; publicVariable ""%1""", _MRV_Logic getVariable "G_MRV_Name"];
 		_MRV_Logic setVariable ["G_MRV_Deployed",false,true];
 	};
+	//
 	_mrvDir = _MRV_Logic getVariable "G_MRV_Dir";
 	_MRV setDir _mrvDir;
 	_side = _MRV_Logic getVariable "G_Side";
+	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
+	//bug - make this a function
 	if (G_Mobile_Respawn_Moveable) then {
 		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
 		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
@@ -135,115 +162,186 @@ G_fnc_MRV_onRespawn = {
 		_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Deploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and !((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];
 		_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>",G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic],1.5,true,true,"", "((_target distance _this) < 5) and (_target != _this) and !(_this getVariable ""G_Dragged"") and !(_this getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and ((_target getVariable ""G_MRV_Logic"") getVariable ""G_MRV_Deployed"") and ((speed _target) < 1) and ((speed _target) > -1) and ((_this getVariable ""G_Side"") == ((_target getVariable ""G_MRV_Logic"") getVariable ""G_Side""))"];	
 	};
+	//Broadcast Deploy and Undeploy action variables
+	//bug - holy locality. See previous mention of this in init.
 	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
 	_MRV setVariable ["G_MRV_Undeploy_ID",_undeployActionID,true];
+	//Manage MRV spawn marker init
 	[_MRV, _MRV_Logic] spawn G_fnc_MRV_Marker_Creation;
+	//Add MRV onkilled EH
 	[_MRV, _MRV_Logic] spawn G_fnc_MRV_onKilled_EH;
+	//Manage MRV locking if enabled
 	if (G_Mobile_Respawn_Locked) then {
 		[_MRV, _MRV_Logic] spawn G_fnc_MRV_Lock;
 	};
+	//Custom execution
 	if (G_Custom_Exec_4 != "") then {
 		[_MRV] execVM G_Custom_Exec_4;
 	};
 };
 
+//Define function for handling MRV respawn
 G_fnc_MRV_onRespawn_EH = {
 	_MRV_Logic = _this select 0;
 
+	//Wait for respawn timer
 	sleep G_Mobile_Respawn_RespTimer;
+	//Create MRV at initial spawn position
 	_MRV = (_MRV_Logic getVariable "G_MRV_Type") createVehicle (_MRV_Logic getVariable "G_MRV_Pos");
+	//Reassign MRV Logic to new MRV
 	_MRV setVariable ["G_MRV_Logic",_MRV_Logic,true];
+	//Publically handle MRV onRespawn
 	[_MRV, _MRV_Logic] remoteExec ["G_fnc_MRV_onRespawn", 0, true];
 };
 
+//Define function for handling MRV markers
 G_fnc_MRV_Marker_Process = {
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	_MRV_mkr = _this select 2;
+	//Check if MRV marker is displayed only when Deployed or not
 	if !(G_Mobile_Respawn_Mkr_Display) then {
+		//MRV marker only displayed when Deployed
+		//Manage appropriately for PvP
 		if (G_PvP) then {
+			//Is PvP, so is local marker
+			//Handle marker while MRV is alive
 			while {alive _MRV} do {
+				//Wait for MRV to be deployed or destroyed
 				waitUntil {((_MRV_Logic getVariable "G_MRV_Deployed") || (!alive _MRV))};
+				//Display marker
 				_MRV_mkr setMarkerTypeLocal G_Mobile_Respawn_Mkr_Type;
-				while {((_MRV_Logic getVariable "G_MRV_Deployed") and (alive _MRV))} do {
+				//Handle marker while MRV is deployed
+				while {((_MRV_Logic getVariable "G_MRV_Deployed") && (alive _MRV))} do {
+					//Reposition marker onto MRV
 					_MRV_mkr setMarkerPosLocal (getPos _MRV);
+					//Wait for refresh time
 					sleep G_Mobile_Respawn_Mkr_Refresh;
 				};
+				//Hide marker
 				_MRV_mkr setMarkerTypeLocal "empty";
 			};
+			//Delete local marker
 			deleteMarkerLocal _MRV_mkr;
 		}
 		else
 		{
+			//Is not PvP, so is public marker
+			//Only handle public marker on server
 			if (G_isServer) then {
+				//Handle marker while MRV is alive
 				while {alive _MRV} do {
+					//Wait for MRV to be deployed or destroyed
 					waitUntil {((_MRV_Logic getVariable "G_MRV_Deployed") || (!alive _MRV))};
+					//Display marker
 					_MRV_mkr setMarkerType G_Mobile_Respawn_Mkr_Type;
-					while {((_MRV_Logic getVariable "G_MRV_Deployed") and (alive _MRV))} do {
+					//Handle marker while MRV is deployed
+					while {((_MRV_Logic getVariable "G_MRV_Deployed") && (alive _MRV))} do {
+						//Reposition marker onto MRV
 						_MRV_mkr setMarkerPos (getPos _MRV);
+						//Wait for refresh time
 						sleep G_Mobile_Respawn_Mkr_Refresh;
 					};
+					//Hide marker
 					_MRV_mkr setMarkerType "empty";
 				};
+				//Delete public marker
 				deleteMarker _MRV_mkr;
 			};
 		};
 	}
 	else
 	{
+		//MRV marker always displayed
+		//Manage appropriately for PvP
 		if (G_PvP) then {
+			//Is PvP, so is local marker
+			//Display marker
 			_MRV_mkr setMarkerTypeLocal G_Mobile_Respawn_Mkr_Type;
+			//Handle marker while MRV is alive
 			while {alive _MRV} do {
+				//Reposition marker onto MRV
 				_MRV_mkr setMarkerPosLocal (getPos _MRV);
+				//Wait for refresh time
 				sleep G_Mobile_Respawn_Mkr_Refresh;
 			};
+			//Hide marker
 			_MRV_mkr setMarkerTypeLocal "empty";
+			//Delete local marker
 			deleteMarkerLocal _MRV_mkr;
 		}
 		else
 		{
+			//Is not PvP, so is public marker
+			//Only handle public marker on server
 			if (G_isServer) then {
+				//Display marker
 				_MRV_mkr setMarkerType G_Mobile_Respawn_Mkr_Type;
+				//Handle marker while MRV is alive
 				while {alive _MRV} do {
+					//Reposition marker onto MRV
 					_MRV_mkr setMarkerPos (getPos _MRV);
+					//Wait for refresh time
 					sleep G_Mobile_Respawn_Mkr_Refresh;
 				};
+				//Hide marker
 				_MRV_mkr setMarkerType "empty";
+				//Delete local marker
 				deleteMarker _MRV_mkr;
 			};
 		};
 	};	
 };
 
+//Define function for creating MRV markers
 G_fnc_MRV_Marker_Creation = {
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
-	if (G_PvP and G_isClient) then {
+	//Create local marker for each client if in PvP
+	//bug - maybe just always do this, and optimize? Or detect PvP instead of setting it?
+	if (G_PvP && G_isClient) then {
+		//Check if MRV is on player's side
 		if ((player getVariable "G_Side") == (_MRV_Logic getVariable "G_Side")) then {
+			//MRV and player on same side, so create local marker
 			_MRV_mkr = createMarkerLocal [format["G_MRV_mkr_%1",_MRV], getPos _MRV];
 			_MRV_mkr setMarkerColorLocal G_Mobile_Respawn_Mkr_Color;
 			_MRV_mkr setMarkerTextLocal G_Mobile_Respawn_Mkr_Text;
+			//If respawn marker is enabled, handle it
+			//bug - why did we create the marker before checking if this is enabled?
 			if (G_Mobile_Respawn_Marker) then {
 				[_MRV, _MRV_Logic, _MRV_mkr] spawn G_fnc_MRV_Marker_Process;
 			};
 		};
 	};
 
-	if (!G_PvP and G_isServer) then {
+	//Create public marker on server if not PvP
+	if (!G_PvP && G_isServer) then {
+		//Local to server and not in PvP, so create public marker
 		_MRV_mkr = createMarker [format["G_MRV_mkr_%1",_MRV], getPos _MRV];
 		_MRV_mkr setMarkerColor G_Mobile_Respawn_Mkr_Color;
 		_MRV_mkr setMarkerText G_Mobile_Respawn_Mkr_Text;
+		//If respawn marker is enabled, handle it
+		//bug - why did we create the marker before checking if this is enabled?
 		if (G_Mobile_Respawn_Marker) then {
 			[_MRV, _MRV_Logic, _MRV_mkr] spawn G_fnc_MRV_Marker_Process;
 		};
 	};
 };
 
+//Execute MRV init
 {
-	_MRV_Logic = _x getVariable "G_MRV_Logic";
-	[_x, _MRV_Logic] spawn G_fnc_MRV_Marker_Creation;
-	[_x, _MRV_Logic] spawn G_fnc_MRV_onKilled_EH;
-	if (G_Mobile_Respawn_Locked) then {
-		[_x, _MRV_Logic] spawn G_fnc_MRV_Lock;
-	};
+	//_x = [[MRV], Side]
+	{
+		//_x = MRV
+		_MRV_Logic = _x getVariable "G_MRV_Logic";
+		//Manage MRV spawn marker init
+		[_x, _MRV_Logic] spawn G_fnc_MRV_Marker_Creation;
+		//Add MRV onkilled EH
+		[_x, _MRV_Logic] spawn G_fnc_MRV_onKilled_EH;
+		//Manage MRV locking if enabled
+		if (G_Mobile_Respawn_Locked) then {
+			[_x, _MRV_Logic] spawn G_fnc_MRV_Lock;
+		};
+		//bug - onRespawn custom execution here, or no? Since this is init, could all just go in editor init
+	} forEach (_x select 0);
 } forEach _MRV_Array; 
