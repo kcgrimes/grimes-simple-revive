@@ -6,14 +6,5 @@ _unit = _this select 3 select 0;
 
 _unit setVariable ["G_Loaded", objNull, true];
 
-[_unit, true] remoteExec ["enableSimulation", 0, true];
-
 unassignVehicle _unit;
-_unit action ["EJECT", _vehicle];
-sleep 1;
-[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
-[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
-
-sleep 2.75;
-
-[_unit, false] remoteExec ["enableSimulation", 0, true];
+_unit setPos (_unit modelToWorldVisual [-2,0,0]);

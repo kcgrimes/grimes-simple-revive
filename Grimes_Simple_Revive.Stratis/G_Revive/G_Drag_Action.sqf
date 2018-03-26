@@ -6,8 +6,6 @@ _rescuer = _this select 1;
 _unit setVariable ["G_Dragged",true,true];
 _rescuer setVariable ["G_Dragging",true,true];
 
-[_unit, true] remoteExec ["enableSimulation", 0, false];
-
 waitUntil {simulationEnabled _unit};
 
 sleep 0.3;

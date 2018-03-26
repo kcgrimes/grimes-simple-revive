@@ -10,7 +10,14 @@ if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitW
 _unit setVariable ["G_Unconscious", true, true];
 
 //Broadcast unconscious-state animation
-[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+_unit setUnconscious true;
+
+//Disable collision of the incapacitated unit with all other units
+	//Without this, incapacitated can be kicked around
+	//bug - is the locality here ok, or does there need to be a broadcast?
+{
+	_unit disableCollisionWith _x;
+} forEach allUnits;
 
 //Handle unit if inside vehicle
 _bypass = false;
@@ -34,16 +41,9 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 			//Remove unit from vehicle
 			_unit setVariable ["G_Loaded", objNull, true];
 			unassignVehicle _unit;
-			_unit action ["EJECT", _vehicle];
-			//Give the game a second
-			sleep 1;
-			//Force unconscious-state animation and broadcast
-			[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
-			//Attempt clean unconscious-state animation and broadcast
-			//bug - are both executions necessary?
-			[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+			_unit setPos (_unit modelToWorldVisual [-2,0,0]);
 			//Allow time for animation to get set
-			sleep 0.5;
+			sleep 1.5;
 			//Allow more time for animation if coming from Air vehicle
 			//bug - why?
 			if (_vehicle isKindOf "Air") then {
@@ -64,16 +64,9 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 		//Remove unit from vehicle
 		_unit setVariable ["G_Loaded", objNull, true];
 		unassignVehicle _unit;
-		_unit action ["EJECT", _vehicle];
+		_unit setPos (_unit modelToWorldVisual [-2,0,0]);
 		//Wait for game to catch up
-		sleep 1;
-		//Force unconscious-state animation
-		[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
-		//Cleaner unconscious-state animation
-		//bug - is this necessary?
-		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
-		//Allow time for animation to get set
-		sleep 0.5;
+		sleep 1.5;
 		//Allow more time for animation if coming from Air vehicle
 		//bug - why?
 		if (_vehicle isKindOf "Air") then {
@@ -105,6 +98,11 @@ if (G_Revive_DownsPerLife > 0) then {
 if (_bypass) exitWith {
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
+	//Enable collision of the incapacitated unit with all other units
+		//bug - is the locality here ok, or does there need to be a broadcast?
+	{
+		_unit enableCollisionWith _x;
+	} forEach allUnits;
 	_unit setDamage 1;
 };
 
@@ -175,20 +173,10 @@ if (G_Custom_Exec_1 != "") then {
 	[] execVM G_Custom_Exec_1;
 };
 
-//Wait for unconscious animation to be set
-//bug - are there any time issues with this commented out in order to allow unconscious in veh?
-//waitUntil {(animationState _unit) == "DeadState"};
-
 //Wait for game to catch up
 //bug - why sleep here?
-sleep 1.5;
-//Disable unit movement
-//bug - what is simulation status at this point anyway?
-[_unit, false] remoteExec ["enableSimulation", 0, true];
+sleep 2.5;
 
-//Wait for game to catch up
-//bug - why sleep here?
-sleep 1;
 _reviveTimer = G_Revive_Time_Limit;
 //Check if revive timer is unlimited
 if (_reviveTimer > -1) then {
@@ -216,23 +204,14 @@ if (_reviveTimer > -1) then {
 					//Remove unit from vehicle
 					_unit setVariable ["G_Loaded", objNull, true];
 					unassignVehicle _unit;
-					_unit action ["EJECT", _vehicle];
+					_unit setPos (_unit modelToWorldVisual [-2,0,0]);
 					//Wait for game to catch up
-					sleep 1;
-					[_unit, true] remoteExecCall ["enableSimulation", 0, true];
-					//Force unconscious-state animation
-					[_unit, "DeadState"] remoteExecCall ["switchMove", 0, true];
-					//Cleaner unconscious-state animation
-					//bug - is this necessary?
-					[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
-					//Allow time for animation to get set
-					sleep 0.5;
+					sleep 1.5;
 					//Allow more time for animation if coming from Air vehicle
 					//bug - why?
 					if (_vehicle isKindOf "Air") then {
 						sleep 1.5;
 					};
-					[_unit, false] remoteExecCall ["enableSimulation", 0, true];
 				}
 				else
 				{
@@ -302,12 +281,13 @@ else
 	//Remove from Unconscious
 	//bug - this is done anyway, so add it before the if/then for optimization?
 	_unit setVariable ["G_Unconscious", false, true];
-	//Enable simulation of unit
-	[_unit, true] remoteExec ["enableSimulation", 0, true];
+	_unit setUnconscious false;
+	/*
 	//Cleanly move unit to prone animation
 	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 	//Forcefully move unit to prone animation
 	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
+	*/
 	//Allow unit to be engaged by AI
 	_unit setCaptive false;
 	//Allow AI unit to move
@@ -318,6 +298,11 @@ else
 	_unit allowDamage true;
 	_rescuer = _unit getVariable "G_Reviver";
 	_downs = _unit getVariable "G_Downs";
+	//Enables collision of the incapacitated unit with all other units
+		//bug - is the locality here ok, or does there need to be a broadcast?
+	{
+		_unit enableCollisionWith _x;
+	} forEach allUnits;
 	//Display downs remaining for players
 	//bug - do AI units properly count downs?
 	if (isPlayer _unit) then {

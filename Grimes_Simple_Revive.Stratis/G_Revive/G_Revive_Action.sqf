@@ -100,8 +100,6 @@ waitUntil {!(G_Revive_Time_To_Var < G_Revive_Time_To) || (G_Revive_Abort)};
 //Exit if revive was aborted
 if (G_Revive_Abort) exitWith {};
 
-[_unit, true] remoteExec ["enableSimulation", 0, true];
-
 (findDisplay 46) displayRemoveEventHandler ["KeyDown",G_Revive_Global_KeyDown_EH];
 
 //Set unit animation to prone

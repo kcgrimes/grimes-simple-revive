@@ -174,6 +174,7 @@ G_fnc_moveInCargoToUnloadAction = {
 	
 	_unit assignAsCargo _vehicle;
 	_unit moveInCargo _vehicle;
+	[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
 	_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
 	
 	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and ((_target distance _this) < 5) and ((speed _target) < 1)"];

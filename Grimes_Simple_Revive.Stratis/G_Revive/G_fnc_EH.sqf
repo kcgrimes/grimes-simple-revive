@@ -120,7 +120,7 @@ if (G_Revive_System) then {
 	//Execute function to add revive actions to unit
 	[_unit] call G_fnc_Revive_Actions;
 	
-	//Add Respawn EH to unit to add revive actions and re-enableSimulation, both publically
+	//Add Respawn EH to unit to add revive actions publically
 	//bug - some things are done onRespawn, like variable resetting; should they just be done here?
 	_unit addEventHandler 
 	[	"Respawn",
@@ -128,7 +128,6 @@ if (G_Revive_System) then {
 			_unit = _this select 0;
 			_old = _this select 1;
 			[_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
-			[_old, true] remoteExec ["enableSimulation", 0, true];
 		}
 	];
 
@@ -151,7 +150,6 @@ if (G_Revive_System) then {
 				_unit setVariable ["G_Loaded",objNull,true];
 				_unit setVariable ["G_byVehicle",false,true];
 				_unit setVariable ["G_Downs",0,true];
-				[_unit, true] remoteExec ["enableSimulation", 0, true];
 				_unit setCaptive false;
 				_unit setVariable ["G_Side",side _unit,true];
 				_unit enableAI "MOVE";
