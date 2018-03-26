@@ -4,7 +4,7 @@ _unit = _this select 0;
 _rescuer = _this select 1;
 _side = _this select 3 select 0;
 
-_vehicle = (nearestObjects [_unit, ["Car","Tank","Helicopter","Truck"], 10]) select 0;
+_vehicle = (nearestObjects [_unit, G_Revive_Load_Types, 10]) select 0;
 
 if (G_Mobile_Respawn_Locked) then {
 	if ((!isNil {(_vehicle getVariable "G_MRV_Logic") getVariable "G_Side"}) and ((_unit getVariable "G_Side") != ((_vehicle getVariable "G_MRV_Logic") getVariable "G_Side"))) exitWith {
