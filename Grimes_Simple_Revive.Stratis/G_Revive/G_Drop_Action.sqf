@@ -4,46 +4,68 @@ _unit = _this select 0;
 _rescuer = _this select 1;
 _dropActionID = _this select 2;
 
+//Remove Drop action
 _unit removeAction _dropActionID;
 
+//Handle drop from Drag or Drop
 if (_unit getVariable "G_Dragged") then {
+	//From Drag
 	if (_rescuer getVariable "G_Unconscious") then {
+		//Rescuer was incapacitated, so set both as incapacitated
 		[_rescuer, "UnconsciousFaceDown"] remoteExec ["switchMove", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
 	}
 	else
 	{
+		//Rescuer animation to lower down to ground
 		[_rescuer, "AcinPknlMstpSrasWrflDnon_AmovPknlMstpSrasWrflDnon"] remoteExec ["switchMove", 0, true];
 		//[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["playMoveNow", 0, true];
 		//[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["switchMove", 0, true];
+		//Unit animation to return to incapacitated animation
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
 	};
+	//Detach unit from rescuer
 	detach _unit;
+	//Allow time for animations to set
+	//bug - is this necessary?
 	sleep 3;
-	_unit setVariable ["G_Dragged",false,true];
-	_rescuer setVariable ["G_Dragging",false,true];
+	//Reset Drag-related variables
+	_unit setVariable ["G_Dragged", false, true];
+	_rescuer setVariable ["G_Dragging", false, true];
 }
 else
 {
+	//From Carry
 	if (_rescuer getVariable "G_Unconscious") then {
+		//Rescuer was incapacitated, so set both as incapacitated
 		[_rescuer, "UnconsciousFaceDown"] remoteExec ["switchMove", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
+		//Allow time for animations to set
+		//bug - is this necessary? Why not sleep for both?
 		sleep 4;
 	}
 	else
 	{
+		//Rescuer animation to lower to ground from carry
 		[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
+		//Unit animation of being lowered to ground from carry
 		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["playMoveNow", 0, true];
 		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["switchMove", 0, true];
+		//Allow time for animations to set
+		//bug - is this necessary?
 		sleep 5;
+		//Unit animation to return to incapacitated animation
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
 	};
+	//Allow rescuer to run again
 	_rescuer forceWalk false;
+	//Detach unit from rescuer
 	detach _unit;
-	_unit setVariable ["G_Carried",false,true];
-	_rescuer setVariable ["G_Carrying",false,true];
+	//Reset Carry-related variables
+	_unit setVariable ["G_Carried", false, true];
+	_rescuer setVariable ["G_Carrying", false, true];
 };
