@@ -116,7 +116,7 @@ _lives = _rescuer getVariable "G_Lives";
 if ((_lives >= 0) and (G_Revive_Reward > 0)) then {
 	_lives = _lives + G_Revive_Reward;
 	_livesPlural = "lives";
-	if (_lives = 1) then {
+	if (_lives == 1) then {
 		_livesPlural = "life";
 	};
 	titleText [format["You have been rewarded an additional life for reviving %1! You have %2 %3 remaining!", name _unit, _lives, _livesPlural], "PLAIN", 1];
