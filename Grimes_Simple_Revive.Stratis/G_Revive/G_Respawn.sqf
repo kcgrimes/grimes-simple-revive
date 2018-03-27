@@ -44,7 +44,11 @@ sleep 2;
 
 _lives = _unit getVariable "G_Lives";
 if ((_lives >= 0) and !(G_Revive_FirstSpawn)) then {
-	titleText [format["You have %1 lives remaining!",_lives],"PLAIN",2];
+	_livesPlural = "lives";
+	if (_lives == 1) then {
+		_livesPlural = "life";
+	};
+	titleText [format["You have %1 %2 remaining!", _lives, _livesPlural], "PLAIN", 2];
 	sleep 3;
 	titleFadeOut 3;
 };

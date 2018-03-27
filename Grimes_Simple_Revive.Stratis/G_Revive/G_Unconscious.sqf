@@ -309,13 +309,17 @@ else
 		//Display text depending on downs remaining
 		if (G_Revive_DownsPerLife > 0) then {
 			//Down(s) remaining
+			_downsPlural = "downs";
+			if (_downs == 1) then {
+				_downsPlural = "down";
+			};
 			//Display text depending on if black screen is enabled
 			if (G_Revive_Black_Screen == 1) then {
-				titleText [format["You have been revived by %1! You have %2 downs remaining!", name _rescuer, _downs], "BLACK IN", 5]; 
+				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downs, _downsPlural], "BLACK IN", 5]; 
 			}
 			else
 			{
-				titleText [format["You have been revived by %1! You have %2 downs remaining!", name _rescuer, _downs], "PLAIN", 1];
+				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downs, _downsPlural], "PLAIN", 1];
 			};
 		}
 		else
