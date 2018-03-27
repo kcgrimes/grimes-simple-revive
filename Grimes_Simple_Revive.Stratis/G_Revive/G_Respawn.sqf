@@ -20,7 +20,6 @@ _unit setVariable ["G_getRevived",false,true];
 _unit setVariable ["G_Reviving",false,true];
 _unit setVariable ["G_Reviver",objNull,true];
 _unit setVariable ["G_Loaded",objNull,true];
-_unit setVariable ["G_byVehicle",false,true];
 _unit setVariable ["G_Downs",0,true];
 _unit setCaptive false;
 _unit setVariable ["G_Side",side _unit,true];

@@ -106,9 +106,6 @@ if (_bypass) exitWith {
 	_unit setDamage 1;
 };
 
-//Killed by vehicle strike, not by a man or weapon or fall
-_byVeh = ((vehicle _source != _source) && (_projectile == "") && (!isNull _source));
-
 //Black out the screen with text for unconscious player
 if (isPlayer _unit) then {
 	//Disable keyboard/mouse input
@@ -116,19 +113,11 @@ if (isPlayer _unit) then {
 	//Black out the screen
 	titleText ["","BLACK", 1]; 
 	if (G_Revive_Black_Screen == 0) then {
-		[_byVeh] spawn {
-			_byVeh = _this select 0;
+		//Run in parallel because of suspension
+		[] spawn {
 			sleep 3;
 			//Display unconscious announcement text for a few seconds
-			if (_byVeh) then {
-				//Killed by vehicle contact, so give more time for body to settle
-				titleText ["You are Unconscious. Wait for teammate to revive you.","BLACK IN", 9]; 
-			}
-			else
-			{
-				//Give normal time
-				titleText ["You are Unconscious. Wait for teammate to revive you.","BLACK IN", 4]; 
-			}; 
+			titleText ["You are Unconscious. Wait for teammate to revive you.", "BLACK IN", 4]; 
 		};
 	};
 };
@@ -145,15 +134,6 @@ if (isPlayer _unit) then {
 		waitUntil {!isNull (findDisplay -1)};
 		G_Revive_Unc_Global_KeyDown_EH = (findDisplay -1) displayAddEventHandler ["KeyDown","if ((_this select 1) == 1) then {(findDisplay -1) displayRemoveEventHandler [""KeyDown"",G_Revive_Unc_Global_KeyDown_EH];closeDialog 0;player setVariable [""G_Unconscious"",false,true];}; false;"]; 
 	};
-};
-
-if (_byVeh) then {
-	_unit setVariable ["G_byVehicle", true, true];
-	sleep 9;
-	_dir = getDir _unit;
-	_time = time;
-	//bug - what are we waiting on exactly?
-	waitUntil {(getDir _unit >= _dir + 10) || (getDir _unit <= _dir - 10) || (time >= (_time + 10))};
 };
 
 //Reenable keyboard/mouse input for player

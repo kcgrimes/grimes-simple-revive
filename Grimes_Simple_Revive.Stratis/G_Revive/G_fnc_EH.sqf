@@ -17,7 +17,7 @@ if (G_isServer || _specialJIP) then {
 	if (G_Revive_System) then {
 		//Define revive-related variables
 		//bug - this foreach needs to be used elsewhere, so do that, and make it a function!
-		_vars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying", "G_getRevived", "G_Reviving", "G_byVehicle"];
+		_vars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying", "G_getRevived", "G_Reviving"];
 		{
 			if (isNil {_unit getVariable _x}) then {
 				_unit setVariable [_x, false, true];
@@ -148,7 +148,6 @@ if (G_Revive_System) then {
 				_unit setVariable ["G_Reviving",false,true];
 				_unit setVariable ["G_Reviver",objNull,true];
 				_unit setVariable ["G_Loaded",objNull,true];
-				_unit setVariable ["G_byVehicle",false,true];
 				_unit setVariable ["G_Downs",0,true];
 				_unit setCaptive false;
 				_unit setVariable ["G_Side",side _unit,true];
