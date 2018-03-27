@@ -34,12 +34,20 @@ if ((G_Revive_FirstSpawn) && ((_unit getVariable "G_Lives") == G_Num_Respawns) &
 };
 
 //Handle squad leader spawn
-//bug - incomplete since MenuPosition update; intended to bypass without impacting stance or causing error
 if (G_Squad_Leader_Spawn) then {
-	if ((isNil "G_Player_Squad_Leader_Var") || (isNil "_identity")) exitWith {};
-	if (G_Player_Squad_Leader_Var isEqualTo _identity) then {
-		_stance = animationState G_Player_Squad_Leader_Var;
-		[_unit, _stance] remoteExecCall ["switchMove", 0, true];
+	//Execute in parallel because of having to wait on parallel script
+	[_unit] spawn {
+		_unit = _this select 0;
+		//Make sure squad leader exists; note that squad leader changes when unit is setUnconscious
+		if (isNil "G_Player_Squad_Leader_Var") exitWith {};
+		//Make sure unit spawned on squad leader (probably landed within 10m) or time has elapsed without true
+			//Code executes in 0.25, so this delay should be plenty and non-intrusive
+		_timer = time;
+		waitUntil {(((G_Player_Squad_Leader_Var distance _unit) < 10) || ((time - _timer) >= 2))};
+		if ((G_Player_Squad_Leader_Var distance _unit) < 10) then {
+			//Assume squad leader's stance
+			[_unit, animationState G_Player_Squad_Leader_Var] remoteExecCall ["switchMove", 0, true];
+		};
 	};
 };
 
