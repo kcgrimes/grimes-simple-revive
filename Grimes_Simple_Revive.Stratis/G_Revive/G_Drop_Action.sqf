@@ -1,11 +1,11 @@
 //Drop (from Carry or Drag)
 
-_unit = _this select 0;
-_rescuer = _this select 1;
+_rescuer = _this select 0;
 _dropActionID = _this select 2;
+_unit = _this select 3;
 
 //Remove Drop action
-_unit removeAction _dropActionID;
+_rescuer removeAction _dropActionID;
 
 //Handle drop from Drag or Drop
 if (_unit getVariable "G_Dragged") then {
