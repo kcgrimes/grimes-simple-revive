@@ -10,12 +10,18 @@ if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitW
 //Broadcast unconscious-state animation
 _unit setUnconscious true;
 
-//Add parallel delay to Unconscious variable and therefore revive-related actions
+//Prepare to add mock delay to revive actions to prevent animation failures
+_unit setVariable ["G_Dragged", true, true];
+
+//Set unit as unconscious and broadcast
+_unit setVariable ["G_Unconscious", true, true];
+
+//Add parallel delay to revive-related actions
 [_unit] spawn {
 	_unit = _this select 0;
 	sleep 2.5;
 	//Set unit as unconscious and broadcast
-	_unit setVariable ["G_Unconscious", true, true];
+	_unit setVariable ["G_Dragged", false, true];
 };
 
 //Disable collision of the incapacitated unit with all other units
