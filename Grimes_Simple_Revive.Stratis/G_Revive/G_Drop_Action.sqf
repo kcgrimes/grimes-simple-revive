@@ -49,20 +49,27 @@ else
 	}
 	else
 	{
-		//Rescuer animation to lower to ground from carry
-		[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
-		//Unit animation of being lowered to ground from carry
-		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["playMoveNow", 0, true];
-		[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["switchMove", 0, true];
-		//Allow time for animations to set
-		//bug - is this necessary?
-		sleep 5;
-		//Unit animation to return to incapacitated animation
-		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
-		[_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
+		if ((!alive _unit) || (!(_unit getVariable "G_Unconscious"))) then {
+			//Unit died, reset rescuer animation
+			[_rescuer, ""] remoteExec ["switchMove", 0, true];
+		}
+		else
+		{
+			//Unit still alive
+			//Rescuer animation to lower to ground from carry
+			[_rescuer, "AcinPercMrunSrasWrflDf_AmovPercMstpSlowWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
+			//Unit animation of being lowered to ground from carry
+			[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["playMoveNow", 0, true];
+			[_unit, "AinjPfalMstpSnonWnonDnon_carried_Down"] remoteExecCall ["switchMove", 0, true];
+			//Allow time for animations to set
+			//bug - is this necessary?
+			sleep 5;
+			//Unit animation to return to incapacitated animation
+			[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
+			[_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
+		};
 	};
-	//Allow rescuer to run again
-	_rescuer forceWalk false;
+
 	//Detach unit from rescuer
 	detach _unit;
 	//Reset Carry-related variables
