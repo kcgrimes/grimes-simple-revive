@@ -6,11 +6,17 @@ _projectile = _this select 2;
 
 //If the unit is already unconscious or is not local to the executer, and is not JIP, exit
 if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitWith {};
-//Set unit as unconscious and broadcast
-_unit setVariable ["G_Unconscious", true, true];
 
 //Broadcast unconscious-state animation
 _unit setUnconscious true;
+
+//Add parallel delay to Unconscious variable and therefore revive-related actions
+[_unit] spawn {
+	_unit = _this select 0;
+	sleep 2.5;
+	//Set unit as unconscious and broadcast
+	_unit setVariable ["G_Unconscious", true, true];
+};
 
 //Disable collision of the incapacitated unit with all other units
 	//Without this, incapacitated can be kicked around
@@ -76,9 +82,8 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 }
 else
 {
-	//Unit unconscious outside vehicle, give time for game to catch up
-	//bug - why the magic 2 seconds? 
-	sleep 2;
+	//Unit unconscious outside vehicle, give time for ragdoll animation
+	sleep 3;
 };
 
 //Handle bypassing Unconscious based on downs per life
