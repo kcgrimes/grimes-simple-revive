@@ -32,12 +32,12 @@ waitUntil {animationState _unit == "AinjPfalMstpSnonWnonDf_carried_dead"};
 _unit attachTo [_rescuer, [-0.2, 0.25, 0]];
 
 //Create drop action
-_dropActionID = _unit addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], "G_Revive\G_Drop_Action.sqf", [], 1.5, true, true, ""];
+_dropActionID = _unit addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], "G_Revive\G_Drop_Action.sqf", [], 3, true, true, ""];
 
 //Wait for Drop or someone to die
 waitUntil {sleep 0.5; (!(_unit getVariable "G_Carried") || !(alive _unit) || (_rescuer getVariable "G_Unconscious"));};  
 
 //If unit or rescuer died, handle in Drop function
-if ((!alive _unit) || (_rescuer getVariable "G_Unconscious")) then {
+if ((!alive _unit) || (!(_unit getVariable "G_Unconscious")) || (_rescuer getVariable "G_Unconscious")) then {
 	[_unit, _rescuer, _dropActionID] execVM "G_Revive\G_Drop_Action.sqf";
 };
