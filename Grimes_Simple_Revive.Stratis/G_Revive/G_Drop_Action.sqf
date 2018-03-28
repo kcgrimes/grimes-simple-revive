@@ -29,7 +29,6 @@ if (_unit getVariable "G_Dragged") then {
 	//Detach unit from rescuer
 	detach _unit;
 	//Allow time for animations to set
-	//bug - is this necessary?
 	sleep 3;
 	//Reset Drag-related variables
 	_unit setVariable ["G_Dragged", false, true];
