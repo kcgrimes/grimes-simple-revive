@@ -1,6 +1,6 @@
 enableSaving [false, false];
 
-////THE FOLLOWING LINES ARE NEEDED FOR GRIMES SIMPLE REVIVE SCRIPT
+////THE FOLLOWING LINES ARE NEEDED FOR GRIMES SIMPLE REVIVE
 G_isDedicated = false;
 G_isServer = false;
 G_isClient = false;
