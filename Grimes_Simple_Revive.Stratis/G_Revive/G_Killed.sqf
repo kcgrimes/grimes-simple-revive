@@ -1,10 +1,11 @@
-//Handle first spawn
-//bug - why is this a thing? Possibly fix to old problem; think it can be removed
-if (G_Revive_FirstSpawn) then {
+//Handle spawn time based on initial spawn or not
+if (G_Revive_InitialSpawn) then {
+	//Initial spawn, so ensure no respawn time
 	setPlayerRespawnTime 2;
 }
 else
 {
+	//Subsequent spawn, so apply respawn time
 	setPlayerRespawnTime G_Respawn_Time;
 };
 
@@ -17,10 +18,9 @@ private _unit 			= _this param [0,objnull,[objnull]];
 private _respawnDelay 	= _this param [3, 0, [0]];
 _respawn = _this param [2,-1,[0]];
 
-//Handle life count if spawns are limited and this is not the first spawn
-//bug - well hey, there is a reason for first spawn. But is there really..?
+//Handle life count if spawns are limited and this is not the initial spawn
 _noLives = false;
-if !((G_Num_Respawns == -1) || (G_Revive_FirstSpawn)) then {
+if !((G_Num_Respawns == -1) || (G_Revive_InitialSpawn)) then {
 	//Get life count
 	_lives = _unit getVariable "G_Lives";
 	//Remove one life from count

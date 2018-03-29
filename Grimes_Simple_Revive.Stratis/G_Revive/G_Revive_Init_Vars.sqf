@@ -53,14 +53,10 @@ if (typeName G_Unit_Tag_ShowDistance != "BOOL") exitWith {systemChat "G_Revive_I
 //Custom Executions
 if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING")) exitWith {systemChat "G_Revive_Init - G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
-//Various defines
-//bug - Why is G_Revive_FirstSpawn needed?
-G_Revive_FirstSpawn = true;
-//Define starting position of player
-//bug - Why is G_Unit_Start_Pos needed?
-if (G_isClient) then {
-	G_Unit_Start_Pos = getPos player;
-};
+//Track first spawn in order to adjust spawn time and life management accordingly
+	//onRespawn occurs on any initial spawn; onKilled occurs with respawnOnStart
+	//Without this, on respawnOnStart unit will wait full respawn time and lose a life
+G_Revive_InitialSpawn = true;
 
 //Execute briefing for player if enabled
 if ((G_Briefing) && (G_isClient)) then {

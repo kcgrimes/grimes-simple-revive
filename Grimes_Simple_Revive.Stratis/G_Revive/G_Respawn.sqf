@@ -1,11 +1,11 @@
 private _unit 			= _this param [0,objnull,[objnull]];
 private _respawnDelay 	= _this param [3, 0, [0]];
 
-//Handle first spawn
-//bug - why is this a thing? Possibly from a deprecated fix, probably can remove
-if ((G_Revive_FirstSpawn) && ((_unit getVariable "G_Lives") == G_Num_Respawns) && (((G_JIP_Start == 0) && (G_isJIP)) || ((G_Init_Start == 0) && (!G_isJIP)))) exitWith {
-	G_Revive_FirstSpawn = false;
+//If this is the initial spawn and there is no respawn on start, don't handle spawn like respawn and exit
+if ((G_Revive_InitialSpawn) && ((_unit getVariable "G_Lives") == G_Num_Respawns) && (((G_JIP_Start == 0) && (G_isJIP)) || ((G_Init_Start == 0) && (!G_isJIP)))) exitWith {
+	G_Revive_InitialSpawn = false;
 };
+//Handle like respawn
 
 //BIS_fnc_respawnMenuPosition running in parallel
 
@@ -25,12 +25,6 @@ _unit setCaptive false;
 _unit setVariable ["G_Side",side _unit,true];
 _unit enableAI "MOVE";
 _unit allowDamage true;
-
-//Handle starting position
-//bug - is this working correctly? What is it actually meant for? Might be related to FirstSpawn fix-that-is-no-longer-a-fix
-if ((G_Revive_FirstSpawn) && ((_unit getVariable "G_Lives") == G_Num_Respawns) && (((G_JIP_Start == 0) && (G_isJIP)) || ((G_Init_Start == 0) && (!G_isJIP)))) then {
-	_unit setPos G_Unit_Start_Pos;
-};
 
 //Handle squad leader spawn
 if (G_Squad_Leader_Spawn) then {
@@ -58,9 +52,9 @@ if (G_Custom_Exec_3 != "") then {
 //Slight delay before life count announcement
 sleep 2;
 
-//Handle life count announcement, if limited
+//Handle life count announcement, if limited and not the inital spawn
 _lives = _unit getVariable "G_Lives";
-if ((_lives >= 0) && !(G_Revive_FirstSpawn)) then {
+if ((_lives >= 0) && !(G_Revive_InitialSpawn)) then {
 	//Use appropriate plurality
 	_livesPlural = "lives";
 	if (_lives == 1) then {
@@ -72,5 +66,5 @@ if ((_lives >= 0) && !(G_Revive_FirstSpawn)) then {
 	titleFadeOut 3;
 };
 
-//First Spawn won't occur again
-G_Revive_FirstSpawn = false;
+//Don't treat like initial spawn again
+G_Revive_InitialSpawn = false;
