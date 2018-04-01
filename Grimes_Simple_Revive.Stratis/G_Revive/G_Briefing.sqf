@@ -8,8 +8,8 @@ player createDiaryRecord ["G_Revive",
 	<br/>     I would like to extend a big thanks to the following individuals and groups, in no particular order, for their direct or indirect assistance and contribution to this project. Thank you for choosing Grimes Simple Revive!
 	<br/>
 	<br/>* Bohemia Interactive – For providing an amazing game and location for a fan base, in addition to provided assistance.
-	<br/>* BI Forum Users – For providing an active location for anyone to receive assistance and education about ArmA.
-	<br/>  * Honorable Mention: norrin, brians200, Das Attorney, PtPau, Imperator_Pete, csk222, maximumvmo, pathfinder2, marcatore, Zio Sam, and any whom I have failed to mention.
+	<br/>* BI Forum Users – For providing an active community for ArmA assistance, feedback, and collaboration. 
+	<br/>  * Honorable Mention: norrin, brians200, Das Attorney, PtPau, Imperator_Pete, csk222, maximumvmo, pathfinder2, marcatore, Zio Sam, fortun, Ignotus17, Bunnylord, mech79, airfell, Droopypiles, doktorflan, runforrest, Ironman13 and any whom I have failed to mention.
 	<br/>* 3rd Infantry Division – For providing everything that is indescribable in a single mention, but specifically for testing assistance.
 	<br/>  * Honorable Mention: Taylor, Ski, Foondle, Robertson, Townsend, and any whom I have failed to mention.
 	<br/>
