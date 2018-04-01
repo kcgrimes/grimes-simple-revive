@@ -37,6 +37,7 @@ At this time, there is no “installer” for the script, and it is instead a si
 1. Obtain the script files
 	1. Armaholic: http://www.armaholic.com/page.php?id=25662
 	1. github: https://github.com/kcgrimes/grimes-simple-revive/releases
+	1. Steam Workshop: http://steamcommunity.com/sharedfiles/filedetails/?id=1349229256
 2. Extract the “Grimes_Simple_Revive.stratis” folder and place it somewhere on your computer that is easily accessible, such as Desktop or your MP Missions folder.
 3. In the folder that contains your mission.sqm (ie, “my_mission.stratis”), do the following:
 	1. If you haven’t already created a description.ext file, simply copy the provided one into your mission folder. If you already have your own description.ext, simply copy and paste the following line into it. Be sure to not have any respawn-related settings in place, as they will conflict with this file (for custom use, just edit the file).
