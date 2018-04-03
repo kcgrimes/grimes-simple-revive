@@ -166,7 +166,7 @@ if (G_AI_Fixed_Spawn) then {
 		[	"Respawn",
 			{
 				private ["_respawnPos"];
-				//Define respawn position based on side
+				//Define AI's fixed respawn position based on side
 				switch (side (_this select 0)) do {
 					case WEST: {
 						if (G_AI_Fixed_Spawn_WEST != "") then {
