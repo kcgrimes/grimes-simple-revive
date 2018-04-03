@@ -98,99 +98,98 @@
 
 class RscText
 {
-    access = 0;
-    idc = -1;
-    type = CT_STATIC;
-    style = ST_MULTI;
-    linespacing = 1;
-    colorBackground[] = {0,0,0,1};
-    colorText[] = {1,1,1,1};
-    text = "";
-    shadow = 0;
-    font = "PuristaLight";
-    SizeEx = 0.02300;
-    fixedWidth = 0;
-    x = 0;
-    y = 0;
-    h = 0;
-    w = 0;
-   
+	access = 0;
+	idc = -1;
+	type = CT_STATIC;
+	style = ST_MULTI;
+	linespacing = 1;
+	colorBackground[] = {0,0,0,1};
+	colorText[] = {1,1,1,1};
+	text = "";
+	shadow = 0;
+	font = "PuristaLight";
+	SizeEx = 0.02300;
+	fixedWidth = 0;
+	x = 0;
+	y = 0;
+	h = 0;
+	w = 0;
 };
 
 class RscPicture
 {
-    access = 0;
-    idc = -1;
-    type = CT_STATIC;
-    style = ST_PICTURE;
-    colorBackground[] = {0,0,0,0};
-    colorText[] = {1,1,1,1};
-    font = "PuristaLight";
-    sizeEx = 0;
-    lineSpacing = 0;
-    text = "";
-    fixedWidth = 0;
-    shadow = 0;
-    x = 0;
-    y = 0;
-    w = 0.2;
-    h = 0.15;
+	access = 0;
+	idc = -1;
+	type = CT_STATIC;
+	style = ST_PICTURE;
+	colorBackground[] = {0,0,0,0};
+	colorText[] = {1,1,1,1};
+	font = "PuristaLight";
+	sizeEx = 0;
+	lineSpacing = 0;
+	text = "";
+	fixedWidth = 0;
+	shadow = 0;
+	x = 0;
+	y = 0;
+	w = 0.2;
+	h = 0.15;
 };
 
 class RscButton
 {
-    
-   access = 0;
-    type = CT_BUTTON;
-    text = "";
-    colorText[] = {1,1,1,.9};
-    colorDisabled[] = {0.4,0.4,0.4,0};
-    colorBackground[] = {0.75,0.75,0.75,0.8};
-    colorBackgroundDisabled[] = {0,0.0,0};
-    colorBackgroundActive[] = {0.75,0.75,0.75,1};
-    colorFocused[] = {0.75,0.75,0.75,.5};
-    colorShadow[] = {0.023529,0,0.0313725,1};
-    colorBorder[] = {0.023529,0,0.0313725,1};
-    soundEnter[] = {"\ca\ui\data\sound\onover",0.09,1};
-    soundPush[] = {"\ca\ui\data\sound\new1",0,0};
-    soundClick[] = {"\ca\ui\data\sound\onclick",0.07,1};
-    soundEscape[] = {"\ca\ui\data\sound\onescape",0.09,1};
-    style = 2;
-    x = 0;
-    y = 0;
-    w = 0.055589;
-    h = 0.039216;
-    shadow = 2;
-    font = "PuristaLight";
-    sizeEx = 0.03921;
-    offsetX = 0.003;
-    offsetY = 0.003;
-    offsetPressedX = 0.002;
-    offsetPressedY = 0.002;
-    borderSize = 0;
+	access = 0;
+	type = CT_BUTTON;
+	text = "";
+	colorText[] = {1,1,1,.9};
+	colorDisabled[] = {0.4,0.4,0.4,0};
+	colorBackground[] = {0.75,0.75,0.75,0.8};
+	colorBackgroundDisabled[] = {0,0.0,0};
+	colorBackgroundActive[] = {0.75,0.75,0.75,1};
+	colorFocused[] = {0.75,0.75,0.75,.5};
+	colorShadow[] = {0.023529,0,0.0313725,1};
+	colorBorder[] = {0.023529,0,0.0313725,1};
+	soundEnter[] = {"\ca\ui\data\sound\onover",0.09,1};
+	soundPush[] = {"\ca\ui\data\sound\new1",0,0};
+	soundClick[] = {"\ca\ui\data\sound\onclick",0.07,1};
+	soundEscape[] = {"\ca\ui\data\sound\onescape",0.09,1};
+	style = 2;
+	x = 0;
+	y = 0;
+	w = 0.055589;
+	h = 0.039216;
+	shadow = 2;
+	font = "PuristaLight";
+	sizeEx = 0.03921;
+	offsetX = 0.003;
+	offsetY = 0.003;
+	offsetPressedX = 0.002;
+	offsetPressedY = 0.002;
+	borderSize = 0;
 };
 
 class RscFrame
 {
-    type = CT_STATIC;
-    idc = -1;
-    style = ST_FRAME;
-    shadow = 2;
-    colorBackground[] = {0,0,1,0.5};
-    colorText[] = {1,1,1,0.9};
-    font = "PuristaLight";
-    sizeEx = 0.03;
-    text = "";
+	type = CT_STATIC;
+	idc = -1;
+	style = ST_FRAME;
+	shadow = 2;
+	colorBackground[] = {0,0,1,0.5};
+	colorText[] = {1,1,1,0.9};
+	font = "PuristaLight";
+	sizeEx = 0.03;
+	text = "";
 };
+
 class Box
 {
-    type = CT_STATIC;
-    idc = -1;
-    style = ST_CENTER;
-    shadow = 2;
-    colorBackground[] = {1,0.9,0.5, 0.5};
-    colorText[] = {1,1,1,0.9};
-    font = "PuristaLight";
-    sizeEx = 0.03;
-    text = "";
+	type = CT_STATIC;
+	idc = -1;
+	style = ST_CENTER;
+	shadow = 2;
+	colorBackground[] = {1,0.9,0.5, 0.5};
+	colorText[] = {1,1,1,0.9};
+	font = "PuristaLight";
+	sizeEx = 0.03;
+	text = "";
 };

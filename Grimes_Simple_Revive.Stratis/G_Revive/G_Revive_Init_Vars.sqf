@@ -190,8 +190,8 @@ if ((G_isClient) and (G_Revive_System)) then {
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
 			private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
-			//Continue cycling while player is unconscious
-			while {player getVariable "G_Unconscious"} do {
+			//Continue cycling while player is unconscious and dialog is open
+			while {((player getVariable "G_Unconscious") && (dialog))} do {
 				//Get array of all "men" within 500m, including player
 				_array = nearestObjects [player, ["CAManBase"], 500];
 				_arrayDistance = [];
@@ -218,7 +218,6 @@ if ((G_isClient) and (G_Revive_System)) then {
 				//Format nearest rescuers
 				_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
 				//Output nearest rescuers
-				//bug - where does this displayCtrl # come from?
 				((_this select 0) displayCtrl 1001) ctrlSetText _text;
 				//Update list every 5 seconds
 				sleep 5;

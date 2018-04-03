@@ -146,8 +146,11 @@ if (isPlayer _unit) then {
 		while {(_unit getVariable "G_Unconscious")} do {
 			//Open dialog
 			_reviveDialog = createDialog "G_Revive_Dialog";
+			if (!G_Allow_GiveUp) then {
+				((findDisplay 474637) displayCtrl 1600) ctrlShow false;
+			};
 			//Wait for dialog to be open
-			waitUntil {!isNull (findDisplay -1)};
+			waitUntil {!isNull (findDisplay 474637)};
 			//Wait for dialog to be closed (by Escape)
 			waitUntil {!dialog};
 			//Give player time to access game menu before re-cycling
