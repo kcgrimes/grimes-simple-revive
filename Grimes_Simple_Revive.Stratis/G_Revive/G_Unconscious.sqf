@@ -123,7 +123,7 @@ if (isPlayer _unit) then {
 	disableUserInput true;
 	//Black out the screen
 	titleText ["","BLACK", 1]; 
-	if (G_Revive_Black_Screen == 0) then {
+	if (!G_Revive_Black_Screen) then {
 		//Run in parallel because of suspension
 		[] spawn {
 			sleep 3;
@@ -226,7 +226,7 @@ if (_reviveTimer > -1) then {
 		//Show counter text for player
 		if (isPlayer _unit) then {
 			//Check environment only if black screen is disabled
-			if (G_Revive_Black_Screen == 0) then {
+			if (!G_Revive_Black_Screen) then {
 				titleText [format["%1 seconds until auto-respawn, unless you are revived!", _reviveTimer],"PLAIN",1];
 			}
 			else
@@ -274,6 +274,10 @@ if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_uni
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
 	_unit setDamage 1;
+	//If on black screen, bring back normal view
+	if (G_Revive_Black_Screen) then {
+		titleText ["", "BLACK IN", 1]; 
+	};
 }
 else
 {
@@ -317,7 +321,7 @@ else
 				_downsPlural = "down";
 			};
 			//Display text depending on if black screen is enabled
-			if (G_Revive_Black_Screen == 1) then {
+			if (G_Revive_Black_Screen) then {
 				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downs, _downsPlural], "BLACK IN", 5]; 
 			}
 			else
@@ -329,7 +333,7 @@ else
 		{
 			//No downs remaining
 			//Display text depending on if black screen is enabled
-			if (G_Revive_Black_Screen == 1) then {
+			if (G_Revive_Black_Screen) then {
 				titleText [format["You have been revived by %1!",name _rescuer],"BLACK IN", 5]; 
 			}
 			else

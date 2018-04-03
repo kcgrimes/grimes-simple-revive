@@ -17,7 +17,7 @@ G_Revive_DownsPerLife = 0; //Number of times unit can go Unconscious in single l
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
 G_Revive_Time_To = 10; //Time (in seconds) required for reviver to complete revive action
 G_Revive_Requirement = 0; //1 or greater = number of FAKs (single use) or Medikit (unlimited use) needed to revive (and treat still). 0 = Those items only needed to treat, not revive (stock).
-G_Revive_Black_Screen = 0; //1 = While Unconscious/waiting for revive, screen stays black. 0 = Screen goes black at death then fades back in, with surroundings visible.
+G_Revive_Black_Screen = false; //true = While Unconscious/waiting for revive, screen stays black. false = Screen goes black at death then fades back in, with surroundings visible.
 G_Revive_Action_Color = "#FFCC00"; //HTML color code that will be the color of the Revive, Drag, Carry, and Load/Unload action text. Default is Orange. 
 G_Revive_Load_Types = ["Car","Tank","Helicopter","Ship"]; //Array of strings of kinds of vehicles that unconscious units can be loaded into
 G_Eject_Occupants = false; //If killed while in a vehicle, the revivable unit is ejected from the vehicle. True = enabled, false = disabled.
