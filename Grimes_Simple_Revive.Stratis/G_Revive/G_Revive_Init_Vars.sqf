@@ -166,16 +166,17 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 	};
 } forEach allUnits;
 
-//Handle loading game as JIP into an unconscious unit
-if (G_isJIP) then {
-	if (player getVariable "G_Unconscious") then {
-		_revive_factors = player getVariable "G_Revive_Factors";
-		_revive_factors execVM "G_Revive\G_Unconscious.sqf";
-	};
-};
-
-//If revive system is enabled, create handler for key strokes
+//Init revive system
 if (G_Revive_System) then {
+	//Handle loading game as JIP into an unconscious unit
+	if (G_isJIP) then {
+		if (player getVariable "G_Unconscious") then {
+			_revive_factors = player getVariable "G_Revive_Factors";
+			_revive_factors execVM "G_Revive\G_Unconscious.sqf";
+		};
+	};
+
+	//Create handler for key strokes
 	G_fnc_ReviveKeyDownAbort = {
 		//bug - what are each of these, and is this all necessary?
 		switch (_this select 0) do {
@@ -189,10 +190,95 @@ if (G_Revive_System) then {
 			case 205: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
 		};
 	};
+
+	//Define revive system text for player
+	if (G_isClient) then {
+		G_fnc_Dialog_Rescuer_Text = {
+			[_this select 0] spawn {
+				private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
+				//Continue cycling while player is unconscious and dialog is open
+				while {((player getVariable "G_Unconscious") && (dialog))} do {
+					//Get array of all "men" within 500m, including player
+					_array = nearestObjects [player, ["CAManBase"], 500];
+					_arrayDistance = [];
+					{
+						//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not unconscious
+						if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
+							//Add to array with distance from player
+							_arrayDistance pushBack ([_x, ceil(_x distance player)]);
+						};
+					} forEach _array;
+					
+					//Define empty variables for unit names
+					_unit0 = "";
+					_unit1 = "";
+					_unit2 = "";
+					_unit3 = "";
+					_unit4 = "";
+					
+					//Define unit variables with unit name and distanace if available
+					for "_i" from 0 to (((count _arrayDistance) - 1) min 4) do {
+						call compile format["_unit%1 = format[""%2  (%3m)"", name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];", _i, "%1", "%2"];
+					};
+					
+					//Format nearest rescuers
+					_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
+					//Output nearest rescuers
+					((_this select 0) displayCtrl 1001) ctrlSetText _text;
+					//Update list every 5 seconds
+					sleep 5;
+				};
+			};
+		};
+
+		G_fnc_Dialog_Downs_Text = {
+			private ["_downs", "_lives"];
+			if (G_Revive_DownsPerLife > 0) then {
+				_downs = (G_Revive_DownsPerLife) - (player getVariable "G_Downs");
+			}
+			else
+			{
+				_downs = "Unlimited";
+			};
+			if (G_Num_Respawns == -1) then {
+				_lives = "Unlimited";
+			}
+			else
+			{
+				_lives = player getVariable "G_Lives";
+			};
+			_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2",_downs,_lives];
+			((_this select 0) displayCtrl 1002) ctrlSetText _text;
+		};
+	};
+	
+	//Define function that handles Load/Unload of player
+	G_fnc_moveInCargoToUnloadAction = {
+		waitUntil {!isNull player};
+		_unit = _this select 0;
+		_vehicle = _this select 1;
+		_side = _this select 2;
+		
+		_unit assignAsCargo _vehicle;
+		_unit moveInCargo _vehicle;
+		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
+		
+		_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
+
+		[_unit, _vehicle, _unloadActionID] spawn {
+			_unit = _this select 0;
+			_vehicle = _this select 1;
+			_unloadActionID = _this select 2;
+			waitUntil {sleep 0.3; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
+		
+			_vehicle removeAction _unloadActionID;
+		};
+	};
 };
 
 //If player's respawn button is disabled by script, execute loop that prevents use of it
-if (!(G_Respawn_Button) and (G_isClient)) then {
+if (!(G_Respawn_Button) && (G_isClient)) then {
 	[] spawn {
 		while {true} do {
 			//Wait for game menu to open
@@ -203,89 +289,4 @@ if (!(G_Respawn_Button) and (G_isClient)) then {
 			waitUntil {sleep 0.1; isNull (findDisplay 49)};
 		};
 	};  
-};
-
-//Define function that handles Load/Unload of player
-G_fnc_moveInCargoToUnloadAction = {
-	waitUntil {!isNull player};
-	_unit = _this select 0;
-	_vehicle = _this select 1;
-	_side = _this select 2;
-	
-	_unit assignAsCargo _vehicle;
-	_unit moveInCargo _vehicle;
-	[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
-	_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
-	
-	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and ((_target distance _this) < 5) and ((speed _target) < 1)"];
-
-	[_unit, _vehicle, _unloadActionID] spawn {
-		_unit = _this select 0;
-		_vehicle = _this select 1;
-		_unloadActionID = _this select 2;
-		waitUntil {sleep 0.3; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
-	
-		_vehicle removeAction _unloadActionID;
-	};
-};
-
-//Define revive system text for player if revive is enabled
-if ((G_isClient) and (G_Revive_System)) then {
-	G_fnc_Dialog_Rescuer_Text = {
-		[_this select 0] spawn {
-			private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
-			//Continue cycling while player is unconscious and dialog is open
-			while {((player getVariable "G_Unconscious") && (dialog))} do {
-				//Get array of all "men" within 500m, including player
-				_array = nearestObjects [player, ["CAManBase"], 500];
-				_arrayDistance = [];
-				{
-					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not unconscious
-					if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
-						//Add to array with distance from player
-						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
-					};
-				} forEach _array;
-				
-				//Define empty variables for unit names
-				_unit0 = "";
-				_unit1 = "";
-				_unit2 = "";
-				_unit3 = "";
-				_unit4 = "";
-				
-				//Define unit variables with unit name and distanace if available
-				for "_i" from 0 to (((count _arrayDistance) - 1) min 4) do {
-					call compile format["_unit%1 = format[""%2  (%3m)"", name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];", _i, "%1", "%2"];
-				};
-				
-				//Format nearest rescuers
-				_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
-				//Output nearest rescuers
-				((_this select 0) displayCtrl 1001) ctrlSetText _text;
-				//Update list every 5 seconds
-				sleep 5;
-			};
-		};
-	};
-
-	G_fnc_Dialog_Downs_Text = {
-		private ["_downs", "_lives"];
-		if (G_Revive_DownsPerLife > 0) then {
-			_downs = (G_Revive_DownsPerLife) - (player getVariable "G_Downs");
-		}
-		else
-		{
-			_downs = "Unlimited";
-		};
-		if (G_Num_Respawns == -1) then {
-			_lives = "Unlimited";
-		}
-		else
-		{
-			_lives = player getVariable "G_Lives";
-		};
-		_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2",_downs,_lives];
-		((_this select 0) displayCtrl 1002) ctrlSetText _text;
-	};
 };
