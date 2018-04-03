@@ -58,7 +58,7 @@ _unit setVariable ["G_Reviver", _rescuer, true];
 
 //Revive announcement for rescuer
 //bug - add progress of some sort?
-titleText [format["You are reviving %1! This will take %2 seconds!", name _unit, G_Revive_Time_To], "PLAIN", 1]; 
+titleText [format["You are reviving %1! This will take %2 seconds!", name _unit, G_Revive_actionTime], "PLAIN", 1]; 
 titleFadeOut 5;
 
 //Handle revive abort
@@ -77,26 +77,26 @@ G_fnc_Revive_Abort = {
 waitUntil {!isNull (findDisplay 46)};
 G_Revive_Global_KeyDown_EH = (findDisplay 46) displayAddEventHandler ["KeyDown","[_this select 1] call G_fnc_ReviveKeyDownAbort; false;"];  
 
-G_Revive_Time_To_Var = 0;
+G_Revive_actionTime_Var = 0;
 [] spawn {
-	while {(G_Revive_Time_To_Var < G_Revive_Time_To) and (!G_Revive_Abort)} do {
+	while {(G_Revive_actionTime_Var < G_Revive_actionTime) and (!G_Revive_Abort)} do {
 		sleep 1;
-		G_Revive_Time_To_Var = G_Revive_Time_To_Var + 1;
+		G_Revive_actionTime_Var = G_Revive_actionTime_Var + 1;
 	};
 };
 
 [_rescuer] spawn {
 	_rescuer = _this select 0;
-	while {(G_Revive_Time_To_Var < G_Revive_Time_To) and (!G_Revive_Abort)} do {
+	while {(G_Revive_actionTime_Var < G_Revive_actionTime) and (!G_Revive_Abort)} do {
 		[_rescuer, "AinvPknlMstpSnonWrflDr_medic3"] remoteExec ["playMoveNow", 0, false];
-		waitUntil {sleep 0.1; (!(G_Revive_Time_To_Var < G_Revive_Time_To) || (G_Revive_Abort) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"));};
+		waitUntil {sleep 0.1; (!(G_Revive_actionTime_Var < G_Revive_actionTime) || (G_Revive_Abort) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"));};
 	};
 	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
 };
 
 //Wait for revive timer or abort
-waitUntil {!(G_Revive_Time_To_Var < G_Revive_Time_To) || (G_Revive_Abort)};
+waitUntil {!(G_Revive_actionTime_Var < G_Revive_actionTime) || (G_Revive_Abort)};
 //Exit if revive was aborted
 if (G_Revive_Abort) exitWith {};
 

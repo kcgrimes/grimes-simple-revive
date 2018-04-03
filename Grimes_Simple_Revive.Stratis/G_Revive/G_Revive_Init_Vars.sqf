@@ -15,7 +15,7 @@ if (typeName G_Revive_Can_Revive != "ARRAY") then {_validationFailed pushBack "G
 {
 	if (typeName _x != "STRING") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
 } forEach G_Revive_Can_Revive;
-if ((typeName G_Revive_Time_To != "SCALAR") || (G_Revive_Time_To < 0)) then {_validationFailed pushBack "G_Revive_Time_To must be an integer greater than or equal to 0!"};
+if ((typeName G_Revive_actionTime != "SCALAR") || (G_Revive_actionTime < 0)) then {_validationFailed pushBack "G_Revive_actionTime must be an integer greater than or equal to 0!"};
 if ((typeName G_Revive_Requirement != "SCALAR") || (G_Revive_Requirement < 0)) then {_validationFailed pushBack "G_Revive_Requirement must be an integer greater than or equal to 0!"};
 if (typeName G_Revive_Black_Screen != "BOOL") then {_validationFailed pushBack "G_Revive_Black_Screen must be true/false!"};
 if (typeName G_Revive_Action_Color != "STRING") then {_validationFailed pushBack "G_Revive_Action_Color must be an HTML Color Code in string format."};
