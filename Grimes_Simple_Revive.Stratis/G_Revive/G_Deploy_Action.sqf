@@ -15,6 +15,8 @@ if !(G_Mobile_Respawn_Moveable) then {
 	//Create empty helipad as anchor and position it on MRV
 	_hp = "Land_HelipadEmpty_F" createVehicle (getPos _mobile);
 	[_hp, getDir _mobile] remoteExec ["setDir", 0, false];
+	//Sleep required to avoid MRV attaching to still-moving _hp
+	sleep 0.1;
 	//Anchor the MRV to the helipad
 	_mobile attachTo [_hp];
 };
