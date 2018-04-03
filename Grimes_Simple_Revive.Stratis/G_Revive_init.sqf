@@ -5,7 +5,6 @@ Version: V0.8
 */
 ////Editable parameters, sorted by category and relevance - Please adjust values to suit your application.
 //Generic
-G_PvP = true; //true = PvP mission where there are more than one playable sides (PvP, TvT, etc), false = players only on one side (CoOp, SP, etc).
 G_Briefing = true; //true = information, how to, and credits will be displayed on ingame briefing screen. Can be used in conjunction with your own briefing. false = disabled. 
 
 //Revive

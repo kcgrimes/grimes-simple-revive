@@ -1,7 +1,6 @@
 ////Settings Validation
 _validationFailed = [];
 //Generic
-if (typeName G_PvP != "BOOL") then {_validationFailed pushBack "G_PvP must be true/false!"};
 if (typeName G_Briefing != "BOOL") then {_validationFailed pushBack "G_Briefing must be true/false!"};
 
 //Revive
@@ -81,6 +80,23 @@ if ((count _validationFailed) > 0) exitWith {
 		systemChat _msg;
 		diag_log _msg;
 	} forEach _validationFailed;
+};
+
+//Define if PvP - Mission where there are more than one playable sides (PvP, TvT, etc.), as opposed to having players on only one side (CoOp, SP, etc.).
+//Check each side for "playable" slots, adding to array if they exist
+_playableSideArray = [];
+{
+	if ((playableSlotsNumber _x) > 0) then {
+		_playableSideArray pushBack _x;
+	};
+} forEach [WEST, EAST, RESISTANCE, CIVILIAN];
+//If more than one side has playable slots, this is PvP
+if ((count _playableSideArray) > 1) then {
+	G_PvP = true;
+}
+else
+{
+	G_PvP = false;
 };
 
 //Track first spawn in order to adjust spawn time and life management accordingly
