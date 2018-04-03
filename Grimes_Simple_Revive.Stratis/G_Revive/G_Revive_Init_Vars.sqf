@@ -154,8 +154,11 @@ if (G_Revive_System) then {
 if (!(G_Respawn_Button) and (G_isClient)) then {
 	[] spawn {
 		while {true} do {
+			//Wait for game menu to open
 			waitUntil {!isNull (findDisplay 49)};
-			_respawnButtonEH = ((findDisplay 49) displayCtrl 1010)  ctrlAddEventHandler ["MouseButtonDown",{(findDisplay 49) closeDisplay 0; titleText ["The Respawn Button is disabled by the host!","PLAIN",1]; titleFadeOut 5;}]; 
+			//Add EH to close game menu when respawn button is clicked and announce that it is disabled
+			_respawnButtonEH = ((findDisplay 49) displayCtrl 1010) ctrlAddEventHandler ["MouseButtonDown",{(findDisplay 49) closeDisplay 0; titleText ["The Respawn Button is disabled by the host!","PLAIN",1]; titleFadeOut 5;}]; 
+			//Wait for game menu to be closed (and EH deleted)
 			waitUntil {isNull (findDisplay 49)};
 		};
 	};  
