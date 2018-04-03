@@ -1,12 +1,12 @@
 ////Checks
 //Generic
 if (typeName G_PvP != "BOOL") exitWith {systemChat "G_Revive_Init - G_PvP must be true/false!"};
-if (typeName G_Enemy_AI_Unconscious != "BOOL") exitWith {systemChat "G_Revive_Init - G_Enemy_AI_Unconscious must be true/false!"};
-if (!(G_Enemy_AI_Unconscious) and (typeName G_Friendly_Side != "SIDE")) exitWith {systemChat "G_Revive_Init - G_Friendly_Side must be WEST, EAST, RESISTANCE, or CIVILIAN!"};
 if (typeName G_Briefing != "BOOL") exitWith {systemChat "G_Revive_Init - G_Briefing must be true/false!"};
 
 //Revive
 if (typeName G_Revive_System != "BOOL") exitWith {systemChat "G_Revive_Init - G_Revive_System must be true/false!"};
+if (typeName G_Revive_AI_Unconscious != "ARRAY") exitWith {systemChat "G_Revive_Init - G_Revive_AI_Unconscious must be an array of sides!"};
+//if ((typeName (foreach G_Revive_AI_Unconscious) != "SIDE")) exitWith {systemChat "G_Revive_Init - G_Friendly_Side must be WEST, EAST, RESISTANCE, or CIVILIAN!"};
 if ((typeName G_Revive_Time_Limit != "SCALAR") || (G_Revive_Time_Limit < -1)) exitWith {systemChat "G_Revive_Init - G_Revive_Time_Limit must be a number greater than or equal to -1!"};
 if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) exitWith {systemChat "G_Revive_Init - G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
 if ((typeName G_Revive_Time_To != "SCALAR") || (G_Revive_Time_To < 0)) exitWith {systemChat "G_Revive_Init - G_Revive_Time_To must be an integer greater than or equal to 0!"};
@@ -104,26 +104,21 @@ if (G_Unit_Tag) then {
 //Define EH to handle revive/respawn system
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
-//Execute G_fnc_EH on self, friendly units, and enemy units if enabled
+//Execute G_fnc_EH on all players and AI by side as enabled
 //bug - does this need to be more specifically localized?
-if (G_Enemy_AI_Unconscious) then {
-	//Can revive enemy units, so execute on all units
-	{
-		if (_x isKindOf "CAManBase") then {
-			[_x] spawn G_fnc_EH;
-		};
-	} forEach allUnits;
-}
-else
 {
+	if (isPlayer _x) then {
+		//Is a player
+		[_x] spawn G_fnc_EH;
+	}
+	else
 	{
-	//Cannot revive enemy units, so execute on only friendly units (including self)
-	//bug - better way to do this, without needing to define friendly side?
-		if ((_x isKindOf "CAManBase") and (side _x == G_Friendly_Side)) then {
+		//Is an AI
+		if ((side _x) in G_Revive_AI_Unconscious) then {
 			[_x] spawn G_fnc_EH;
 		};
-	} forEach allUnits;
-};
+	};
+} forEach allUnits;
 
 //Handle loading game as JIP into an unconscious unit
 if (G_isJIP) then {

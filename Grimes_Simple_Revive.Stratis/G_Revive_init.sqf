@@ -6,12 +6,11 @@ Version: V0.8
 ////Editable parameters, sorted by category and relevance - Please adjust values to suit your application.
 //Generic
 G_PvP = true; //true = PvP mission where there are more than one playable sides (PvP, TvT, etc), false = players only on one side (CoOp, SP, etc).
-G_Enemy_AI_Unconscious = true; //true = Enemy AI can be revived, dragged, and carried by enemy players (only recommended for PvP), false = disabled
-	G_Friendly_Side = WEST; //Side of friendly units if the above is false
 G_Briefing = true; //true = information, how to, and credits will be displayed on ingame briefing screen. Can be used in conjunction with your own briefing. false = disabled. 
 
 //Revive
 G_Revive_System = true; //Whether the revive system will be used or not. true = enabled, false = disabled.
+G_Revive_AI_Unconscious = [WEST, EAST, RESISTANCE, CIVILIAN]; //Array of sides of AI that will utilize revive system
 G_Revive_Time_Limit = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
 G_Allow_GiveUp = true; //Allow player to force death while unconscious. true = enabled, false = disabled.
 G_Revive_DownsPerLife = 0; //Number of times unit can go Unconscious in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
