@@ -7,7 +7,7 @@ class G_Revive_Dialog
 	class controls 
 	{
 		////////////////////////////////////////////////////////
-		// GUI EDITOR OUTPUT START (by Grimes [3rd ID], v1.063, #Sihigi)
+		// GUI EDITOR OUTPUT START (by KC Grimes, v1.063, #Sihigi)
 		////////////////////////////////////////////////////////
 		class G_Near_Rescuers: RscText
 		{
@@ -40,7 +40,7 @@ class G_Revive_Dialog
 		class G_Frame_Bottom: RscText
 		{
 			idc = 1003;
-			text = "\n\nYou are Unconscious and awaiting revive.\nPress Escape to give up."; //--- ToDo: Localize;
+			text = "\n\nYou are Unconscious and awaiting revive."; //--- ToDo: Localize;
 			font = TahomaB;
 			sizeEx = 0.04;
 			style = 530;

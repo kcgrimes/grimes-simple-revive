@@ -139,11 +139,20 @@ _unit setVariable ["G_Revive_Factors", [_unit, _source, _projectile], true];
 //Create unconscious dialog for player
 //bug - check locality for this, make sure only be executed on one machine
 if (isPlayer _unit) then {
-	[] spawn {
+	[_unit] spawn {
+		_unit = _this select 0;
+		//Wait a few seconds before opening dialog
 		sleep 3.25;
-		_reviveDialog = createDialog "G_Revive_Dialog";
-		waitUntil {!isNull (findDisplay -1)};
-		G_Revive_Unc_Global_KeyDown_EH = (findDisplay -1) displayAddEventHandler ["KeyDown","if ((_this select 1) == 1) then {(findDisplay -1) displayRemoveEventHandler [""KeyDown"",G_Revive_Unc_Global_KeyDown_EH];closeDialog 0;player setVariable [""G_Unconscious"",false,true];}; false;"]; 
+		while {(_unit getVariable "G_Unconscious")} do {
+			//Open dialog
+			_reviveDialog = createDialog "G_Revive_Dialog";
+			//Wait for dialog to be open
+			waitUntil {!isNull (findDisplay -1)};
+			//Wait for dialog to be closed (by Escape)
+			waitUntil {!dialog};
+			//Give player time to access game menu before re-cycling
+			sleep 5;
+		};
 	};
 };
 
