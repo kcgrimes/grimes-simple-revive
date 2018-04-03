@@ -134,7 +134,7 @@ if (G_Unit_Tag) then {
 		sleep 1;
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
-			waitUntil {scriptDone _handle};
+			waitUntil {sleep 0.1; scriptDone _handle};
 			[player, (player getVariable "G_Unit_Tag_Number")] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
 		};
 	}
@@ -142,7 +142,7 @@ if (G_Unit_Tag) then {
 	{
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
-			waitUntil {scriptDone _handle};
+			waitUntil {sleep 0.1; scriptDone _handle};
 		};
 	};
 };
@@ -196,11 +196,11 @@ if (!(G_Respawn_Button) and (G_isClient)) then {
 	[] spawn {
 		while {true} do {
 			//Wait for game menu to open
-			waitUntil {!isNull (findDisplay 49)};
+			waitUntil {sleep 0.1; !isNull (findDisplay 49)};
 			//Add EH to close game menu when respawn button is clicked and announce that it is disabled
 			_respawnButtonEH = ((findDisplay 49) displayCtrl 1010) ctrlAddEventHandler ["MouseButtonDown",{(findDisplay 49) closeDisplay 0; titleText ["The Respawn Button is disabled by the host!","PLAIN",1]; titleFadeOut 5;}]; 
 			//Wait for game menu to be closed (and EH deleted)
-			waitUntil {isNull (findDisplay 49)};
+			waitUntil {sleep 0.1; isNull (findDisplay 49)};
 		};
 	};  
 };
@@ -223,7 +223,7 @@ G_fnc_moveInCargoToUnloadAction = {
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_unloadActionID = _this select 2;
-		waitUntil {sleep 0.25; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
+		waitUntil {sleep 0.3; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
 	
 		_vehicle removeAction _unloadActionID;
 	};

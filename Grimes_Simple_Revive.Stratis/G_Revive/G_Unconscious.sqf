@@ -71,7 +71,7 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 		//Eject on explosion is enabled, so eject
 		//If in Air vehicle, wait for it to be nearly stopped and nearly crashed
 		if (_vehicle isKindOf "Air") then {
-			waitUntil {(((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
+			waitUntil {sleep 0.2; (((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
 		};
 		//Remove unit from vehicle
 		_unit setVariable ["G_Loaded", objNull, true];
@@ -150,9 +150,9 @@ if (isPlayer _unit) then {
 				((findDisplay 474637) displayCtrl 1600) ctrlShow false;
 			};
 			//Wait for dialog to be open
-			waitUntil {!isNull (findDisplay 474637)};
+			waitUntil {sleep 1; !isNull (findDisplay 474637)};
 			//Wait for dialog to be closed (by Escape)
-			waitUntil {!dialog};
+			waitUntil {sleep 1; !dialog};
 			//Give player time to access game menu before re-cycling
 			sleep 5;
 		};
@@ -202,7 +202,7 @@ if (_reviveTimer > -1) then {
 					//Eject on explosion is enabled, so eject
 					//If in Air vehicle, wait for it to be nearly stopped and nearly crashed
 					if (_vehicle isKindOf "Air") then {
-						waitUntil {(((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
+						waitUntil {sleep 0.2; (((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
 					};
 					//Remove unit from vehicle
 					_unit setVariable ["G_Loaded", objNull, true];
@@ -255,7 +255,7 @@ else
 			};
 		};
 		if (_breakOut) exitWith {};
-		sleep 0.25;
+		sleep 0.2;
 	};
 };
 

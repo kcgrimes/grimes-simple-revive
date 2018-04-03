@@ -89,14 +89,14 @@ G_Revive_actionTime_Var = 0;
 	_rescuer = _this select 0;
 	while {(G_Revive_actionTime_Var < G_Revive_actionTime) and (!G_Revive_Abort)} do {
 		[_rescuer, "AinvPknlMstpSnonWrflDr_medic3"] remoteExec ["playMoveNow", 0, false];
-		waitUntil {sleep 0.1; (!(G_Revive_actionTime_Var < G_Revive_actionTime) || (G_Revive_Abort) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"));};
+		waitUntil {sleep 0.05; (!(G_Revive_actionTime_Var < G_Revive_actionTime) || (G_Revive_Abort) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"));};
 	};
 	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 	[_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
 };
 
 //Wait for revive timer or abort
-waitUntil {!(G_Revive_actionTime_Var < G_Revive_actionTime) || (G_Revive_Abort)};
+waitUntil {sleep 0.1; !(G_Revive_actionTime_Var < G_Revive_actionTime) || (G_Revive_Abort)};
 //Exit if revive was aborted
 if (G_Revive_Abort) exitWith {};
 

@@ -33,7 +33,7 @@ _unit attachTo [_rescuer, [-0.2, 0.25, 0]];
 _dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], "G_Revive\G_Drop_Action.sqf", _unit, 1.5, true, true, ""];
 
 //Wait for Drop or someone to die
-waitUntil {sleep 0.5; (!(_unit getVariable "G_Carried") || !(alive _unit) || (_rescuer getVariable "G_Unconscious"));};  
+waitUntil {sleep 0.1; (!(_unit getVariable "G_Carried") || !(alive _unit) || (_rescuer getVariable "G_Unconscious"));};  
 
 //If unit or rescuer died, handle in Drop function
 if ((!alive _unit) || (!(_unit getVariable "G_Unconscious")) || (_rescuer getVariable "G_Unconscious")) then {

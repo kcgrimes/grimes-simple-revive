@@ -83,7 +83,7 @@ G_fnc_MRV_Lock = {
 				titleText [format["You are not on the right team to enter %1!", getText (configFile >> "CfgVehicles" >> typeOf _MRV >> "displayName")],"PLAIN",1]; 
 				titleFadeOut 4;
 				//Wait for unit to be out of the vehicle
-				waitUntil {sleep 1; vehicle _unit == _unit};
+				waitUntil {sleep 0.5; vehicle _unit == _unit};
 				//Add fuel back to MRV
 				_MRV setFuel _fuel;
 			};
@@ -208,7 +208,7 @@ G_fnc_MRV_Marker_Process = {
 			//Handle marker while MRV is alive
 			while {alive _MRV} do {
 				//Wait for MRV to be deployed or destroyed
-				waitUntil {((_MRV_Logic getVariable "G_MRV_Deployed") || (!alive _MRV))};
+				waitUntil {sleep 0.5; ((_MRV_Logic getVariable "G_MRV_Deployed") || (!alive _MRV))};
 				//Display marker
 				_MRV_mkr setMarkerTypeLocal G_Mobile_Respawn_Mkr_Type;
 				//Handle marker while MRV is deployed
@@ -232,7 +232,7 @@ G_fnc_MRV_Marker_Process = {
 				//Handle marker while MRV is alive
 				while {alive _MRV} do {
 					//Wait for MRV to be deployed or destroyed
-					waitUntil {((_MRV_Logic getVariable "G_MRV_Deployed") || (!alive _MRV))};
+					waitUntil {sleep 0.5; ((_MRV_Logic getVariable "G_MRV_Deployed") || (!alive _MRV))};
 					//Display marker
 					_MRV_mkr setMarkerType G_Mobile_Respawn_Mkr_Type;
 					//Handle marker while MRV is deployed

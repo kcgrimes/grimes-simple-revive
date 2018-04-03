@@ -29,9 +29,10 @@ if (G_isServer) then {
 };
 
 if (G_isClient) then {
-	waitUntil {!isNil "G_Unit_Tag_Num_List"};
-	waitUntil {!isNull G_Unit_Tags_Logic};
-
+	waitUntil {sleep 0.1; !isNil "G_Unit_Tag_Num_List"};
+	waitUntil {sleep 0.1; !isNull G_Unit_Tags_Logic};
+	
+	//bug - able to slow the waitUntil in here?
 	G_fnc_Unit_Tag_Exec = {
 		_unit = _this select 0;
 		_a = _this select 1;
@@ -81,10 +82,10 @@ if (G_isClient) then {
 	switch (G_Unit_Tag_Display) do {
 		case 0: {
 			G_Unit_Tags_Key_Pressed = false;
-			waitUntil {!isNull (findDisplay 46)};
+			waitUntil {sleep 0.1; !isNull (findDisplay 46)};
 			(findDisplay 46) displayAddEventHandler ["KeyDown","if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};"]; 
 			while {true} do {
-				waitUntil {G_Unit_Tags_Key_Pressed};
+				waitUntil {sleep 0.1; G_Unit_Tags_Key_Pressed};
 				G_Unit_Tags_Key_Pressed = false;
 				{
 					if (_x isKindOf "CAManBase") then {

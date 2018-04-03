@@ -36,7 +36,7 @@ if (G_Squad_Leader_Spawn) then {
 		//Make sure unit spawned on squad leader (probably landed within 10m) or time has elapsed without true
 			//Code executes in 0.25, so this delay should be plenty and non-intrusive
 		_timer = time;
-		waitUntil {(((G_Player_Squad_Leader_Var distance _unit) < 10) || ((time - _timer) >= 2))};
+		waitUntil {sleep 0.1; (((G_Player_Squad_Leader_Var distance _unit) < 10) || ((time - _timer) >= 2))};
 		if ((G_Player_Squad_Leader_Var distance _unit) < 10) then {
 			//Assume squad leader's stance
 			[_unit, animationState G_Player_Squad_Leader_Var] remoteExecCall ["switchMove", 0, true];
