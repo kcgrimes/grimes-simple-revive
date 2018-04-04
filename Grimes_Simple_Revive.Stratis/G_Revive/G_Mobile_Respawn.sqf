@@ -1,4 +1,51 @@
 //Mobile respawn
+//Define functions for MRV action
+G_fnc_MRV_Deploy_Action = {
+	//MRV Deployment
+	_mobile = _this select 0;
+	_deployer = _this select 1;
+	_side = _this select 3 select 0;
+	_MRV_Logic = _this select 3 select 1;
+
+	//Create respawn position
+	_mobileRespawnID = [_side, _mobile] call BIS_fnc_addRespawnPosition;
+	//Store respawn ID
+	_mobile setVariable ["G_MRV_SpawnID", _mobileRespawnID, true];
+
+	//Handle MRV if not moveable
+	if !(G_Mobile_Respawn_Moveable) then {
+		//Create empty helipad as anchor and position it on MRV
+		_hp = "Land_HelipadEmpty_F" createVehicle (getPos _mobile);
+		[_hp, getDir _mobile] remoteExec ["setDir", 0, false];
+		//Sleep required to avoid MRV attaching to still-moving _hp
+		sleep 0.1;
+		//Anchor the MRV to the helipad
+		_mobile attachTo [_hp];
+	};
+
+	//Set MRV as deployed for usage and marker handling
+	_MRV_Logic setVariable ["G_MRV_Deployed", true, true];
+};
+
+G_fnc_MRV_UnDeploy_Action = {
+	//Undeploy
+	_mobile = _this select 0;
+	_deployer = _this select 1;
+	_undeployActionID = _this select 2;
+	_MRV_Logic = _this select 3 select 1;
+	_mobileRespawnID = _mobile getVariable "G_MRV_SpawnID";
+
+	_mobileRespawnID call BIS_fnc_removeRespawnPosition; 
+
+	if !(G_Mobile_Respawn_Moveable) then {
+		_hp = attachedTo _mobile;
+		detach _mobile;
+		deleteVehicle _hp;
+	};
+
+	_MRV_Logic setVariable ["G_MRV_Deployed",false,true];
+};
+
 //Define functions for MRV action conditions
 if (G_Revive_System) then {
 	G_fnc_MRV_Common_actionCondition = {
@@ -62,8 +109,8 @@ _initVars = {
 	//bug - all this vs remoteExec?
 	_MRV_Logic = _MRV getVariable "G_MRV_Logic";
 	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
-	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], "G_Revive\G_Deploy_Action.sqf", [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
-	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color],"G_Revive\G_Undeploy_Action.sqf",[_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
+	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
+	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
 	//Broadcast the action variables for remote manipulation
 	//bug - WOAH. Locality check. This is being broadcasted by everyone. Doesn't make sense. This needs to change.
 	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
@@ -180,8 +227,8 @@ G_fnc_MRV_onRespawn = {
 	_MRV setDir _mrvDir;
 	_side = _MRV_Logic getVariable "G_Side";
 	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
-	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], "G_Revive\G_Deploy_Action.sqf", [_side, _MRV_Logic], 1.5, true, true,"", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
-	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], "G_Revive\G_Undeploy_Action.sqf", [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
+	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
+	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];		
 	//Broadcast Deploy and Undeploy action variables
 	//bug - holy locality. See previous mention of this in init.
 	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
