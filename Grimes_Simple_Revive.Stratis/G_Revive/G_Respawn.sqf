@@ -11,15 +11,7 @@ if ((G_Revive_InitialSpawn) && ((_unit getVariable "G_Lives") == G_Num_Respawns)
 
 //Set system variables
 //bug - forEach loop these like in init_vars
-_unit setVariable ["G_Unconscious",false,true];
-_unit setVariable ["G_Dragged",false,true];
-_unit setVariable ["G_Carried",false,true];
-_unit setVariable ["G_Dragging",false,true];
-_unit setVariable ["G_Carrying",false,true];
-_unit setVariable ["G_getRevived",false,true];
-_unit setVariable ["G_Reviving",false,true];
-_unit setVariable ["G_Reviver",objNull,true];
-_unit setVariable ["G_Loaded",objNull,true];
+_unit call G_fnc_Revive_resetVariables;
 _unit setVariable ["G_Downs",0,true];
 _unit setCaptive false;
 _unit setVariable ["G_Side",side _unit,true];

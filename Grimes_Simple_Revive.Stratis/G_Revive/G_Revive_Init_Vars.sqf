@@ -152,6 +152,7 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
 //Execute G_fnc_EH on all players and AI by side as enabled
 //bug - does this need to be more specifically localized?
+	//particularly for AI on isServer
 {
 	if (isPlayer _x) then {
 		//Is a player
@@ -176,22 +177,7 @@ if (G_Revive_System) then {
 		};
 	};
 
-	//Create handler for key strokes
-	G_fnc_ReviveKeyDownAbort = {
-		//bug - what are each of these, and is this all necessary?
-		switch (_this select 0) do {
-			case 17: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 30: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 31: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 32: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 200: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 203: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 208: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-			case 205: {G_Revive_Abort = true; [] call G_fnc_Revive_Abort;};
-		};
-	};
-
-	//Define revive system text for player
+	//Define player-related incapacitated functions
 	if (G_isClient) then {
 		G_fnc_Dialog_Rescuer_Text = {
 			[_this select 0] spawn {

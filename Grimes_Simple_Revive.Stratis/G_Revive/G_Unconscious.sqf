@@ -150,7 +150,8 @@ if (isPlayer _unit) then {
 				((findDisplay 474637) displayCtrl 1600) ctrlShow false;
 			};
 			//Wait for dialog to be open
-			waitUntil {sleep 1; !isNull (findDisplay 474637)};
+			_timeDialog = time + 5;
+			waitUntil {sleep 1; ((!isNull (findDisplay 474637)) || (time > _timeDialog))};
 			//Wait for dialog to be closed (by Escape)
 			waitUntil {sleep 1; !dialog};
 			//Give player time to access game menu before re-cycling
@@ -180,6 +181,131 @@ if (G_Custom_Exec_1 != "") then {
 //bug - why sleep here?
 sleep 2.5;
 
+//Execute AI tracking for AI's revive behavior
+[_unit] spawn {
+	_unit = _this select 0;
+	//Cycle through AI role assignments as long as unit is unconscious
+	//bug - use of Call for Help concept, or keep it automatic?
+	//By default, reviver and guard are unassigned
+	_aiReviver = objNull;
+	_aiGuard = objNull;
+	while {(_unit getVariable "G_Unconscious")} do {
+		//Only cycle for AI help if not inside a vehicle
+		while {((_unit getVariable "G_Unconscious") && (vehicle _unit == _unit))} do {
+			//If aiReviver is assigned and incapacitated, unassign them
+			if (!isNull _aiReviver) then {
+				if ((_aiReviver getVariable "G_Unconscious") || (!alive _aiReviver)) then {
+					_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
+					_aiReviver = objNull;
+				};
+			};
+			//If aiGuard is assigned and incapacitated, unassign them
+			if (!isNull _aiGuard) then {
+				if ((_aiGuard getVariable "G_Unconscious") || (!alive _aiGuard)) then {
+					_aiGuard setVariable ["G_AI_rescueRole", [0, objNull], true];
+					_aiGuard = objNull;
+				};
+			};
+			
+			//Obtain array of potential rescuers from men within a certain distance
+			_arrayPotentialRescuers = [];
+			{
+				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not unconscious
+					//bug - consider what "friendly" means vs "same side"
+					//This system always runs with AI; players are not considered for roles
+				if ((_x != _unit) && (!isPlayer _x) && ((_unit getVariable "G_Side") == (_x getVariable "G_Side")) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
+					//Add to array, ordered by distance ascending
+					_arrayPotentialRescuers pushBack _x;
+				};
+			} forEach nearestObjects [_unit, ["CAManBase"], 500];
+
+			//Get slot for last potential rescuer
+			_arrayPotentialRescuersCount = (count _arrayPotentialRescuers) - 1;
+			
+			//Attempt to select closest (eligible) AI for reviver and broadcast variable so he comes
+			{
+				//Check if potential is eligible to revive based on setting; exit after code if they are the one
+				//bug - check for FAKs/Medikit, if required?
+				if (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) exitWith {
+					//Eligible to revive
+					//Check if potential is different than current
+					if (_aiReviver != _x) then {
+						//Potential is different; check if is replacement or not
+						if (isNull _aiReviver) then {
+							//Initial reviver, so assign the role
+							_aiReviver = _x;
+							_x setVariable ["G_AI_rescueRole", [1, _unit], true];
+						}
+						else
+						{
+							//Possible replacement, make sure is reasonable before replacing
+								//Must be 50m closer to victim than current assigned reviver
+							if ((_aiReviver distance _unit) > ((_x distance _unit) + 50)) then {
+								//Replace current reviver with new
+								_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
+								_aiReviver = _x;
+								_x setVariable ["G_AI_rescueRole", [1, _unit], true];
+							};
+						};
+						//If new reviver is coming from guard, unassign the guard role
+						if (_aiReviver == _aiGuard) then {
+							_aiGuard = objNull;
+						};
+					};
+				};
+				//If by last option of potentials no one is selected, then make sure aiReviver goes unassigned
+				if (_x == (_arrayPotentialRescuers select _arrayPotentialRescuersCount)) then {
+					_aiReviver = objNull;
+				};
+			} forEach _arrayPotentialRescuers;
+			
+			//Attempt to select 2nd closest AI for guard and broadcast variable so he comes
+			{
+				//Check if potential is different than current
+				if ((_aiGuard != _x) && (_aiReviver != _x)) then {
+					//Potential is different; check if is replacement or not
+					if (isNull _aiGuard) then {
+						//Initial guard, so assign the role
+						_aiGuard = _x;
+						_x setVariable ["G_AI_rescueRole", [2, _unit], true];
+					}
+					else
+					{
+						//Possible replacement, make sure is reasonable before replacing
+							//Must be 50m closer to victim than current assigned guard
+						if ((_aiGuard distance _unit) > ((_x distance _unit) + 50)) then {
+							//Replace current guard with new
+							_aiGuard setVariable ["G_AI_rescueRole", [0, objNull], true];
+							_aiGuard = _x;
+							_x setVariable ["G_AI_rescueRole", [2, _unit], true];
+						};
+					};
+				};
+				//No exitWith like aiRevive, but same reason - if eligible and not replaced, keep current guard
+				if (_aiGuard == _x) exitWith {};
+				//If by last option of potentials no one is selected, then make sure aiGuard goes unassigned
+				if (_x == (_arrayPotentialRescuers select _arrayPotentialRescuersCount)) then {
+					_aiGuard = objNull;
+				};
+			} forEach _arrayPotentialRescuers;
+
+			//Wait magic amount of seconds before re-checking
+			sleep 5;
+		};
+		
+		//Unit no longer unconscious, or is in vehicle, so disregard any rescuing AI by resetting variables
+		if (!isNull _aiReviver) then {
+			_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
+		};
+		if (!isNull _aiGuard) then {
+			_aiGuard setVariable ["G_AI_rescueRole", [0, objNull], true];
+		};
+		
+		//Wait magic amount of seconds before re-checking if in vehicle
+		sleep 10;
+	};
+};
+
 _reviveTimer = G_Revive_Time_Limit;
 //Check if revive timer is unlimited
 if (_reviveTimer > -1) then {
@@ -189,7 +315,7 @@ if (_reviveTimer > -1) then {
 	while {(_unit getVariable "G_Unconscious") && (_reviveTimer > 0) && (alive _unit) && (local _unit)} do 
 	{
 		//If unit is not currently being revived, count down
-		if !(_unit getVariable "G_getRevived") then {
+		if (isNull (_unit getVariable "G_Reviver")) then {
 			_reviveTimer = _reviveTimer - 1;
 		};
 		//Handle vehicle if unit is in one
@@ -286,8 +412,6 @@ else
 	//bug - Make option to have certain damage, requiring further treatment?
 	_unit setDamage 0;
 	//Remove from Unconscious
-	//bug - this is done anyway, so add it before the if/then for optimization?
-	_unit setVariable ["G_Unconscious", false, true];
 	_unit setUnconscious false;
 	/*
 	//Cleanly move unit to prone animation
