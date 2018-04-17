@@ -76,6 +76,7 @@ G_Custom_Exec_1 = ""; //File executed when unit is set Unconscious (NOT "killed"
 G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed)
 G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed
 G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. The newly spawned MRV = _this select 0
+G_Custom_Exec_5 = ""; //File executed when unit is revived
 
 ////DO NOT EDIT
 [] execVM "G_Revive\G_Revive_Init_Vars.sqf";

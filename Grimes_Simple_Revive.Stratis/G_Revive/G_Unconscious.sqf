@@ -466,6 +466,11 @@ else
 			};
 		};
 	};
+	
+	//Custom execution
+	if (G_Custom_Exec_3 != "") then {
+		[] execVM G_Custom_Exec_3;
+	};
 };
 
 //Reset Reviver variable
