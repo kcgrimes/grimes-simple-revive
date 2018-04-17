@@ -373,13 +373,31 @@ else
 	while {(_unit getVariable "G_Unconscious") && (alive _unit) && (local _unit)} do 
 	{
 		//Handle vehicle if unit is in one
-		_vehicleLoop = _unit getVariable "G_Loaded";
 		_breakOut = false;
-		if (!isNull _vehicleLoop) then {
+		if (!isNull (_unit getVariable "G_Loaded")) then {
 			//Unit in a vehicle
-			if ((!alive _vehicleLoop) && (!G_Explosion_Eject_Occupants)) then {
-				//Vehicle is destroyed, cannot eject, break out to kill the unit
-				_breakOut = true;
+			if (!alive (_unit getVariable "G_Loaded")) then {
+				//Vehicle is destroyed
+				if (G_Explosion_Eject_Occupants) then {
+					//Eject on explosion is enabled, so eject
+					//If in Air vehicle, wait for it to be nearly stopped and nearly crashed
+					if (_vehicle isKindOf "Air") then {
+						waitUntil {sleep 0.2; (((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
+					};
+					//Remove unit from vehicle
+					_unit setVariable ["G_Loaded", objNull, true];
+					//Wait for game to catch up
+					sleep 1.5;
+					//Allow more time for animation if coming from Air vehicle
+					//bug - why?
+					if (_vehicle isKindOf "Air") then {
+						sleep 1.5;
+					};
+				}
+				else
+				{
+					_breakOut = true;
+				};
 			};
 		};
 		if (_breakOut) exitWith {};
