@@ -55,7 +55,7 @@ if (G_Revive_System) then {
 	//Common conditions for action when revive is enabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		(((_target distance _this) < 5) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
+		(((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
 	};
 }
 else
@@ -63,7 +63,7 @@ else
 	//Common conditions for action when revive is disabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		(((_target distance _this) < 5) && (_target != _this) && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
+		(((_target distance _this) < 6) && (_target != _this) && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
 	};
 };
 
