@@ -24,13 +24,6 @@ _unit setVariable ["G_Unconscious", true, true];
 	_unit setVariable ["G_Dragged", false, true];
 };
 
-//Disable collision of the incapacitated unit with all other units
-	//Without this, incapacitated can be kicked around
-	//bug - is the locality here ok, or does there need to be a broadcast?
-{
-	_unit disableCollisionWith _x;
-} forEach allUnits;
-
 //Handle unit if inside vehicle
 _bypass = false;
 //If already Loaded, define vehicle that unit is in
@@ -113,11 +106,6 @@ if (G_Revive_DownsPerLife > 0) then {
 if (_bypass) exitWith {
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
-	//Enable collision of the incapacitated unit with all other units
-		//bug - is the locality here ok, or does there need to be a broadcast?
-	{
-		_unit enableCollisionWith _x;
-	} forEach allUnits;
 	_unit setDamage 1;
 };
 
@@ -449,11 +437,6 @@ else
 	_unit allowDamage true;
 	_rescuer = _unit getVariable "G_Reviver";
 	_downs = _unit getVariable "G_Downs";
-	//Enables collision of the incapacitated unit with all other units
-		//bug - is the locality here ok, or does there need to be a broadcast?
-	{
-		_unit enableCollisionWith _x;
-	} forEach allUnits;
 	//Display downs remaining for players
 	//bug - do AI units properly count downs?
 	if (isPlayer _unit) then {
