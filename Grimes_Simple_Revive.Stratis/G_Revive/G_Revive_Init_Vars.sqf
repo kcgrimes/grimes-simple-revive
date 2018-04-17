@@ -116,32 +116,46 @@ if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER
 };
 
 //If Squad Leader spawn or markers are enabled, execute associated script for player
+//bug - why not rework and use with AI too?
 if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
 	[] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
 };
 
 //If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
-//bug - does this need to be more specifically localized?
+//bug - does this need to be more specifically localized? Probably yes, to player only
 if (G_Unit_Tag) then {
+	//If JIP need to resume, if initial need to start
 	if (G_isJIP) then {
+		//Is JIP
+		//bug - this waitUntil should already be accomplished? Reminder to move that stuff from init to revive_init
 		waitUntil {alive player};
+		//bug - why is this statement even here?
 		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
+		//Add unit and tag number to player list
 		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, player];
+		//Obtain complete local player list
 		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
+		//Broadcast player list
 		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
+		//Add one to tag number list
+		//bug - what if this JIP is a replacement? Is this appropriate?
 		G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
 		publicVariable "G_Unit_Tag_Num_List";
+		//Wait for variable broadcasts
 		sleep 1;
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
+			//Wait for Unit Tags to process
 			waitUntil {sleep 0.1; scriptDone _handle};
 			[player, (player getVariable "G_Unit_Tag_Number")] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
 		};
 	}
 	else
 	{
+		//Fresh start
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
+			//Wait for Unit Tags to process
 			waitUntil {sleep 0.1; scriptDone _handle};
 		};
 	};
@@ -179,6 +193,7 @@ if (G_Revive_System) then {
 
 	//Define player-related incapacitated functions
 	if (G_isClient) then {
+		//Define function for "nearest rescuer" text
 		G_fnc_Dialog_Rescuer_Text = {
 			[_this select 0] spawn {
 				private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
@@ -207,7 +222,7 @@ if (G_Revive_System) then {
 						call compile format["_unit%1 = format[""%2  (%3m)"", name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];", _i, "%1", "%2"];
 					};
 					
-					//Format nearest rescuers
+					//Format text to be displayed
 					_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
 					//Output nearest rescuers
 					((_this select 0) displayCtrl 1001) ctrlSetText _text;
@@ -216,16 +231,21 @@ if (G_Revive_System) then {
 				};
 			};
 		};
-
+		
+		//Define function for "downs/lives remaining" text
 		G_fnc_Dialog_Downs_Text = {
 			private ["_downs", "_lives"];
+			//If downs-per-life is limited, display remaining, otherwise text
 			if (G_Revive_DownsPerLife > 0) then {
-				_downs = (G_Revive_DownsPerLife) - (player getVariable "G_Downs");
+				//Subtract accrued number of downs from the limit to obtain remainder
+				_downs = G_Revive_DownsPerLife - (player getVariable "G_Downs");
 			}
 			else
 			{
 				_downs = "Unlimited";
 			};
+			
+			//If number of lives is limited, display remaining, otherwise text
 			if (G_Num_Respawns == -1) then {
 				_lives = "Unlimited";
 			}
@@ -233,31 +253,44 @@ if (G_Revive_System) then {
 			{
 				_lives = player getVariable "G_Lives";
 			};
-			_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2",_downs,_lives];
+			//Format text to be displayed
+			_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2", _downs, _lives];
+			//Display the "lives remaining" dialog"
 			((_this select 0) displayCtrl 1002) ctrlSetText _text;
 		};
 	};
 	
 	//Define function that handles Load/Unload of player
 	G_fnc_moveInCargoToUnloadAction = {
+		//bug - is this waitUntil necessary? why?
 		waitUntil {!isNull player};
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_side = _this select 2;
 		
+		//Command AI to stay in vehicle
 		_unit assignAsCargo _vehicle;
+		//Move unit into vehicle
 		_unit moveInCargo _vehicle;
+		//Perform DeadState animation due to lack of Unconscious anim in vehicle
 		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+		//Set vehicle side to unit's side for action condition
+		//bug - is this reset later? 
 		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
 		
-		_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>",name _unit,G_Revive_Action_Color],"G_Revive\G_Unload_Action.sqf",[_unit],1.5,true,true,"", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
-
+		//Add Unload action for unit to vehicle
+		_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "G_Revive\G_Unload_Action.sqf", [_unit], 1.5, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
+		
+		//Create parallel loop to monitor Unload action
+		//bug - can this not just be accomplished in the Unload script, instead of cycling?
 		[_unit, _vehicle, _unloadActionID] spawn {
 			_unit = _this select 0;
 			_vehicle = _this select 1;
 			_unloadActionID = _this select 2;
+			//Wait for unit to be unloaded or no longer unconscious
 			waitUntil {sleep 0.3; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
-		
+			
+			//Remove the Unload action from the vehicle
 			_vehicle removeAction _unloadActionID;
 		};
 	};

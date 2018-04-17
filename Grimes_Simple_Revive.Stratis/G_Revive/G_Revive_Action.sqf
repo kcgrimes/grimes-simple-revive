@@ -54,38 +54,54 @@ if (isPlayer _rescuer) then {
 	titleFadeOut 5;
 };
 
-//Handle revive abort
+//Handle revive abort for players
 if (isPlayer _rescuer) then {
+	//Common fix before displayAddEH
 	waitUntil {!isNull (findDisplay 46)};
+	//Define KeyDown EH for abort upon any key stroke
+	//bug - rename to something useful?
+	//bug - does it need to be global?
 	G_Revive_Global_KeyDown_EH = (findDisplay 46) displayAddEventHandler ["KeyDown", {
-		//Create handler for key strokes
+		//Remove this EH (so only happens once)
 		(findDisplay 46) displayRemoveEventHandler ["KeyDown", G_Revive_Global_KeyDown_EH];
+		//Obtain unit from player's object
 		_unit = player getVariable "G_Reviving";
+		//Reset revive action variables
 		player setVariable ["G_Reviving", objNull, true];
 		_unit setVariable ["G_Reviver", objNull, true];
+		//Announce revive abort
 		titleText [format["You have aborted the revive process of %1!", name _unit], "PLAIN", 1]; 
 		titleFadeOut 5;
 	}];  
 }; 
 
+//Define what game time revive action should be completed
 _endTime = time + G_Revive_actionTime;
+//Until the end time is reached, make sure the revive animation continues to play as long as revive is not aborted and nobody is incapacitated/killed
 while {(time < _endTime) && (!isNull (_rescuer getVariable "G_Reviving")) && (alive _unit) && (!(_rescuer getVariable "G_Unconscious")) && (alive _rescuer)} do {
+	//Execute revive animation
 	[_rescuer, "AinvPknlMstpSnonWrflDr_medic3"] remoteExec ["playMoveNow", 0, false];
+	//Wait for revive animation to be set
 	waitUntil {sleep 0.05; ((animationState _rescuer) == "AinvPknlMstpSnonWrflDr_medic3")};
+	//Wait for revive animation to be finished, abort, or something happens
 	waitUntil {sleep 0.05; (!(time < _endTime) || (isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Unconscious") || (!alive _rescuer) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"))};
 };
 
 //Wait for revive timer or abort
+//bug - is this not always true here?
 waitUntil {sleep 0.1; (!(time < _endTime) || (isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Unconscious") || (!alive _rescuer))};
+//Either way, reset reviver animation to kneeling position to prevent revive animation cycling
 [_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 [_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
 
+//Make sure KeyDown EH is removed
 if (isPlayer _rescuer) then {
 	(findDisplay 46) displayRemoveEventHandler ["KeyDown", G_Revive_Global_KeyDown_EH];
 };
 
 //Exit if revive was aborted, the victim died, or the rescuer was incapacitated
 if ((isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Unconscious") || (!alive _rescuer)) exitWith {
+	//Reset revive action variables
 	_rescuer setVariable ["G_Reviving", objNull, true];
 	_unit setVariable ["G_Reviver", objNull, true];
 };
@@ -93,25 +109,35 @@ if ((isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer 
 //Revive action is stopped; reset variables
 _unit setVariable ["G_Unconscious", false, true];
 _rescuer setVariable ["G_Reviving", objNull, true];
-//_unit's "G_Reviver" is reset with abort or after its use in G_Unconscious
+//_unit's "G_Reviver" is reset with abort or later after its use in G_Unconscious
 
-//Handle revive announcement depending on use of Lives system
+//Handle revive announcement depending on use of life rewarding system
+//Obtain number of lives (or determine if unlimited with -1)
 _lives = _rescuer getVariable "G_Lives";
-if ((_lives >= 0) and (G_Revive_Reward > 0)) then {
+if ((_lives >= 0) && (G_Revive_Reward > 0)) then {
+	//Limited lives
+	//+1 to life count
 	_lives = _lives + G_Revive_Reward;
-	_livesPlural = "lives";
-	if (_lives == 1) then {
-		_livesPlural = "life";
-	};
+	//Announce revive success life count for players
 	if (isPlayer _rescuer) then {
+		//Determine plurality
+		_livesPlural = "lives";
+		if (_lives == 1) then {
+			_livesPlural = "life";
+		};
+		//Format and display text
 		titleText [format["You have been rewarded an additional life for reviving %1! You have %2 %3 remaining!", name _unit, _lives, _livesPlural], "PLAIN", 1];
 		titleFadeOut 4;
 	};
+	//Set new life count and broadcast
 	_rescuer setVariable ["G_Lives", _lives, true];
 }
 else
 {
+	//Unlimited lives
+	//Announce revive success for players
 	if (isPlayer _rescuer) then {
+		//Format and display text
 		titleText [format["You have revived %1!", name _unit], "PLAIN", 1]; 
 		titleFadeOut 4;
 	};

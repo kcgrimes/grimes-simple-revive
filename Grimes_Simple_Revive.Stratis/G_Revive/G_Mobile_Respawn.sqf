@@ -27,27 +27,32 @@ G_fnc_MRV_Deploy_Action = {
 	_MRV_Logic setVariable ["G_MRV_Deployed", true, true];
 };
 
+//Create definition for Undeploy action
 G_fnc_MRV_UnDeploy_Action = {
-	//Undeploy
 	_mobile = _this select 0;
 	_deployer = _this select 1;
 	_undeployActionID = _this select 2;
 	_MRV_Logic = _this select 3 select 1;
+	//Obtain spawnID from object variable
 	_mobileRespawnID = _mobile getVariable "G_MRV_SpawnID";
-
+	
+	//Delete the MRV respawn position
 	_mobileRespawnID call BIS_fnc_removeRespawnPosition; 
 
+	//Detach and delete helipad anchor if used
 	if !(G_Mobile_Respawn_Moveable) then {
 		_hp = attachedTo _mobile;
 		detach _mobile;
 		deleteVehicle _hp;
 	};
-
-	_MRV_Logic setVariable ["G_MRV_Deployed",false,true];
+	
+	//Mark MRV as Undeployed and broadcast
+	_MRV_Logic setVariable ["G_MRV_Deployed", false, true];
 };
 
-//Define functions for MRV action conditions
+//Define functions for common MRV action conditions
 if (G_Revive_System) then {
+	//Common conditions for action when revive is enabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
 		(((_target distance _this) < 5) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
@@ -55,17 +60,22 @@ if (G_Revive_System) then {
 }
 else
 {
+	//Common conditions for action when revive is disabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
 		(((_target distance _this) < 5) && (_target != _this) && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
 	};
 };
 
+//Define functions for more specific MRV action conditions
 if (G_Mobile_Respawn_Moveable) then {
+	//Deployed MRV is movable
+	//Condition for Deploy action
 	G_fnc_MRV_Deploy_actionCondition = {
 		params ["_target", "_this"];
 		(([_target, _this] call G_fnc_MRV_Common_actionCondition) && !((_target getVariable "G_MRV_Logic") getVariable "G_MRV_Deployed"))
 	};
+	//Condition for UnDeploy action
 	G_fnc_MRV_UnDeploy_actionCondition = {
 		params ["_target", "_this"];
 		(([_target, _this] call G_fnc_MRV_Common_actionCondition) && ((_target getVariable "G_MRV_Logic") getVariable "G_MRV_Deployed"))
@@ -73,10 +83,13 @@ if (G_Mobile_Respawn_Moveable) then {
 }
 else
 {
+	//Deployed MRV is not movable
+	//Condition for Deploy action
 	G_fnc_MRV_Deploy_actionCondition = {
 		params ["_target", "_this"];
 		(([_target, _this] call G_fnc_MRV_Common_actionCondition) && !((_target getVariable "G_MRV_Logic") getVariable "G_MRV_Deployed") && ((speed _target) < 1) && ((speed _target) > -1))
 	};
+	//Condition for UnDeploy action
 	G_fnc_MRV_UnDeploy_actionCondition = {
 		params ["_target", "_this"];
 		(([_target, _this] call G_fnc_MRV_Common_actionCondition) && ((_target getVariable "G_MRV_Logic") getVariable "G_MRV_Deployed") && ((speed _target) < 1) && ((speed _target) > -1))
@@ -113,8 +126,8 @@ _initVars = {
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
 	//Broadcast the action variables for remote manipulation
 	//bug - WOAH. Locality check. This is being broadcasted by everyone. Doesn't make sense. This needs to change.
-	_MRV setVariable ["G_MRV_Action_ID",_deployActionID,true];
-	_MRV setVariable ["G_MRV_Undeploy_ID",_undeployActionID,true];
+	_MRV setVariable ["G_MRV_Action_ID", _deployActionID, true];
+	_MRV setVariable ["G_MRV_Undeploy_ID", _undeployActionID, true];
 };
 
 //Define array of MRVs and associated side
@@ -222,7 +235,7 @@ G_fnc_MRV_onRespawn = {
 		_MRV call compile format ["%1 = _this; publicVariable ""%1""", _MRV_Logic getVariable "G_MRV_Name"];
 		_MRV_Logic setVariable ["G_MRV_Deployed", false, true];
 	};
-	//
+	//Obtain and set MRV direction
 	_mrvDir = _MRV_Logic getVariable "G_MRV_Dir";
 	_MRV setDir _mrvDir;
 	_side = _MRV_Logic getVariable "G_Side";
