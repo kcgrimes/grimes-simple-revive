@@ -421,12 +421,23 @@ else
 	_unit setDamage 0;
 	//Remove from Unconscious
 	_unit setUnconscious false;
-	/*
-	//Cleanly move unit to prone animation
-	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
-	//Forcefully move unit to prone animation
-	[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
-	*/
+	
+	//If under water, must manually execute swimming animation
+	if ((eyePos _unit select 2) < 0) then {
+		//Below sea level
+		//Cleanly move unit to swimming animation
+		[_unit, "abswpercmstpsnonwnondnon"] remoteExecCall ["playMoveNow", 0, true];
+	}
+	else
+	{
+		/*
+		//Above sea level
+		//Cleanly move unit to prone animation
+		[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
+		//Forcefully move unit to prone animation
+		[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
+		*/
+	};
 	//Allow unit to be engaged by AI
 	_unit setCaptive false;
 	//Allow AI unit to move
