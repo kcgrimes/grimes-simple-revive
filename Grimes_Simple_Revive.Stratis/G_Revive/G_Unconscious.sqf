@@ -44,16 +44,14 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 	
 	//Check if vehicle is alive
 	if (alive _vehicle) then {
-		//Vehicle is alive, so unit is already "Loaded", so set accordingly
-		_unit setVariable ["G_Loaded", _vehicle, true];
-		[_unit, _vehicle, side _unit] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
-		
-		//If killed units should be ejected, handle accordingly
+		//Vehicle is alive
+		//If incapacitated units should be ejected, handle accordingly
 		if (G_Eject_Occupants) then {
-			//Remove unit from vehicle
-			_unit setVariable ["G_Loaded", objNull, true];
+			//Eject incapacitated unit
+			//Order unit to be out of vehicle
 			unassignVehicle _unit;
-			_unit setPos (_unit modelToWorldVisual [-2,0,0]);
+			//Manually remove unit from vehicle
+			moveOut _unit;
 			//Allow time for animation to get set
 			sleep 1.5;
 			//Allow more time for animation if coming from Air vehicle
@@ -61,6 +59,12 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 			if (_vehicle isKindOf "Air") then {
 				sleep 1.5;
 			};
+		}
+		else
+		{
+			//Don't eject, so unit is already "Loaded", so set accordingly
+			_unit setVariable ["G_Loaded", _vehicle, true];
+			[_unit, _vehicle, side _unit] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
 		};
 	}
 	else
@@ -73,10 +77,10 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 		if (_vehicle isKindOf "Air") then {
 			waitUntil {sleep 0.2; (((speed _vehicle) < 3) and (((getPos _vehicle) select 2) < 10))};
 		};
-		//Remove unit from vehicle
-		_unit setVariable ["G_Loaded", objNull, true];
+		//Order unit to be out of vehicle
 		unassignVehicle _unit;
-		_unit setPos (_unit modelToWorldVisual [-2,0,0]);
+		//Manually remove unit from vehicle
+		moveOut _unit;
 		//Wait for game to catch up
 		sleep 1.5;
 		//Allow more time for animation if coming from Air vehicle
@@ -332,8 +336,6 @@ if (_reviveTimer > -1) then {
 					};
 					//Remove unit from vehicle
 					_unit setVariable ["G_Loaded", objNull, true];
-					unassignVehicle _unit;
-					_unit setPos (_unit modelToWorldVisual [-2,0,0]);
 					//Wait for game to catch up
 					sleep 1.5;
 					//Allow more time for animation if coming from Air vehicle
