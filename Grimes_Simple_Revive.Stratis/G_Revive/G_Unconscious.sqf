@@ -10,6 +10,9 @@ if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitW
 //Broadcast unconscious-state animation
 _unit setUnconscious true;
 
+//Prevent being further engaged by enemies
+_unit setCaptive true;
+
 //Prepare to add mock delay to revive actions to prevent animation failures
 _unit setVariable ["G_Dragged", true, true];
 
@@ -161,8 +164,6 @@ if (isPlayer _unit) then {
 _unit disableAI "MOVE";
 //Prevent scripted AI responses (such as exiting immobile vehicle)
 _unit disableAI "FSM";
-//Prevent being further engaged by enemies
-_unit setCaptive true;
 
 //Custom execution
 if (G_Custom_Exec_1 != "") then {

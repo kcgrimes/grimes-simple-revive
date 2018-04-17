@@ -20,6 +20,7 @@ if (_unit getVariable "G_Dragged") then {
 	{
 		//Rescuer animation to lower down to ground
 		[_rescuer, "AcinPknlMstpSrasWrflDnon_AmovPknlMstpSrasWrflDnon"] remoteExec ["switchMove", 0, true];
+		//bug - I'd like to use these, but they don't seem to work right
 		//[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["playMoveNow", 0, true];
 		//[_unit, "AinjPpneMrunSnonWnonDb_release"] remoteExecCall ["switchMove", 0, true];
 		//Unit animation to return to incapacitated animation
