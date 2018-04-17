@@ -273,7 +273,8 @@ if (G_Revive_System) then {
 		//Move unit into vehicle
 		_unit moveInCargo _vehicle;
 		//Perform DeadState animation due to lack of Unconscious anim in vehicle
-		[_unit, "DeadState"] remoteExecCall ["playMoveNow", 0, true];
+		//bug - check locality
+		[_unit, "Unconscious"] remoteExecCall ["playAction", 0, true];
 		//Set vehicle side to unit's side for action condition
 		//bug - is this reset later? 
 		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];

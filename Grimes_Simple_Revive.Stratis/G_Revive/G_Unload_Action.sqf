@@ -10,7 +10,7 @@ unassignVehicle _unit;
 //bug - does moveOut work now?
 _unit setPos (_unit modelToWorldVisual [-2,0,0]);
 
-//Execute Unconscious animation (coming from DeadState)
+//Execute Unconscious animation (still required despite playAction "Unconscious")
 [_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
 [_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
 
