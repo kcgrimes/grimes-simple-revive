@@ -430,13 +430,17 @@ else
 	}
 	else
 	{
-		/*
 		//Above sea level
-		//Cleanly move unit to prone animation
-		[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
-		//Forcefully move unit to prone animation
-		[_unit, "AmovPpneMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
-		*/
+		//Fix from BIS_fnc_reviveOnState for being revived while having no weapon or binocular
+		if ({currentWeapon _unit == _x} count ["", binocular _unit] > 0) then {
+			[_unit] spawn {
+				_unit = _this select 0;
+				sleep 0.1;
+				if ({currentWeapon _unit == _x} count ["", binocular _unit] > 0) then {
+					_unit playAction "Civil";
+				};
+			};
+		};
 	};
 	//Allow unit to be engaged by AI
 	_unit setCaptive false;
