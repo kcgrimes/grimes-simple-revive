@@ -110,6 +110,10 @@ if (_bypass) exitWith {
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
 	_unit setDamage 1;
+	//Add killed message for AI for consistency
+	if ((G_isClient) && (!isPlayer _unit) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
+		systemChat format["%1 was killed", name _unit];
+	};
 };
 
 //Black out the screen with text for unconscious player
@@ -409,6 +413,10 @@ if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_uni
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
 	_unit setDamage 1;
+	//Add killed message for AI for consistency
+	if ((G_isClient) && (!isPlayer _unit) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
+		systemChat format["%1 was killed", name _unit];
+	};
 	//If on black screen, bring back normal view
 	if (G_Revive_Black_Screen) then {
 		titleText ["", "BLACK IN", 1]; 
@@ -453,6 +461,12 @@ else
 	_unit allowDamage true;
 	_rescuer = _unit getVariable "G_Reviver";
 	_downs = _unit getVariable "G_Downs";
+	
+	//Announce revive
+	if ((G_isClient) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
+		systemChat format["%1 was revived by %2", name _unit, name _rescuer];
+	};
+	
 	//Display downs remaining for players
 	//bug - do AI units properly count downs?
 	if (isPlayer _unit) then {

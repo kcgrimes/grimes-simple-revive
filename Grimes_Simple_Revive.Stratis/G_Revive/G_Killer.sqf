@@ -4,13 +4,32 @@ private ["_killer_lives"];
 _unit = _this select 0;
 _killer = _this select 1;
 
+_noKiller = false;
 //If unit was killed by environment, exit
-if (isNull _killer) exitWith {};
+if (isNull _killer) then {
+	_noKiller = true;
+};
 //If unit killed self, exit
-if (_unit == _killer) exitWith {};
+if (_unit == _killer) then {
+	_noKiller = true;
+};
 //If killer does not have lives (is not a Man), no need to be here
-if ((typeName (_killer getVariable "G_Lives")) != "SCALAR") exitWith {};
+if ((typeName (_killer getVariable "G_Lives")) != "SCALAR") then {
+	_noKiller = true;
+};
 
+//If no killer defined, no killer to manage, so exit with incapacitated text
+if (_noKiller) exitWith {
+	if ((G_isClient) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
+		systemChat format["%1 was incapacitated", name _unit];
+	};
+};
+
+//Killer was defined, so announce
+if ((G_isClient) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
+	systemChat format["%1 was incapacitated by %2", name _unit, name _killer];
+};
+	
 //Check if teamkill
 if ((_unit getVariable "G_Side") == (_killer getVariable "G_Side")) then {
 	//Is teamkill

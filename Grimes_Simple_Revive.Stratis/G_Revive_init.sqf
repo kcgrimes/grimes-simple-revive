@@ -23,6 +23,7 @@ G_Eject_Occupants = false; //If killed while in a vehicle, the revivable unit is
 G_Explosion_Eject_Occupants = true; //Once the wreck of an exploded vehicle comes to a stop (air or land), the occupants will be ejected and revivable. True to enable, false to disable (units will bypass revive and be forced to respawn).
 G_Revive_Reward = 0; //0 = No lives rewarded for revive. 1 and up = number of lives rewarded for reviving. (CAN be a decimal)
 G_TK_Penalty = 0; //Amount of lives a Team Killer loses per team kill. Note, must be negative to be negative result (Ex. Value of -2 means 2 lives lost per TK) (CAN be a decimal)
+G_Revive_Messages = 2; //Chat messages upon incapacitation and revive. 0 = None. 1 = Friendly only. 2 = All.
 
 //Respawn/Initial Spawn
 G_Init_Start = 0; //0 = starting position is editor-placed position. 1 = starting position is random spawn marker. 2 = On start, player is presented with menu to select spawn position (NOTE: For the menu to work at start, you must go to G_Revive\G_Desc_Include.hpp, find respawnOnStart, and change it to 1. As well, if you do this, G_JIP_Start must also be 2.)
