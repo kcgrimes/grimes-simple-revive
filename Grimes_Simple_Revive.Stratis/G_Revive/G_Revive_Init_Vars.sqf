@@ -74,12 +74,31 @@ if ((count G_Unit_Tag_SquadColor) != 3) then {_validationFailed pushBack "G_Unit
 //Custom Executions
 if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING")) then {_validationFailed pushBack "G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
+//If error messages exist, format and execute a message for each one and exit
+	//Done on all machines to prevent anyone from loading script
 if ((count _validationFailed) > 0) exitWith {
 	{
 		_msg = format["G_Revive_Init ERROR: %1", _x];
 		systemChat _msg;
 		diag_log _msg;
 	} forEach _validationFailed;
+};
+
+//Machine detection
+G_isDedicated = false;
+G_isServer = false;
+G_isClient = false;
+G_isJIP = false;
+if (isDedicated) then {
+	G_isDedicated = true;
+	G_isServer = true;
+}
+else
+{
+	if (isServer) then {G_isServer = true};
+	G_isClient = true;
+	if (isNull player) then {G_isJIP = true};
+	waitUntil {!isNull player};
 };
 
 //Define if PvP - Mission where there are more than one playable sides (PvP, TvT, etc.), as opposed to having players on only one side (CoOp, SP, etc.).
@@ -110,7 +129,6 @@ if ((G_Briefing) && (G_isClient)) then {
 };
 
 //If MRVs are in use, execute MRV script
-//bug - does this need to be more specifically localized?
 if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER + G_Mobile_Respawn_CIV) > 0) then {
 	[] execVM "G_Revive\G_Mobile_Respawn.sqf";
 };
