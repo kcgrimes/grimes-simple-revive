@@ -173,6 +173,7 @@ class Mission
 	class Intel
 	{
 		briefingName="Grimes Simple Revive";
+		overviewText="Simple revive script that utilizes stock functions in a simple, user-friendly, and quality manner.";
 		resistanceWest=0;
 		startWind=0.099999994;
 		startWaves=0.099999994;
