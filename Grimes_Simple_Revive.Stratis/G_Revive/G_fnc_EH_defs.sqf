@@ -37,7 +37,6 @@ G_fnc_Revive_Actions = {
 };
 
 //Define function to create revive-oriented AI behavior
-//bug - address locality, if need be
 G_fnc_Revive_AI_Behavior = {
 	_unit = _this select 0; 
 	//Create parallel loop to actually run the behavior
@@ -45,6 +44,8 @@ G_fnc_Revive_AI_Behavior = {
 		_unit = _this select 0; 
 		//bug - is true the right condition here?
 		while {true} do {
+			//Wait for AI to be local
+			waitUntil {sleep 5; (local _unit)};
 			//Wait to be called upon as reviver or guard
 			waitUntil {sleep 5; (((_unit getVariable "G_AI_rescueRole") select 0) != 0)};
 			//Execute appropriate behavior up to and including completing revive or guard function
