@@ -1,7 +1,5 @@
 //Handle onKilled
 
-systemChat "onKilled EH";
-
 _unit = _this select 0;
 _respawnType = getNumber(missionConfigFile >> "respawn");
 

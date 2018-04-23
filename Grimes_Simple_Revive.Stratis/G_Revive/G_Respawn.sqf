@@ -2,8 +2,6 @@
 
 _unit = _this select 0;
 
-systemChat "onRespawn EH";
-
 //Set next respawn time
 setPlayerRespawnTime G_Respawn_Time;
 
