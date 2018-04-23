@@ -23,15 +23,14 @@ if (G_Squad_Leader_Spawn) then {
 	//Execute in parallel because of having to wait on parallel script
 	[_unit] spawn {
 		_unit = _this select 0;
-		//Make sure squad leader exists; note that squad leader changes when unit is setUnconscious
-		if (isNil "G_Player_Squad_Leader_Var") exitWith {};
 		//Make sure unit spawned on squad leader (probably landed within 10m) or time has elapsed without true
 			//Code executes in 0.25, so this delay should be plenty and non-intrusive
 		_timer = time;
-		waitUntil {sleep 0.1; (((G_Player_Squad_Leader_Var distance _unit) < 10) || ((time - _timer) >= 2))};
-		if ((G_Player_Squad_Leader_Var distance _unit) < 10) then {
+		_squadLeader = leader group _unit;
+		waitUntil {sleep 0.1; (((_squadLeader != _unit) && ((_squadLeader distance _unit) < 10)) || ((time - _timer) >= 2))};
+		if ((_squadLeader != _unit) && ((_squadLeader distance _unit) < 10)) then {
 			//Assume squad leader's stance
-			[_unit, animationState G_Player_Squad_Leader_Var] remoteExecCall ["switchMove", 0, true];
+			[_unit, animationState _squadLeader] remoteExecCall ["switchMove", 0, true];
 		};
 	};
 };

@@ -139,7 +139,7 @@ if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER
 //If Squad Leader spawn or markers are enabled, execute associated script for player
 //bug - why not rework and use with AI too?
 if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
-	[] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
+	[player] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
 };
 
 //If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
