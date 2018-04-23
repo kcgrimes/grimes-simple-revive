@@ -131,26 +131,23 @@ G_fnc_MRV_init = {
 };
 
 //Define function to handle vehicle being locked to enemy
-//bug - Currently this EH is executed (and triggered) on every client; can't find a way to basically use "owner Object" on non-server client
-G_fnc_MRV_Lock = {
-	_MRV = _this select 0;
-	_MRV_Logic = _this select 1;
-	//On unit getting in, kick them back out if they are not friendly
-	_MRV addEventHandler ["GetIn", {
+if (G_isServer) then {
+	G_fnc_MRV_Lock = {
 		_MRV = _this select 0;
-		_unit = _this select 2;
-		//If not local to the involved parties, exit
-		if (!((local _MRV) || (local _unit))) exitWith {};
-		//Obtain MRV logic from MRV
-		_MRV_Logic = _MRV getVariable "G_MRV_Logic";
-		//If the MRV and unit side are different, prevent entry
-		//bug - way to make inde friendly, if appropriate? If so, that may be used elsewhere too
-		if ((_MRV_Logic getVariable "G_Side") != (_unit getVariable "G_Side")) then {
-			//Unit needs to be removed, so handle accordingly
-			//Handle MRV engine locally
-			if (local _MRV) then {
+		_MRV_Logic = _this select 1;
+		//On unit getting in, kick them back out if they are not friendly
+		_MRV addEventHandler ["GetIn", {
+			_MRV = _this select 0;
+			_unit = _this select 2;
+			//Obtain MRV logic from MRV
+			_MRV_Logic = _MRV getVariable "G_MRV_Logic";
+			//If the MRV and unit side are different, prevent entry
+			//bug - way to make inde friendly, if appropriate? If so, that may be used elsewhere too
+			if ((_MRV_Logic getVariable "G_Side") != (_unit getVariable "G_Side")) then {
+				//Unit needs to be removed, so handle accordingly
+				//Handle MRV engine
 				_fuel = fuel _MRV;
-				_MRV setFuel 0;
+				0 remoteExecCall ["setFuel", _MRV, false];
 				//Finish handling MRV engine in parallel
 				[_unit, _MRV, _fuel] spawn {
 					_unit = _this select 0;
@@ -159,20 +156,17 @@ G_fnc_MRV_Lock = {
 					//Wait for unit to be out of the vehicle
 					waitUntil {sleep 0.5; (vehicle _unit == _unit)};
 					//Add fuel back to MRV
-					_MRV setFuel _fuel;
+					_fuel remoteExecCall ["setFuel", _MRV, false];
 				};
-			};
-			
-			//Handle the unit locally
-			if (local _unit) then {
+				
 				//Remove unit from vehicle
 				_unit action ["eject", _MRV];
 				//Announce kick out using MRV's display name
-				titleText [format["You are not on the right team to enter %1!", getText (configFile >> "CfgVehicles" >> typeOf _MRV >> "displayName")], "PLAIN", 1]; 
-				titleFadeOut 4;
+				[[format["You are not on the right team to enter %1!", getText (configFile >> "CfgVehicles" >> typeOf _MRV >> "displayName")], "PLAIN", 1]] remoteExecCall ["titleText", _unit, false];
+				4 remoteExecCall ["titleFadeOut", _unit, false];
 			};
-		};
-	}];
+		}];
+	};
 };
 
 //Define function for easier remoteExec for handling local MRV actions onKilled
@@ -245,7 +239,7 @@ G_fnc_MRV_onRespawn = {
 	_MRV setVariable ["G_MRV_Undeploy_ID", _undeployActionID];
 
 	//Manage MRV locking if enabled
-	if (G_Mobile_Respawn_Locked) then {
+	if (G_isServer && G_Mobile_Respawn_Locked) then {
 		[_MRV, _MRV_Logic] spawn G_fnc_MRV_Lock;
 	};
 	//Manage MRV spawn marker init
@@ -268,7 +262,7 @@ G_fnc_MRV_onRespawn_EH = {
 	//Create MRV at initial spawn position
 	_MRV = (_MRV_Logic getVariable "G_MRV_Type") createVehicle (_MRV_Logic getVariable "G_MRV_Pos");
 	//Reassign MRV Logic to new MRV
-	_MRV setVariable ["G_MRV_Logic",_MRV_Logic,true];
+	_MRV setVariable ["G_MRV_Logic", _MRV_Logic, true];
 	//Publically handle MRV onRespawn
 	[_MRV, _MRV_Logic] remoteExec ["G_fnc_MRV_onRespawn", 0, true];
 };
@@ -414,8 +408,8 @@ G_fnc_MRV_Marker_Creation = {
 		//_x = MRV
 		[_side, _x] call G_fnc_MRV_init;
 		_MRV_Logic = _x getVariable "G_MRV_Logic";
-		//Manage MRV locking if enabled
-		if (G_Mobile_Respawn_Locked) then {
+		//Manage MRV locking on server if enabled
+		if (G_isServer && G_Mobile_Respawn_Locked) then {
 			[_x, _MRV_Logic] spawn G_fnc_MRV_Lock;
 		};
 		//Manage MRV spawn marker init
