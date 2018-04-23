@@ -1,11 +1,12 @@
 private ["_reviveTimer"];
 	
-_unit = _this select 0;
-_source = _this select 1;
-_projectile = _this select 2;
+_unit = _this;
 
 //If the unit is already unconscious or is not local to the executer, and is not JIP, exit
 if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitWith {};
+
+//Prevent further damage/being killed
+_unit allowDamage false;
 
 //Broadcast unconscious-state animation
 _unit setUnconscious true;
@@ -131,9 +132,6 @@ if (isPlayer _unit) then {
 		};
 	};
 };
-
-//Define revive factors
-_unit setVariable ["G_Revive_Factors", [_unit, _source, _projectile], true];
 
 //Create unconscious dialog for player
 //bug - check locality for this, make sure only be executed on one machine

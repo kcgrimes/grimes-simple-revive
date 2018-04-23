@@ -102,14 +102,10 @@ if (G_Revive_System) then {
 			if (_curDmg >= 1) then {
 				//Damage is fatal, so make it just under fatal so unit is not actually killed
 				_newDmg = 0.99;
-				//Whoever the _unit is local to will execute Unconscious state publically
-				if (local _unit) then {
-					_unit allowDamage false;
-					[_unit, _source, _projectile] execVM "G_Revive\G_Unconscious.sqf";
-				};
+				_unit spawn G_fnc_unconsciousState;
 				//Execute code for the killer
 				//bug - does this need to be localized more specifically?
-				[_unit, _source] execVM "G_Revive\G_Killer.sqf";
+				[_unit, _source] spawn G_fnc_onKill;
 				//Output new (total) damage value
 				_newDmg;
 			}

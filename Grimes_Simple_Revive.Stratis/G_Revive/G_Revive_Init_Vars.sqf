@@ -176,6 +176,10 @@ if (G_Unit_Tag) then {
 	};
 };
 
+//Define Unconscious-state script
+G_fnc_unconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
+//Define onKill script
+G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
 //Define EH to handle revive/respawn system
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
@@ -201,8 +205,7 @@ if (G_Revive_System) then {
 	//Handle loading game as JIP into an unconscious unit
 	if (G_isJIP) then {
 		if (player getVariable "G_Unconscious") then {
-			_revive_factors = player getVariable "G_Revive_Factors";
-			_revive_factors execVM "G_Revive\G_Unconscious.sqf";
+			player spawn G_fnc_unconsciousState;
 		};
 	};
 
