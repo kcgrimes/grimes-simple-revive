@@ -277,8 +277,6 @@ if (G_Revive_System) then {
 	
 	//Define function that handles Load/Unload of player
 	G_fnc_moveInCargoToUnloadAction = {
-		//bug - is this waitUntil necessary? why?
-		waitUntil {!isNull player};
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_side = _this select 2;
