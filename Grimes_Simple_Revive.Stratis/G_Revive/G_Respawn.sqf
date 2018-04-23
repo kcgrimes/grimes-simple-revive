@@ -1,21 +1,23 @@
-private _unit 			= _this param [0,objnull,[objnull]];
-private _respawnDelay 	= _this param [3, 0, [0]];
+//Handle onRespawn
 
-//If this is the initial spawn and there is no respawn on start, don't handle spawn like respawn and exit
-if ((G_Revive_InitialSpawn) && ((_unit getVariable "G_Lives") == G_Num_Respawns) && (((G_JIP_Start == 0) && (G_isJIP)) || ((G_Init_Start == 0) && (!G_isJIP)))) exitWith {
-	G_Revive_InitialSpawn = false;
-};
-//Handle like respawn
+_unit = _this select 0;
+
+systemChat "onRespawn EH";
+
+//Set next respawn time
+setPlayerRespawnTime G_Respawn_Time;
+
+[_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
 
 //BIS_fnc_respawnMenuPosition running in parallel
 
 //Set system variables
-//bug - forEach loop these like in init_vars
 _unit call G_fnc_Revive_resetVariables;
-_unit setVariable ["G_Downs",0,true];
+_unit setVariable ["G_Downs", 0, true];
 _unit setCaptive false;
-_unit setVariable ["G_Side",side _unit,true];
+_unit setVariable ["G_Side", side _unit, true];
 _unit enableAI "MOVE";
+_unit enableAI "FSM";
 _unit allowDamage true;
 
 //Handle squad leader spawn
@@ -41,22 +43,21 @@ if (G_Custom_Exec_3 != "") then {
 	[] execVM G_Custom_Exec_3;
 };
 
-//Slight delay before life count announcement
-sleep 2;
+if (isPlayer _unit) then {
+	//Slight delay before life count announcement
+	sleep 2;
 
-//Handle life count announcement, if limited and not the inital spawn
-_lives = _unit getVariable "G_Lives";
-if ((_lives >= 0) && !(G_Revive_InitialSpawn)) then {
-	//Use appropriate plurality
-	_livesPlural = "lives";
-	if (_lives == 1) then {
-		_livesPlural = "life";
+	//Handle life count announcement, if limited and not the inital spawn
+	_lives = _unit getVariable "G_Lives";
+	if (_lives >= 0) then {
+		//Use appropriate plurality
+		_livesPlural = "lives";
+		if (_lives == 1) then {
+			_livesPlural = "life";
+		};
+		//Announce life count
+		titleText [format["You have %1 %2 remaining!", _lives, _livesPlural], "PLAIN", 2];
+		sleep 3;
+		titleFadeOut 3;
 	};
-	//Announce life count
-	titleText [format["You have %1 %2 remaining!", _lives, _livesPlural], "PLAIN", 2];
-	sleep 3;
-	titleFadeOut 3;
 };
-
-//Don't treat like initial spawn again
-G_Revive_InitialSpawn = false;

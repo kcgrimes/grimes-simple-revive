@@ -1,6 +1,8 @@
+//Handle Spectator view
+
 //Define variables from onKilled
 _unit = _this select 0;
-_respawn = _this select 1;
+_respawnType = _this select 1;
 
 //Create parallel, infinite loop that prevents respawn
 [] spawn {
@@ -21,7 +23,7 @@ _respawn = _this select 1;
 if (!alive _unit) then {
 	["Initialize", [player, [], false]] call BIS_fnc_EGSpectator;
 } else {
-	if (_respawn == 1) then {
+	if (_respawnType == 1) then {
 		//--- Open
 		waituntil {missionnamespace getvariable ["BIS_fnc_feedback_allowDeathScreen",true]};
 		BIS_fnc_feedback_allowPP = false;

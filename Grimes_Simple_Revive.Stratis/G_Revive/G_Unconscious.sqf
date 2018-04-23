@@ -6,7 +6,9 @@ _unit = _this;
 if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitWith {};
 
 //Prevent further damage/being killed
-_unit allowDamage false;
+if (isDamageAllowed _unit) then {
+	_unit allowDamage false;
+};
 
 //Broadcast unconscious-state animation
 _unit setUnconscious true;

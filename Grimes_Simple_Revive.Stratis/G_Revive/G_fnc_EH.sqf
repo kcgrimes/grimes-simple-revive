@@ -12,13 +12,29 @@ if (G_isClient) then {
 	};
 };
 
+//Add onKilled/onRespawn EH's early in case of respawnOnStart
+if (G_Revive_System) then {
+	//Add onKilled EH to unit
+		//onKilled EH will not trigger for respawnOnStart if there is any sleep between here and init
+	_unit addEventHandler 
+	[	"Killed",
+		{
+			[_this select 0] execVM "G_Revive\G_Killed.sqf";
+		}
+	];
+
+	//Add onRespawn EH to unit to reset revive system and handle spawning
+	_unit addEventHandler 
+	[	"Respawn",
+		{
+			[_this select 0] execVM "G_Revive\G_Respawn.sqf";
+		}
+	];
+};
+
 //If is server or client's own player, define system variables and broadcast them
 if (G_isServer || _specialJIP) then {
 	if (G_Revive_System) then {
-		//bug - consider defining in higher scope for less repetition for AI
-		//Define revive-related variables based on data type
-		G_Revive_boolVars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying"];
-		G_Revive_objVars = ["G_Reviver", "G_Reviving", "G_Loaded"];
 		//Set init variables if not already done, maintaining variables for JIP
 		{
 			if (isNil {_unit getVariable _x}) then {
@@ -31,18 +47,6 @@ if (G_isServer || _specialJIP) then {
 			};
 		} forEach G_Revive_objVars;
 		if (isNil {_unit getVariable "G_AI_rescueRole"}) then {
-			_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
-		};
-		
-		//Define function to reset revive variables
-		G_fnc_Revive_resetVariables = {
-			{
-				_unit setVariable [_x, false, true];
-			} forEach G_Revive_boolVars;
-			{
-				_unit setVariable [_x, objNull, true];
-			} forEach G_Revive_objVars;
-			//rescueRole - 0: none, 1: reviver, 2: guard
 			_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
 		};
 	};
@@ -61,7 +65,7 @@ if (G_isServer || _specialJIP) then {
 };
 
 //System variables only being defined on server and client's own player,
-//so all other clients need to wait for definitions
+//so all other clients need to wait for definitions with or without revive enabled
 waitUntil {(!isNil {_unit getVariable "G_Lives"})};
 
 //If revive is enabled, add the components that "make it work"
@@ -102,6 +106,7 @@ if (G_Revive_System) then {
 			if (_curDmg >= 1) then {
 				//Damage is fatal, so make it just under fatal so unit is not actually killed
 				_newDmg = 0.99;
+				_unit allowDamage false;
 				_unit spawn G_fnc_unconsciousState;
 				//Execute code for the killer
 				//bug - does this need to be localized more specifically?
@@ -118,120 +123,11 @@ if (G_Revive_System) then {
 		}
 	];
 	
-	//bug - this function should only be defined once, so move it to a higher scope than this file
-	//Define function to add all revive-related 
-	G_fnc_Revive_Actions = {
-		_unit = _this select 0;
-		_side = _unit getVariable "G_Side";
-		_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>",G_Revive_Action_Color],"G_Revive\G_Revive_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and (isNull (_target getVariable ""G_Reviver"")) and (isNull (_this getVariable ""G_Reviving"")) and (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and (isNull (_target getVariable ""G_Loaded""))"];
-		_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>",G_Revive_Action_Color],"G_Revive\G_Drag_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and (isNull (_target getVariable ""G_Reviver"")) and (isNull (_this getVariable ""G_Reviving"")) and (isNull (_target getVariable ""G_Loaded"")) and ((eyePos _target select 2) > 0)"];
-		_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>",G_Revive_Action_Color],"G_Revive\G_Carry_Action.sqf",[],1.5,true,true,"", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and (_target != _this) and !(_target getVariable ""G_Carried"") and !(_target getVariable ""G_Dragged"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and (isNull (_target getVariable ""G_Reviver"")) and (isNull (_this getVariable ""G_Reviving"")) and (isNull (_target getVariable ""G_Loaded"")) and ((eyePos _target select 2) > 0)"];
-		_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>",G_Revive_Action_Color],"G_Revive\G_Load_Action.sqf",[_side],1.5,true,true,"", format["!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and (isNull (_target getVariable ""G_Reviver"")) and (isNull (_this getVariable ""G_Reviving"")) and (count(nearestObjects [_target, %1, 7]) != 0) and (isNull (_target getVariable ""G_Loaded""))",G_Revive_Load_Types]];
-	};
-	
 	//Execute function to add revive actions to unit
 	[_unit] call G_fnc_Revive_Actions;
 	
-	//Add Respawn EH to unit to add revive actions publically
-	//bug - some things are done onRespawn, like variable resetting; should they just be done here?
-	_unit addEventHandler 
-	[	"Respawn",
-		{
-			_unit = _this select 0;
-			_old = _this select 1;
-			[_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
-		}
-	];
-
-	//Add Respawn EH specifically to AI to reset variables and the revive system
-	//bug - The above EH for all units has enableSimulation too, so it is redundant to have it in this one
-	if (!isPlayer _unit) then {
-		_unit addEventHandler
-		[	"Respawn",
-			{
-				_unit = _this select 0;
-				_unit call G_fnc_Revive_resetVariables;
-				_unit setVariable ["G_Downs",0,true];
-				_unit setCaptive false;
-				_unit setVariable ["G_Side",side _unit,true];
-				_unit enableAI "MOVE";
-				_unit enableAI "FSM";
-				_unit allowDamage true;
-			}
-		];
-	};
-	
-	//Define function to create revive-oriented AI behavior
-	//bug - address locality, if need be
-	G_fnc_Revive_AI_Behavior = {
-		_unit = _this select 0; 
-		//Create parallel loop to actually run the behavior
-		[_unit] spawn {
-			_unit = _this select 0; 
-			//bug - is true the right condition here?
-			while {true} do {
-				//Wait to be called upon as reviver or guard
-				waitUntil {sleep 5; (((_unit getVariable "G_AI_rescueRole") select 0) != 0)};
-				//Execute appropriate behavior up to and including completing revive or guard function
-				_rescueRoleArray = _unit getVariable "G_AI_rescueRole";
-				_victim = (_unit getVariable "G_AI_rescueRole") select 1;
-				//Allow AI to move more freely to victim, but still detect and engage enemies
-				_unit setBehaviour "SAFE";
-				//Determine assigned role
-				if ((_rescueRoleArray select 0) == 1) then {
-					//AI is reviver
-					//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
-					while {((!(_unit getVariable "G_Unconscious")) && (alive _unit) && (_victim getVariable "G_Unconscious") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
-						//Prevent AI from stopping
-						//bug - is this stop necessary?
-						_unit stop false;
-						//Have regrouped AI move to victim
-						_unit doMove (getPos _victim);
-						//Have stopped AI move to victim
-						_unit moveTo (getPos _victim);
-						//If in range, perform revive action
-						if ((_unit distance _victim < 2) && (isNull (_victim getVariable "G_Reviver"))) then {
-							[_victim, _unit] execVM "G_Revive\G_Revive_Action.sqf";
-							//Wait for revive to end one way or another
-							waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
-						};
-						sleep 3;
-					};
-				}
-				else
-				{
-					//AI is guard
-					//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
-					while {((!(_unit getVariable "G_Unconscious")) && (_victim getVariable "G_Unconscious") && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
-						//Prevent AI from stopping
-						//bug - is this stop necessary?
-						_unit stop false;
-						//Have regrouped AI move to victim
-						_unit doMove (getPos _victim);
-						//Have stopped AI move to victim
-						_unit moveTo (getPos _victim);
-						//If in range, start guarding
-						if (_unit distance _victim < 20) then {
-							//bug - this changes behavior of entire group, which could have adverse effects
-							_unit setBehaviour "AWARE";
-							//Stop loop to allow "patrol"
-							waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
-						};
-						sleep 3;
-					};
-				};
-				//Unassigned from role, so resume previous behavior
-				if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
-					//Return to default behavior
-					_unit setBehaviour "AWARE";
-					//Regroup to squad leader
-					_unit doFollow (leader (group _unit));
-				};
-			};
-		};
-	};
-	
 	//Execute revive-oriented behavior only on AI
+	//bug - what if player leaves playable slot, leaving AI in place?
 	if (!isPlayer _unit) then {
 		[_unit] spawn G_fnc_Revive_AI_Behavior;
 	};

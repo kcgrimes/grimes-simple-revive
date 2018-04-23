@@ -26,8 +26,6 @@ G_TK_Penalty = 0; //Amount of lives a Team Killer loses per team kill. Note, mus
 G_Revive_Messages = 1; //Chat messages upon incapacitation and revive. 0 = None. 1 = Friendly only. 2 = All.
 
 //Respawn/Initial Spawn
-G_Init_Start = 0; //0 = starting position is editor-placed position. 1 = starting position is random spawn marker. 2 = On start, player is presented with menu to select spawn position (NOTE: For the menu to work at start, you must go to G_Revive\G_Desc_Include.hpp, find respawnOnStart, and change it to 1. As well, if you do this, G_JIP_Start must also be 2.)
-G_JIP_Start = 0; //0 = JIP starting position is editor-placed position (or position of unit JIPing to). 1 = JIP starting position is random spawn marker. 2 = On start for JIP, player is presented with menu to select spawn position (NOTE: For the menu to work at start, you must go to G_Revive\G_Desc_Include.hpp, find respawnOnStart, and change it to 1. As well, if you do this, G_Init_Start must also be 2.)
 G_Respawn_Button = true; //true = Respawn Button enabled, false = Respawn button disabled
 G_Respawn_Time = 10; //Amount of time (in seconds) dead unit must wait before being able to respawn (overrides description.ext setting)
 G_Num_Respawns = 3; //Number of lives/respawns available to players (must be integer). -1 = unlimited, 0 and up are actual values.

@@ -1,26 +1,21 @@
-//Handle spawn time based on initial spawn or not
-if (G_Revive_InitialSpawn) then {
-	//Initial spawn, so ensure no respawn time
-	setPlayerRespawnTime 2;
-}
-else
-{
-	//Subsequent spawn, so apply respawn time
-	setPlayerRespawnTime G_Respawn_Time;
-};
+//Handle onKilled
+
+systemChat "onKilled EH";
+
+_unit = _this select 0;
+_respawnType = getNumber(missionConfigFile >> "respawn");
+
+//For respawnOnStart, allow time for definitions to catch up
+waitUntil {(!isNil {_unit getVariable "G_Lives"})};
 
 //Custom execution
 if (G_Custom_Exec_2 != "") then {
 	[] execVM G_Custom_Exec_2;
 };
 
-private _unit 			= _this param [0,objnull,[objnull]];
-private _respawnDelay 	= _this param [3, 0, [0]];
-_respawn = _this param [2,-1,[0]];
-
 //Handle life count if spawns are limited and this is not the initial spawn
 _noLives = false;
-if !((G_Num_Respawns == -1) || (G_Revive_InitialSpawn)) then {
+if (!(G_Num_Respawns == -1)) then {
 	//Get life count
 	_lives = _unit getVariable "G_Lives";
 	//Remove one life from count
@@ -35,24 +30,33 @@ if !((G_Num_Respawns == -1) || (G_Revive_InitialSpawn)) then {
 
 //Handle unit if no lives remain
 if (_noLives) exitWith {
-	//Prevent display of RespawnMenu
-	_unit setVariable ["BIS_fnc_showRespawnMenu_disable", true];
-	//Enter Spectator or end the mission
-	if (G_Spectator) then {
-		//Spectator enabled, so launch it
-		[_unit, _respawn] execVM "G_Revive\G_Spectator.sqf";
+	if (isPlayer _unit) then {
+		//Handle as player
+		//Prevent display of RespawnMenu
+		_unit setVariable ["BIS_fnc_showRespawnMenu_disable", true];
+		//Enter Spectator if enabled, otherwise end the mission
+		if (G_Spectator) then {
+			//Spectator enabled, so launch it
+			[_unit, _respawnType] execVM "G_Revive\G_Spectator.sqf";
+		}
+		else
+		{
+			//Spectator disabled, so prevent unit from respawning before they are removed
+			setPlayerRespawnTime 30;
+			//End the mission locally as failure
+			["END1", false] call BIS_fnc_endMission;
+		};
 	}
 	else
 	{
-		//Spectator disabled, so prevent unit from respawning before they are removed
-		setPlayerRespawnTime 30;
-		//End the mission locally as failure
-		["END1", false] call BIS_fnc_endMission;
+		//Handle as AI
+		//bug - what to do here to prevent AI from respawning? Possibly delete somehow?
 	};
 };
 
 //Handle respawn times
 //No respawn timer for AI
+//bug - need to look at all this and associated commands for player/AI integration
 //bug - intended...?
 if (playerRespawnTime < 1 || !isPlayer _unit) exitWith {};
 //Ensure at least a 6 second respawn time

@@ -10,6 +10,7 @@ if (typeName G_Revive_AI_Unconscious != "ARRAY") then {_validationFailed pushBac
 	if (typeName _x != "SIDE") then {_validationFailed pushBack "G_Revive_AI_Unconscious must be array containing only WEST, EAST, RESISTANCE, or CIVILIAN!"};
 } forEach G_Revive_AI_Unconscious;
 if ((typeName G_Revive_Time_Limit != "SCALAR") || (G_Revive_Time_Limit < -1)) then {_validationFailed pushBack "G_Revive_Time_Limit must be a number greater than or equal to -1!"};
+if (typeName G_Allow_GiveUp != "BOOL") then {_validationFailed pushBack "G_Allow_GiveUp must be true/false!"};
 if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) then {_validationFailed pushBack "G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
 if (typeName G_Revive_Can_Revive != "ARRAY") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
 {
@@ -27,10 +28,9 @@ if (typeName G_Eject_Occupants != "BOOL") then {_validationFailed pushBack "G_Ej
 if (typeName G_Explosion_Eject_Occupants != "BOOL") then {_validationFailed pushBack "G_Explosion_Eject_Occupants must be true/false!"};
 if ((typeName G_Revive_Reward != "SCALAR") || (G_Revive_Reward < 0)) then {_validationFailed pushBack "G_Revive_Reward must be a number greater than or equal to 0!"};
 if ((typeName G_TK_Penalty != "SCALAR") || (G_TK_Penalty > 0)) then {_validationFailed pushBack "G_TK_Penalty must be a number less than or equal to 0!"};
+if ((typeName G_Revive_Messages != "SCALAR") || !((G_Revive_Messages > -1) && (G_Revive_Messages < 3))) then {_validationFailed pushBack "G_Revive_Messages must be defined as 0, 1, or 2!"};
 
 //Respawn/Initial Spawn
-if ((typeName G_Init_Start != "SCALAR") || !((G_Init_Start > -1) && (G_Init_Start < 3))) then {_validationFailed pushBack "G_Init_Start must be defined as 0, 1, or 2!"};
-if ((typeName G_JIP_Start != "SCALAR") || !((G_JIP_Start > -1) && (G_JIP_Start < 3))) then {_validationFailed pushBack "G_JIP_Start must be defined as 0, 1, or 2!"};
 if (typeName G_Respawn_Button != "BOOL") then {_validationFailed pushBack "G_Respawn_Button must be true/false!"};
 if ((typeName G_Respawn_Time != "SCALAR") || (G_Respawn_Time < 0)) then {_validationFailed pushBack "G_Respawn_Time must be a number greater than or equal to 0!"};
 if ((typeName G_Num_Respawns != "SCALAR") || (G_Num_Respawns < -1)) then {_validationFailed pushBack "G_Num_Respawns must be an integer greater than or equal to -1!"};
@@ -72,7 +72,7 @@ if ((count G_Unit_Tag_SquadColor) != 3) then {_validationFailed pushBack "G_Unit
 } forEach G_Unit_Tag_SquadColor;
 
 //Custom Executions
-if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING")) then {_validationFailed pushBack "G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
+if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING") || (typeName G_Custom_Exec_5 != "STRING")) then {_validationFailed pushBack "G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
 //If error messages exist, format and execute a message for each one and exit
 	//Done on all machines to prevent anyone from loading script
@@ -118,10 +118,13 @@ else
 	G_PvP = false;
 };
 
-//Track first spawn in order to adjust spawn time and life management accordingly
-	//onRespawn occurs on any initial spawn; onKilled occurs with respawnOnStart
-	//Without this, on respawnOnStart unit will wait full respawn time and lose a life
-G_Revive_InitialSpawn = true;
+//Handle respawnOnStart because onKilled EH triggers when respawnOnStart = 1, so without this block the unit will wait full respawn time and lose a life
+if ((getNumber(missionConfigFile >> "respawnOnStart")) == 1) then {
+	G_Num_Respawns = G_Num_Respawns + 1;
+	if (G_isClient) then {
+		setPlayerRespawnTime 2;
+	};
+};
 
 //Execute briefing for player if enabled
 if ((G_Briefing) && (G_isClient)) then {
@@ -180,6 +183,13 @@ if (G_Unit_Tag) then {
 G_fnc_unconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
 //Define onKill script
 G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
+
+//Call mandatory definitions for revive system if enabled
+if (G_Revive_System) then {
+	[] call compile preprocessFileLineNumbers "G_Revive\G_fnc_EH_defs.sqf";
+};
+
+//bug - consider preprecessing G_Killed and G_Revive here or near here
 //Define EH to handle revive/respawn system
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
@@ -200,116 +210,10 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 	};
 } forEach allUnits;
 
-//Init revive system
-if (G_Revive_System) then {
-	//Handle loading game as JIP into an unconscious unit
-	if (G_isJIP) then {
-		if (player getVariable "G_Unconscious") then {
-			player spawn G_fnc_unconsciousState;
-		};
-	};
-
-	//Define player-related incapacitated functions
-	if (G_isClient) then {
-		//Define function for "nearest rescuer" text
-		G_fnc_Dialog_Rescuer_Text = {
-			[_this select 0] spawn {
-				private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
-				//Continue cycling while player is unconscious and dialog is open
-				while {((player getVariable "G_Unconscious") && (dialog))} do {
-					//Get array of all "men" within 500m, including player
-					_array = nearestObjects [player, ["CAManBase"], 500];
-					_arrayDistance = [];
-					{
-						//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not unconscious
-						if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
-							//Add to array with distance from player
-							_arrayDistance pushBack ([_x, ceil(_x distance player)]);
-						};
-					} forEach _array;
-					
-					//Define empty variables for unit names
-					_unit0 = "";
-					_unit1 = "";
-					_unit2 = "";
-					_unit3 = "";
-					_unit4 = "";
-					
-					//Define unit variables with unit name and distanace if available
-					for "_i" from 0 to (((count _arrayDistance) - 1) min 4) do {
-						call compile format["_unit%1 = format[""%2  (%3m)"", name (_arrayDistance select %1 select 0), _arrayDistance select %1 select 1];", _i, "%1", "%2"];
-					};
-					
-					//Format text to be displayed
-					_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
-					//Output nearest rescuers
-					((_this select 0) displayCtrl 1001) ctrlSetText _text;
-					//Update list every 5 seconds
-					sleep 5;
-				};
-			};
-		};
-		
-		//Define function for "downs/lives remaining" text
-		G_fnc_Dialog_Downs_Text = {
-			private ["_downs", "_lives"];
-			//If downs-per-life is limited, display remaining, otherwise text
-			if (G_Revive_DownsPerLife > 0) then {
-				//Subtract accrued number of downs from the limit to obtain remainder
-				_downs = G_Revive_DownsPerLife - (player getVariable "G_Downs");
-			}
-			else
-			{
-				_downs = "Unlimited";
-			};
-			
-			//If number of lives is limited, display remaining, otherwise text
-			if (G_Num_Respawns == -1) then {
-				_lives = "Unlimited";
-			}
-			else
-			{
-				_lives = player getVariable "G_Lives";
-			};
-			//Format text to be displayed
-			_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2", _downs, _lives];
-			//Display the "lives remaining" dialog"
-			((_this select 0) displayCtrl 1002) ctrlSetText _text;
-		};
-	};
-	
-	//Define function that handles Load/Unload of player
-	G_fnc_moveInCargoToUnloadAction = {
-		_unit = _this select 0;
-		_vehicle = _this select 1;
-		_side = _this select 2;
-		
-		//Command AI to stay in vehicle
-		_unit assignAsCargo _vehicle;
-		//Move unit into vehicle
-		_unit moveInCargo _vehicle;
-		//Perform DeadState animation due to lack of Unconscious anim in vehicle
-		//bug - check locality
-		[_unit, "Unconscious"] remoteExecCall ["playAction", 0, true];
-		//Set vehicle side to unit's side for action condition
-		//bug - is this reset later? 
-		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
-		
-		//Add Unload action for unit to vehicle
-		_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "G_Revive\G_Unload_Action.sqf", [_unit], 1.5, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
-		
-		//Create parallel loop to monitor Unload action
-		//bug - can this not just be accomplished in the Unload script, instead of cycling?
-		[_unit, _vehicle, _unloadActionID] spawn {
-			_unit = _this select 0;
-			_vehicle = _this select 1;
-			_unloadActionID = _this select 2;
-			//Wait for unit to be unloaded or no longer unconscious
-			waitUntil {sleep 0.3; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
-			
-			//Remove the Unload action from the vehicle
-			_vehicle removeAction _unloadActionID;
-		};
+//Handle loading game as JIP into an unconscious unit
+if (G_Revive_System && G_isJIP) then {
+	if (player getVariable "G_Unconscious") then {
+		player spawn G_fnc_unconsciousState;
 	};
 };
 
