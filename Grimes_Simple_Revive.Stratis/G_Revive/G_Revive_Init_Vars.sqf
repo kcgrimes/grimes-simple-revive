@@ -140,13 +140,10 @@ if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
 };
 
 //If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
-//bug - does this need to be more specifically localized? Probably yes, to player only
 if (G_Unit_Tag) then {
-	//If JIP need to resume, if initial need to start
+	//If JIP need to resume, if initial need to start (for client and server)
 	if (G_isJIP) then {
 		//Is JIP
-		//bug - this waitUntil should already be accomplished? Reminder to move that stuff from init to revive_init
-		waitUntil {alive player};
 		//bug - why is this statement even here?
 		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
 		//Add unit and tag number to player list
@@ -170,7 +167,7 @@ if (G_Unit_Tag) then {
 	}
 	else
 	{
-		//Fresh start
+		//Fresh start for client and server
 		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
 		if (G_Unit_Tag_Display != 0) then {
 			//Wait for Unit Tags to process
