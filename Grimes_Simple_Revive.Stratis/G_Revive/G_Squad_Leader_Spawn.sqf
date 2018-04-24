@@ -1,11 +1,12 @@
 //Handle squad leader spawn position and marker
-
+//Local to _unit
+private ["_unit"];
 _unit = _this select 0;
 
 //If squad leader spawning is enabled, execute permanent parallel cycle of squad leader definition and respawn position
 if (G_Squad_Leader_Spawn) then {
 	[_unit] spawn {
-		private ["_squadrespawnid", "_squadLeader"];
+		private ["_unit", "_squadLeader", "_squadrespawnid"];
 		_unit = _this select 0;
 		while {true} do {
 			//Obtain squad leader
@@ -27,7 +28,7 @@ if (G_Squad_Leader_Spawn) then {
 
 //If squad leader map marker is enabled, execute
 if (G_Squad_Leader_Marker) then {
-	private ["_squadLeader"];
+	private ["_squadLeader", "_squad_leader_mkr"];
 	_squadLeader = leader group _unit;
 	//Create marker for squad leader to always be used
 	_squad_leader_mkr = createMarkerLocal ["G_Squad_Leader_Mkr", getPos _squadLeader];

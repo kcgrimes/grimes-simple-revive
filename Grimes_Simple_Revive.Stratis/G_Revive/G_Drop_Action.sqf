@@ -1,6 +1,7 @@
 //Drop (from Carry or Drag)
 //Local to _rescuer
 
+private ["_rescuer", "_dropActionID", "_unit"];
 _rescuer = _this select 0;
 _dropActionID = _this select 2;
 _unit = _this select 3;

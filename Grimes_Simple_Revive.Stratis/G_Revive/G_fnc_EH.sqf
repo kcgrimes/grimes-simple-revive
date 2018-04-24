@@ -1,9 +1,11 @@
 //Universal EHs
-private ["_specialJIP"];
+//Local to executor, not necessarily _unit
 
+private ["_unit"];
 _unit = _this select 0;
 
 //bug - why is this named specialJIP?
+private ["_specialJIP"];
 _specialJIP = false;
 if (G_isClient) then {
 	if (_unit == player) then {
@@ -78,7 +80,8 @@ if (G_Revive_System) then {
 	_unit addEventHandler 
 	[	"HandleDamage",
 		{
-			//Local to _unit
+			//Local to executor, not necessarily _unit
+			private ["_unit", "_selections", "_getHit", "_selection", "_source", "_projectile", "_oldDmg", "_curDmg", "_newDmg"];
 			_unit = _this select 0;
 			//Define variables used to track what is damaged with how much damage, empty if undefined
 			_selections = _unit getVariable ["selections", []];
@@ -107,10 +110,13 @@ if (G_Revive_System) then {
 			if (_curDmg >= 1) then {
 				//Damage is fatal, so make it just under fatal so unit is not actually killed
 				_newDmg = 0.99;
-				_unit allowDamage false;
-				_unit spawn G_fnc_unconsciousState;
-				//Execute code for the killer
-				[_unit, _source] spawn G_fnc_onKill;
+				//Whoever _unit is local to will execute Unconscious state publically
+				if (local _unit) then {
+					_unit allowDamage false;
+					_unit spawn G_fnc_unconsciousState;
+					//Execute code for the killer
+					[_unit, _source] spawn G_fnc_onKill;
+				};
 				//Output new (total) damage value
 				_newDmg;
 			}
@@ -177,6 +183,8 @@ if (G_Unit_Tag) then {
 	_unit addEventHandler 
 	[	"Respawn",
 		{
+			//Local to _unit
+			private ["_unit", "_old", "_num", "_var"];
 			_unit = _this select 0;
 			_old = _this select 1;
 			//Obtain unit tag number from old object
@@ -193,6 +201,7 @@ if (G_Unit_Tag) then {
 			if (G_Unit_Tag_Display != 0) then {
 				//bug - is this spawn necessary? 
 				[_unit, _num] spawn {
+					private ["_unit", "_num"];
 					_unit = _this select 0;
 					_num = _this select 1;
 					//Wait for variable broadcasts

@@ -1,4 +1,5 @@
 ////Settings Validation
+private ["_validationFailed"];
 _validationFailed = [];
 //Generic
 if (typeName G_Briefing != "BOOL") then {_validationFailed pushBack "G_Briefing must be true/false!"};
@@ -78,6 +79,7 @@ if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRI
 	//Done on all machines to prevent anyone from loading script
 if ((count _validationFailed) > 0) exitWith {
 	{
+		private ["_msg"];
 		_msg = format["G_Revive_Init ERROR: %1", _x];
 		systemChat _msg;
 		diag_log _msg;
@@ -103,6 +105,7 @@ else
 
 //Define if PvP - Mission where there are more than one playable sides (PvP, TvT, etc.), as opposed to having players on only one side (CoOp, SP, etc.).
 //Check each side for "playable" slots, adding to array if they exist
+private ["_playableSideArray"];
 _playableSideArray = [];
 {
 	if ((playableSlotsNumber _x) > 0) then {
@@ -144,6 +147,7 @@ if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
 
 //If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
 if (G_Unit_Tag) then {
+	private ["_var", "_handle"];
 	//If JIP need to resume, if initial need to start (for client and server)
 	if (G_isJIP) then {
 		//Is JIP
@@ -220,6 +224,7 @@ if (G_Revive_System && G_isJIP) then {
 //If player's respawn button is disabled by script, execute loop that prevents use of it
 if (!(G_Respawn_Button) && (G_isClient)) then {
 	[] spawn {
+		private ["_respawnButtonEH"];
 		while {true} do {
 			//Wait for game menu to open
 			waitUntil {sleep 0.1; !isNull (findDisplay 49)};

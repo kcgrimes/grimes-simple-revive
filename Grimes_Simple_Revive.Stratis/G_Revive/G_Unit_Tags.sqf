@@ -13,6 +13,7 @@ if (G_isClient) then {
 
 //Create central control on server
 if (G_isServer) then {
+	private ["_hp", "_var"];
 	//Create helipad to be game logic
 	_hp = "Land_HelipadEmpty_F" createVehicle [0,0,0];
 	_hp setVehicleVarName "G_Unit_Tags_Logic";
@@ -55,6 +56,7 @@ if (G_isClient) then {
 	
 	//bug - able to slow the waitUntil in here?
 	G_fnc_Unit_Tag_Exec = {
+		private ["_unit", "_a", "_ehID"];
 		_unit = _this select 0;
 		//bug - and _a is...?
 		_a = _this select 1;
@@ -64,7 +66,7 @@ if (G_isClient) then {
 		//bug - consider formatting differently to allow for syntax highlighting/easier reading
 		call compile format ["G_Unit_Tag_%1 = false;", _a];
 		_ehID = addMissionEventHandler["Draw3D", format["
-			private ['_color', '_height', '_alpha','_distp','_isUnconscious','_exists'];
+			private ['_unit', '_color', '_height', '_alpha','_distp','_isUnconscious','_exists'];
 			_unit = (G_Unit_Tags_Logic getVariable 'G_Revive_Player_List') select %1;
 			if ((name _unit) == 'Error: No Unit') then {
 				call compile format ['G_Unit_Tag_%1 = true', %1];

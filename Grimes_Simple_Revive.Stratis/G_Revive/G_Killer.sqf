@@ -1,6 +1,6 @@
 //Manages unit that kills unit
-private ["_killer_lives"];
 //Local to _unit
+private ["_unit", "_killer", "_noKiller"];
 _unit = _this select 0;
 _killer = _this select 1;
 
@@ -39,6 +39,7 @@ if (G_Revive_Messages > 0) then {
 };
 	
 //Check if teamkill
+private ["_killer_lives"];
 if ((_unit getVariable "G_Side") == (_killer getVariable "G_Side")) then {
 	//Is teamkill
 	//Handle life penalty if enabled

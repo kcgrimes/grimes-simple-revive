@@ -1,6 +1,5 @@
 //Universal definitions for EHs and more
-
-_unit = _this select 0;
+//Local to executor
 
 //Define revive-related variables based on data type
 G_Revive_boolVars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying"];
@@ -8,6 +7,7 @@ G_Revive_objVars = ["G_Reviver", "G_Reviving", "G_Loaded"];
 
 //Define function to reset revive variables and broadcast them
 G_fnc_Revive_resetVariables = {
+	private ["_unit"];
 	_unit = _this;
 	{
 		_unit setVariable [_x, false, true];
@@ -28,6 +28,7 @@ G_fnc_actionDrop = compile preprocessFileLineNumbers "G_Revive\G_Drop_Action.sqf
 
 //Define function to add all revive-related actions
 G_fnc_Revive_Actions = {
+	private ["_unit", "_side", "_reviveActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
 	_unit = _this select 0;
 	_side = _unit getVariable "G_Side";
 	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "!(_this getVariable ""G_Unconscious"") and (_target getVariable ""G_Unconscious"") and ((_target distance _this) < 1.75) and !(_target == _this) and ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) and !(_target getVariable ""G_Dragged"") and !(_target getVariable ""G_Carried"") and !(_this getVariable ""G_Carrying"") and !(_this getVariable ""G_Dragging"") and (isNull (_target getVariable ""G_Reviver"")) and (isNull (_this getVariable ""G_Reviving"")) and (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)) and (isNull (_target getVariable ""G_Loaded""))"];
@@ -38,85 +39,83 @@ G_fnc_Revive_Actions = {
 
 //Define function to create revive-oriented AI behavior
 G_fnc_Revive_AI_Behavior = {
+	private ["_unit", "_rescueRoleArray", "_victim"];
 	_unit = _this select 0; 
-	//Create parallel loop to actually run the behavior
-	[_unit] spawn {
-		_unit = _this select 0; 
-		//bug - is true the right condition here?
-		while {true} do {
-			//Wait for AI to be local
-			waitUntil {sleep 5; (local _unit)};
-			//Wait to be called upon as reviver or guard
-			waitUntil {sleep 5; (((_unit getVariable "G_AI_rescueRole") select 0) != 0)};
-			//Execute appropriate behavior up to and including completing revive or guard function
-			_rescueRoleArray = _unit getVariable "G_AI_rescueRole";
-			_victim = (_unit getVariable "G_AI_rescueRole") select 1;
-			//Allow AI to move more freely to victim, but still detect and engage enemies
-			_unit setBehaviour "SAFE";
-			_unit disableAI "TARGET";
-			_unit disableAI "SUPPRESSION";
-			_unit disableAI "COVER";
-			_unit disableAI "AUTOCOMBAT";
-			//Determine assigned role
-			if ((_rescueRoleArray select 0) == 1) then {
-				//AI is reviver
-				//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
-				while {((!(_unit getVariable "G_Unconscious")) && (alive _unit) && (_victim getVariable "G_Unconscious") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
-					//Prevent AI from stopping
-					//bug - is this stop necessary?
-					_unit stop false;
-					//Have regrouped AI move to victim
-					_unit doMove (getPos _victim);
-					//Have stopped AI move to victim
-					_unit moveTo (getPos _victim);
-					//If in range, perform revive action
-					if ((_unit distance _victim < 2) && (isNull (_victim getVariable "G_Reviver"))) then {
-						[_victim, _unit] spawn G_fnc_actionRevive;
-						//Wait for revive to end one way or another
-						waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
-					};
-					sleep 3;
+	//bug - is true the right condition here?
+	while {true} do {
+		//Wait for AI to be local
+		waitUntil {sleep 5; (local _unit)};
+		//Wait to be called upon as reviver or guard
+		waitUntil {sleep 5; (((_unit getVariable "G_AI_rescueRole") select 0) != 0)};
+		//Execute appropriate behavior up to and including completing revive or guard function
+		_rescueRoleArray = _unit getVariable "G_AI_rescueRole";
+		_victim = (_unit getVariable "G_AI_rescueRole") select 1;
+		//Allow AI to move more freely to victim, but still detect and engage enemies
+		_unit setBehaviour "SAFE";
+		_unit disableAI "TARGET";
+		_unit disableAI "SUPPRESSION";
+		_unit disableAI "COVER";
+		_unit disableAI "AUTOCOMBAT";
+		//Determine assigned role
+		if ((_rescueRoleArray select 0) == 1) then {
+			//AI is reviver
+			//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
+			while {((!(_unit getVariable "G_Unconscious")) && (alive _unit) && (_victim getVariable "G_Unconscious") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
+				//Prevent AI from stopping
+				//bug - is this stop necessary?
+				_unit stop false;
+				//Have regrouped AI move to victim
+				_unit doMove (getPos _victim);
+				//Have stopped AI move to victim
+				_unit moveTo (getPos _victim);
+				//If in range, perform revive action
+				if ((_unit distance _victim < 2) && (isNull (_victim getVariable "G_Reviver"))) then {
+					[_victim, _unit] spawn G_fnc_actionRevive;
+					//Wait for revive to end one way or another
+					waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
 				};
-			}
-			else
-			{
-				//AI is guard
-				//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
-				while {((!(_unit getVariable "G_Unconscious")) && (_victim getVariable "G_Unconscious") && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
-					//Prevent AI from stopping
-					//bug - is this stop necessary?
-					_unit stop false;
-					//Have regrouped AI move to victim
-					_unit doMove (getPos _victim);
-					//Have stopped AI move to victim
-					_unit moveTo (getPos _victim);
-					//If in range, start guarding
-					if (_unit distance _victim < 20) then {
-						//bug - this changes behavior of entire group, which could have adverse effects
-						_unit setBehaviour "AWARE";
-						//Stop loop to allow "patrol"
-						waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
-					};
-					sleep 3;
+				sleep 3;
+			};
+		}
+		else
+		{
+			//AI is guard
+			//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
+			while {((!(_unit getVariable "G_Unconscious")) && (_victim getVariable "G_Unconscious") && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
+				//Prevent AI from stopping
+				//bug - is this stop necessary?
+				_unit stop false;
+				//Have regrouped AI move to victim
+				_unit doMove (getPos _victim);
+				//Have stopped AI move to victim
+				_unit moveTo (getPos _victim);
+				//If in range, start guarding
+				if (_unit distance _victim < 20) then {
+					//bug - this changes behavior of entire group, which could have adverse effects
+					_unit setBehaviour "AWARE";
+					//Stop loop to allow "patrol"
+					waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
 				};
+				sleep 3;
 			};
-			//Unassigned from role, so resume previous behavior
-			if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
-				//Return to default behavior
-				_unit enableAI "TARGET";
-				_unit enableAI "SUPPRESSION";
-				_unit enableAI "COVER";
-				_unit enableAI "AUTOCOMBAT";
-				_unit setBehaviour "AWARE";
-				//Regroup to squad leader
-				_unit doFollow (leader (group _unit));
-			};
+		};
+		//Unassigned from role, so resume previous behavior
+		if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
+			//Return to default behavior
+			_unit enableAI "TARGET";
+			_unit enableAI "SUPPRESSION";
+			_unit enableAI "COVER";
+			_unit enableAI "AUTOCOMBAT";
+			_unit setBehaviour "AWARE";
+			//Regroup to squad leader
+			_unit doFollow (leader (group _unit));
 		};
 	};
 };
 
 //Define function that handles Load/Unload of player
 G_fnc_moveInCargoToUnloadAction = {
+	private ["_unit", "_vehicle", "_side", "_unloadActionID"];
 	_unit = _this select 0;
 	_vehicle = _this select 1;
 	_side = _this select 2;
@@ -127,7 +126,8 @@ G_fnc_moveInCargoToUnloadAction = {
 		//Move unit into vehicle
 		_unit moveInCargo _vehicle;
 		//Perform Unconscious animation manually due to lack of setUnconscious support in vehicle
-		_unit playAction "Unconscious";
+			//This should have global effect, but does not, so it is here and broaadcasted
+		[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
 		//Set vehicle side to unit's side for action condition
 		//bug - is this reset later? 
 		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
@@ -139,6 +139,7 @@ G_fnc_moveInCargoToUnloadAction = {
 	//Create parallel loop to monitor Unload action
 	//bug - can this not just be accomplished in the Unload script, instead of cycling?
 	[_unit, _vehicle, _unloadActionID] spawn {
+		private ["_unit", "_vehicle", "_unloadActionID"];
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_unloadActionID = _this select 2;
@@ -155,7 +156,7 @@ if (G_isClient) then {
 	//Define function for "nearest rescuer" text
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
-			private ["_array", "_arrayDistance","_unit0","_unit1","_unit2","_unit3","_unit4"];
+			private ["_array", "_arrayDistance", "_unit0", "_unit1", "_unit2", "_unit3", "_unit4", "_text"];
 			//Continue cycling while player is unconscious and dialog is open
 			while {((player getVariable "G_Unconscious") && (dialog))} do {
 				//Get array of all "men" within 500m, including player
@@ -193,7 +194,7 @@ if (G_isClient) then {
 	
 	//Define function for "downs/lives remaining" text
 	G_fnc_Dialog_Downs_Text = {
-		private ["_downs", "_lives"];
+		private ["_downs", "_lives", "_text"];
 		//If downs-per-life is limited, display remaining, otherwise text
 		if (G_Revive_DownsPerLife > 0) then {
 			//Subtract accrued number of downs from the limit to obtain remainder

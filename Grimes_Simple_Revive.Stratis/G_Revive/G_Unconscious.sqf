@@ -1,6 +1,6 @@
 //Handle unconscious state
-private ["_reviveTimer"];
 //Local to _unit
+private ["_unit"];
 _unit = _this;
 
 //If the unit is already unconscious or is not local to the executer, and is not JIP, exit
@@ -25,6 +25,7 @@ _unit setVariable ["G_Unconscious", true, true];
 
 //Add parallel delay to revive-related actions
 [_unit] spawn {
+	private ["_unit"];
 	_unit = _this select 0;
 	sleep 2.5;
 	//Set unit as unconscious and broadcast
@@ -32,6 +33,7 @@ _unit setVariable ["G_Unconscious", true, true];
 };
 
 //Handle unit if inside vehicle
+private ["_bypass", "_vehicle"];
 _bypass = false;
 //If already Loaded, define vehicle that unit is in
 _vehicle = _unit getVariable "G_Loaded";
@@ -99,6 +101,7 @@ else
 //Handle bypassing Unconscious based on downs per life
 //bug - should this be done in the HandleDamage EH before Unconscious is even executed? Probably.
 if (G_Revive_DownsPerLife > 0) then {
+	private ["_downCount"];
 	//Add 1 to current down count
 	_downCount = (_unit getVariable "G_Downs") + 1;
 	//Activate bypass if DownsPerLife is exceeded
@@ -144,6 +147,7 @@ if (isPlayer _unit) then {
 //bug - check locality for this, make sure only be executed on one machine
 if (isPlayer _unit) then {
 	[_unit] spawn {
+		private ["_unit", "_reviveDialog", "_timeDialog"], 
 		_unit = _this select 0;
 		//Wait a few seconds before opening dialog
 		sleep 3.25;
@@ -185,6 +189,7 @@ sleep 2.5;
 
 //Execute AI tracking for AI's revive behavior
 [_unit] spawn {
+	//private ["_unit", "_aiReviver", "_aiGuard"];
 	_unit = _this select 0;
 	//Cycle through AI role assignments as long as unit is unconscious
 	//bug - use of Call for Help concept, or keep it automatic?
@@ -210,6 +215,7 @@ sleep 2.5;
 			};
 			
 			//Obtain array of potential rescuers from men within a certain distance
+			//private ["_arrayPotentialRescuers", "_arrayPotentialRescuersCount"];
 			_arrayPotentialRescuers = [];
 			{
 				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not unconscious
@@ -308,6 +314,7 @@ sleep 2.5;
 	};
 };
 
+private ["_reviveTimer"];
 _reviveTimer = G_Revive_Time_Limit;
 //Check if revive timer is unlimited
 if (_reviveTimer > -1) then {
@@ -321,10 +328,12 @@ if (_reviveTimer > -1) then {
 			_reviveTimer = _reviveTimer - 1;
 		};
 		//Handle vehicle if unit is in one
+		private ["_breakOut", "_vehicle"];
 		_breakOut = false;
 		if (!isNull (_unit getVariable "G_Loaded")) then {
 			//Unit in a vehicle
-			if (!alive (_unit getVariable "G_Loaded")) then {
+			_vehicle = _unit getVariable "G_Loaded";
+			if (!alive _vehicle) then {
 				//Vehicle is destroyed
 				if (G_Explosion_Eject_Occupants) then {
 					//Eject on explosion is enabled, so eject
@@ -371,10 +380,12 @@ else
 	while {(_unit getVariable "G_Unconscious") && (alive _unit) && (local _unit)} do 
 	{
 		//Handle vehicle if unit is in one
+		private ["_breakOut", "_vehicle"];
 		_breakOut = false;
 		if (!isNull (_unit getVariable "G_Loaded")) then {
 			//Unit in a vehicle
-			if (!alive (_unit getVariable "G_Loaded")) then {
+			_vehicle = _unit getVariable "G_Loaded";
+			if (!alive _vehicle) then {
 				//Vehicle is destroyed
 				if (G_Explosion_Eject_Occupants) then {
 					//Eject on explosion is enabled, so eject
@@ -452,10 +463,11 @@ else
 		//Fix from BIS_fnc_reviveOnState for being revived while having no weapon or binocular
 		if ({currentWeapon _unit == _x} count ["", binocular _unit] > 0) then {
 			[_unit] spawn {
+				private ["_unit"];
 				_unit = _this select 0;
 				sleep 0.1;
 				if ({currentWeapon _unit == _x} count ["", binocular _unit] > 0) then {
-					_unit playAction "Civil";
+					[_unit, "Civil"] remoteExec ["playAction", 0, true];
 				};
 			};
 		};
@@ -468,6 +480,7 @@ else
 	_unit enableAI "FSM";
 	//Allow unit to take damage
 	_unit allowDamage true;
+	private ["_rescuer", "_downs"];
 	_rescuer = _unit getVariable "G_Reviver";
 	_downs = _unit getVariable "G_Downs";
 	
@@ -486,6 +499,7 @@ else
 		//Display text depending on downs remaining
 		if (G_Revive_DownsPerLife > 0) then {
 			//Down(s) remaining
+			private ["_downsPlural"];
 			_downsPlural = "downs";
 			if (_downs == 1) then {
 				_downsPlural = "down";

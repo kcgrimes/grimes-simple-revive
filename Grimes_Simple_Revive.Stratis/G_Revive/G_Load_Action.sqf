@@ -1,5 +1,7 @@
 //Load unconscious
+//Local to _rescuer
 
+private ["_unit", "_rescuer", "_side", "_vehicle"];
 _unit = _this select 0;
 _rescuer = _this select 1;
 _side = _this select 3 select 0;
@@ -25,4 +27,4 @@ if ((_vehicle emptyPositions "cargo") < 1) exitWith {
 //Define Loaded variable with vehicle object
 _unit setVariable ["G_Loaded", _vehicle, true];
 //Execute validated Load of unit
-[_unit, _vehicle, _side] remoteExecCall ["G_fnc_moveInCargoToUnloadAction", 0, true];
+[_unit, _vehicle, _side] remoteExec ["G_fnc_moveInCargoToUnloadAction", 0, true];

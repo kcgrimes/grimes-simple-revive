@@ -1,4 +1,6 @@
 //Mobile respawn
+//Local to executor, not necessarily _MRV
+private ["_MRV_Array"];
 
 //Define array of MRVs and associated side
 _MRV_Array = [[G_Mobile_Respawn_WEST, WEST], [G_Mobile_Respawn_EAST, EAST], [G_Mobile_Respawn_GUER, RESISTANCE], [G_Mobile_Respawn_CIV, CIVILIAN]];
@@ -6,6 +8,7 @@ _MRV_Array = [[G_Mobile_Respawn_WEST, WEST], [G_Mobile_Respawn_EAST, EAST], [G_M
 //Define functions for MRV action
 G_fnc_MRV_Deploy_Action = {
 	//MRV Deployment
+	private ["_mobile", "_side", "_MRV_Logic", "_mobileRespawnID"];
 	_mobile = _this select 0;
 	_side = _this select 3 select 0;
 	_MRV_Logic = _this select 3 select 1;
@@ -17,6 +20,7 @@ G_fnc_MRV_Deploy_Action = {
 
 	//Handle MRV if not moveable
 	if !(G_Mobile_Respawn_Moveable) then {
+		private ["_anchor"];
 		//Create empty helipad as anchor and position it on MRV
 		_anchor = "Land_HelipadEmpty_F" createVehicle (getPos _mobile);
 		_anchor setDir (getDir _mobile); 
@@ -32,6 +36,7 @@ G_fnc_MRV_Deploy_Action = {
 
 //Create definition for Undeploy action
 G_fnc_MRV_UnDeploy_Action = {
+	private ["_mobile", "_MRV_Logic", "_mobileRespawnID"];
 	_mobile = _this select 0;
 	_MRV_Logic = _this select 3 select 0;
 	//Obtain spawnID from object variable
@@ -42,6 +47,7 @@ G_fnc_MRV_UnDeploy_Action = {
 
 	//Detach and delete helipad anchor if used
 	if !(G_Mobile_Respawn_Moveable) then {
+		private ["_anchor"];
 		_anchor = attachedTo _mobile;
 		detach _mobile;
 		deleteVehicle _anchor;
@@ -100,7 +106,7 @@ else
 //Define function for MRV init
 //bug - Tried executing this only on MRV owner's machine, then remoteExecing the addActions, but nothing happened on all other clients because server execs before client loads and it never execs to client.
 G_fnc_MRV_init = {
-	private ["_deployActionID", "_undeployActionID"];
+	private ["_side", "_MRV", "_MRV_Logic", "_deployActionID", "_undeployActionID"];
 	_side = _this select 0;
 	_MRV = _this select 1;
 	
@@ -133,10 +139,12 @@ G_fnc_MRV_init = {
 //Define function to handle vehicle being locked to enemy
 if (G_isServer) then {
 	G_fnc_MRV_Lock = {
+		private ["_MRV", "_MRV_Logic"];
 		_MRV = _this select 0;
 		_MRV_Logic = _this select 1;
 		//On unit getting in, kick them back out if they are not friendly
 		_MRV addEventHandler ["GetIn", {
+			private ["_MRV", "_unit", "_MRV_Logic"];
 			_MRV = _this select 0;
 			_unit = _this select 2;
 			//Obtain MRV logic from MRV
@@ -146,10 +154,12 @@ if (G_isServer) then {
 			if ((_MRV_Logic getVariable "G_Side") != (_unit getVariable "G_Side")) then {
 				//Unit needs to be removed, so handle accordingly
 				//Handle MRV engine
+				private ["_fuel"];
 				_fuel = fuel _MRV;
 				0 remoteExecCall ["setFuel", _MRV, false];
 				//Finish handling MRV engine in parallel
 				[_unit, _MRV, _fuel] spawn {
+					private ["_unit", "_MRV", "_fuel"];
 					_unit = _this select 0;
 					_MRV = _this select 1;
 					_fuel = _this select 2;
@@ -171,6 +181,7 @@ if (G_isServer) then {
 
 //Define function for easier remoteExec for handling local MRV actions onKilled
 G_fnc_MRV_onKilled_removeAction = {
+	private ["_MRV"];
 	_MRV = _this select 0;
 	//Remove Deploy and Undeploy actions from MRV
 	_MRV removeAction (_MRV getVariable "G_MRV_Action_ID");
@@ -179,12 +190,14 @@ G_fnc_MRV_onKilled_removeAction = {
 
 //Define function for handling MRV onKilled
 G_fnc_MRV_onKilled_EH = {
+	private ["_MRV", "_MRV_Logic"];
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	//Define onKilled EH for MRV to manage respawn position, actions, and its own respawn
 	_MRV_killed_EH = _MRV addEventHandler ["Killed",
 		{
 			//Executing on local machine
+			private ["_MRV", "_MRV_Logic"];
 			_MRV = _this select 0;
 			//Get MRV Logic from MRV
 			_MRV_Logic = _MRV getVariable "G_MRV_Logic";
@@ -196,6 +209,7 @@ G_fnc_MRV_onKilled_EH = {
 			};
 			//Manage MRV wreck in parallel
 			[_MRV] spawn {
+				private ["_oldMRV"];
 				_oldMRV = _this select 0;
 				//Wait for set wreck deletion time
 				sleep G_Mobile_Respawn_Wreck;
@@ -210,7 +224,7 @@ G_fnc_MRV_onKilled_EH = {
 
 //Define function for handling MRV onRespawn
 G_fnc_MRV_onRespawn = {
-	private ["_deployActionID", "_undeployActionID"];
+	private ["_MRV", "_MRV_Logic", "_side", "_deployActionID", "_undeployActionID"];
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	
@@ -223,6 +237,7 @@ G_fnc_MRV_onRespawn = {
 		_MRV call compile format ["%1 = _this; publicVariable ""%1""", _MRV_Logic getVariable "G_MRV_Name"];
 		
 		//Obtain and set MRV direction
+		private ["_mrvDir"];
 		_mrvDir = _MRV_Logic getVariable "G_MRV_Dir";
 		_MRV setDir _mrvDir;
 	};
@@ -255,6 +270,7 @@ G_fnc_MRV_onRespawn = {
 
 //Define function for handling MRV respawn
 G_fnc_MRV_onRespawn_EH = {
+	private ["_MRV_Logic", "_MRV"];
 	_MRV_Logic = _this select 0;
 
 	//Wait for respawn timer
@@ -269,6 +285,7 @@ G_fnc_MRV_onRespawn_EH = {
 
 //Define function for handling MRV markers
 G_fnc_MRV_Marker_Process = {
+	private ["_MRV", "_MRV_Logic", "_MRV_mkr"];
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	_MRV_mkr = _this select 2;
@@ -368,6 +385,7 @@ G_fnc_MRV_Marker_Process = {
 
 //Define function for creating MRV markers
 G_fnc_MRV_Marker_Creation = {
+	private ["_MRV", "_MRV_Logic", "_MRV_mkr"];
 	_MRV = _this select 0;
 	_MRV_Logic = _this select 1;
 	//Create local marker for each client if in PvP
@@ -375,7 +393,7 @@ G_fnc_MRV_Marker_Creation = {
 		//Check if MRV is on player's side
 		if ((player getVariable "G_Side") == (_MRV_Logic getVariable "G_Side")) then {
 			//MRV and player on same side, so create local marker
-			_MRV_mkr = createMarkerLocal [format["G_MRV_mkr_%1",_MRV], getPos _MRV];
+			_MRV_mkr = createMarkerLocal [format["G_MRV_mkr_%1", _MRV], getPos _MRV];
 			_MRV_mkr setMarkerColorLocal G_Mobile_Respawn_Mkr_Color;
 			_MRV_mkr setMarkerTextLocal G_Mobile_Respawn_Mkr_Text;
 			//If respawn marker is enabled, handle it
@@ -403,9 +421,11 @@ G_fnc_MRV_Marker_Creation = {
 //Execute MRV init
 {
 	//_x = [[MRV], Side]
+	private ["_side"];
 	_side = _x select 1;
 	{
 		//_x = MRV
+		private ["_MRV_Logic"];
 		[_side, _x] call G_fnc_MRV_init;
 		_MRV_Logic = _x getVariable "G_MRV_Logic";
 		//Manage MRV locking on server if enabled

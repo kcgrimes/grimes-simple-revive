@@ -1,11 +1,12 @@
 //Unload unconscious
-
+//Local to executor (not _unit)
+private ["_vehicle", "_unloadActionID", "_unit"];
 _vehicle = _this select 0;
 _unloadActionID = _this select 2;
 _unit = _this select 3 select 0;
 
 //Order unit to be out of vehicle
-unassignVehicle _unit;
+[_unit] remoteExecCall ["unassignVehicle", _unit, true];
 //Manually remove unit from vehicle
 moveOut _unit;
 

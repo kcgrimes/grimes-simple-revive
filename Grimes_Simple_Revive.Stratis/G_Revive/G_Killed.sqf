@@ -1,5 +1,7 @@
 //Handle onKilled
+//Local to _unit
 
+private ["_unit", "_respawnType"];
 _unit = _this select 0;
 _respawnType = getNumber(missionConfigFile >> "respawn");
 
@@ -12,6 +14,7 @@ if (G_Custom_Exec_2 != "") then {
 };
 
 //Handle life count if spawns are limited and this is not the initial spawn
+private ["_noLives", "_lives"];
 _noLives = false;
 if (!(G_Num_Respawns == -1)) then {
 	//Get life count

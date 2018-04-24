@@ -1,6 +1,7 @@
 //Carry
 //Local to _rescuer
 
+private ["_unit", "_rescuer"];
 _unit = _this select 0;
 _rescuer = _this select 1;
 
@@ -31,6 +32,7 @@ waitUntil {animationState _unit == "AinjPfalMstpSnonWnonDf_carried_dead"};
 _unit attachTo [_rescuer, [-0.2, 0.25, 0]];
 
 //Create drop action
+private ["_dropActionID"];
 _dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 1.5, true, true, ""];
 
 //Wait for Drop or someone to die
