@@ -1,4 +1,5 @@
 //Drag
+//Local to _rescuer
 
 _unit = _this select 0;
 _rescuer = _this select 1;
@@ -17,7 +18,7 @@ _rescuer setVariable ["G_Dragging", true, true];
 //Attach unit to rescuer
 _unit attachTo [_rescuer, [0.1,1.01,0.1]];
 //Orient unit to be set appropriately
-[_unit, 180] remoteExec ["setDir", 0, false];
+[_unit, 180] remoteExecCall ["setDir", _unit, false];
 
 //Create drop action
 _dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 1.5, true, true, ""];

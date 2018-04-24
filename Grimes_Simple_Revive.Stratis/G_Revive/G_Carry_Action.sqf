@@ -1,4 +1,5 @@
 //Carry
+//Local to _rescuer
 
 _unit = _this select 0;
 _rescuer = _this select 1;
@@ -8,7 +9,7 @@ _unit setVariable ["G_Carried", true, true];
 _rescuer setVariable ["G_Carrying", true, true];
 
 //Make unit's head farthest from rescuer for sake of the animation
-[_unit, (getDir _rescuer) + 180] remoteExec ["setDir", 0, false];
+[_unit, (getDir _rescuer) + 180] remoteExecCall ["setDir", _unit, false];
 
 //Prepare for lift
 [_unit, "AinjPpneMrunSnonWnonDb_still"] remoteExecCall ["playMoveNow", 0, false];

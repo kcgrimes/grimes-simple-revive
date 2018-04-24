@@ -121,16 +121,17 @@ G_fnc_moveInCargoToUnloadAction = {
 	_vehicle = _this select 1;
 	_side = _this select 2;
 	
-	//Command AI to stay in vehicle
-	_unit assignAsCargo _vehicle;
-	//Move unit into vehicle
-	_unit moveInCargo _vehicle;
-	//Perform DeadState animation due to lack of Unconscious anim in vehicle
-	//bug - check locality
-	[_unit, "Unconscious"] remoteExecCall ["playAction", 0, true];
-	//Set vehicle side to unit's side for action condition
-	//bug - is this reset later? 
-	_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
+	if (local _unit) then {
+		//Command AI to stay in vehicle
+		_unit assignAsCargo _vehicle;
+		//Move unit into vehicle
+		_unit moveInCargo _vehicle;
+		//Perform Unconscious animation manually due to lack of setUnconscious support in vehicle
+		_unit playAction "Unconscious";
+		//Set vehicle side to unit's side for action condition
+		//bug - is this reset later? 
+		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
+	};
 	
 	//Add Unload action for unit to vehicle
 	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 1.5, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
