@@ -304,9 +304,11 @@ sleep 2.5;
 		//Unit no longer unconscious, or is in vehicle, so disregard any rescuing AI by resetting variables
 		if (!isNull _aiReviver) then {
 			_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
+			_aiReviver = objNull;
 		};
 		if (!isNull _aiGuard) then {
 			_aiGuard setVariable ["G_AI_rescueRole", [0, objNull], true];
+			_aiGuard = objNull;
 		};
 		
 		//Wait magic amount of seconds before re-checking if in vehicle
