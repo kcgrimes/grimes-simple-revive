@@ -118,7 +118,7 @@ G_fnc_Revive_AI_Behavior = {
 			doStop _unit;
 			sleep 1;
 			//Regroup to squad leader
-			_unit doFollow (leader (group _unit));
+			_unit doFollow (leader _unit);
 		};
 	};
 };
@@ -149,18 +149,29 @@ G_fnc_moveInCargoToUnloadAction = {
 	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
 	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	
-	//Create parallel loop to monitor Unload action
-	//bug - can this not just be accomplished in the Unload script, instead of cycling?
+	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
 	[_unit, _vehicle, _unloadActionID] spawn {
 		private ["_unit", "_vehicle", "_unloadActionID"];
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_unloadActionID = _this select 2;
 		//Wait for unit to be unloaded or no longer unconscious
-		waitUntil {sleep 0.3; ((isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
+		waitUntil {sleep 0.3; ((vehicle _unit != _vehicle) || (isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
 		
 		//Remove the Unload action from the vehicle
 		_vehicle removeAction _unloadActionID;
+		
+		//Handle BIS Revive's Unload action
+		//Allow animation to set to prevent other animation executing too early
+		sleep 3;
+		
+		//Make sure unit is not loaded and broadcast
+		if (local _unit) then {
+			if (!isNull (_unit getVariable "G_Loaded")) then {
+				//BIS Revive's Unload action was used
+				_unit setVariable ["G_Loaded", objNull, true];
+			};
+		};
 	};
 };
 
