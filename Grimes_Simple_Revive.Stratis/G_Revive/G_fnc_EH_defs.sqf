@@ -125,6 +125,8 @@ G_fnc_moveInCargoToUnloadAction = {
 		_unit assignAsCargo _vehicle;
 		//Move unit into vehicle
 		_unit moveInCargo _vehicle;
+		//Wait for unit to be in vehicle before executing animation to prevent wrong animation
+		waitUntil {sleep 0.1; (vehicle _unit != _unit)};
 		//Perform Unconscious animation manually due to lack of setUnconscious support in vehicle
 			//This should have global effect, but does not, so it is here and broaadcasted
 		[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
