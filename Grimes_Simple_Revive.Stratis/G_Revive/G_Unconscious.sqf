@@ -1,5 +1,6 @@
+//Handle unconscious state
 private ["_reviveTimer"];
-	
+//Local to _unit
 _unit = _this;
 
 //If the unit is already unconscious or is not local to the executer, and is not JIP, exit
@@ -114,8 +115,12 @@ if (_bypass) exitWith {
 	_unit setVariable ["G_Unconscious", false, true];
 	_unit setDamage 1;
 	//Add killed message for AI for consistency
-	if ((G_isClient) && (!isPlayer _unit) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
-		systemChat format["%1 was killed", name _unit];
+	if ((!isPlayer _unit) && (G_Revive_Messages > 0)) then {
+		_target = 0;
+		if (G_Revive_Messages == 1) then {
+			_target = _unit getVariable "G_Side";
+		};
+		[format["%1 was killed", name _unit]] remoteExec ["systemChat", _target, false];
 	};
 };
 
@@ -414,8 +419,12 @@ if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_uni
 	_unit setVariable ["G_Unconscious", false, true];
 	_unit setDamage 1;
 	//Add killed message for AI for consistency
-	if ((G_isClient) && (!isPlayer _unit) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
-		systemChat format["%1 was killed", name _unit];
+	if ((!isPlayer _unit) && (G_Revive_Messages > 0)) then {		
+		_target = 0;
+		if (G_Revive_Messages == 1) then {
+			_target = _unit getVariable "G_Side";
+		};
+		[format["%1 was killed", name _unit]] remoteExec ["systemChat", _target, false];
 	};
 	//If on black screen, bring back normal view
 	if (G_Revive_Black_Screen) then {
@@ -463,8 +472,12 @@ else
 	_downs = _unit getVariable "G_Downs";
 	
 	//Announce revive
-	if ((G_isClient) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
-		systemChat format["%1 was revived by %2", name _unit, name _rescuer];
+	if (G_Revive_Messages > 0) then {
+		_target = 0;
+		if (G_Revive_Messages == 1) then {
+			_target = _unit getVariable "G_Side";
+		};
+		[format["%1 was revived by %2", name _unit, name _rescuer]] remoteExec ["systemChat", _target, false];
 	};
 	
 	//Display downs remaining for players

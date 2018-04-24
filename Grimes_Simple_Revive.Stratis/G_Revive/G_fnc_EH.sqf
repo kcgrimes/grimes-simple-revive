@@ -78,6 +78,7 @@ if (G_Revive_System) then {
 	_unit addEventHandler 
 	[	"HandleDamage",
 		{
+			//Local to _unit
 			_unit = _this select 0;
 			//Define variables used to track what is damaged with how much damage, empty if undefined
 			_selections = _unit getVariable ["selections", []];
@@ -109,7 +110,6 @@ if (G_Revive_System) then {
 				_unit allowDamage false;
 				_unit spawn G_fnc_unconsciousState;
 				//Execute code for the killer
-				//bug - does this need to be localized more specifically?
 				[_unit, _source] spawn G_fnc_onKill;
 				//Output new (total) damage value
 				_newDmg;

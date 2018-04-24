@@ -1,6 +1,6 @@
 //Manages unit that kills unit
 private ["_killer_lives"];
-
+//Local to _unit
 _unit = _this select 0;
 _killer = _this select 1;
 
@@ -20,14 +20,22 @@ if ((typeName (_killer getVariable "G_Lives")) != "SCALAR") then {
 
 //If no killer defined, no killer to manage, so exit with incapacitated text
 if (_noKiller) exitWith {
-	if ((G_isClient) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
-		systemChat format["%1 was incapacitated", name _unit];
+	if (G_Revive_Messages > 0) then {
+		_target = 0;
+		if (G_Revive_Messages == 1) then {
+			_target = _unit getVariable "G_Side";
+		};
+		[format["%1 was incapacitated", name _unit]] remoteExec ["systemChat", _target, false];
 	};
 };
 
 //Killer was defined, so announce
-if ((G_isClient) && ((G_Revive_Messages == 2) || ((G_Revive_Messages == 1) && ((player getVariable "G_Side") == (_unit getVariable "G_Side"))))) then {
-	systemChat format["%1 was incapacitated by %2", name _unit, name _killer];
+if (G_Revive_Messages > 0) then {
+	_target = 0;
+	if (G_Revive_Messages == 1) then {
+		_target = _unit getVariable "G_Side";
+	};
+	[format["%1 was incapacitated by %2", name _unit, name _killer]] remoteExec ["systemChat", _target, false];
 };
 	
 //Check if teamkill
@@ -44,7 +52,7 @@ if ((_unit getVariable "G_Side") == (_killer getVariable "G_Side")) then {
 	//Broadcast score deduction to server
 	[_killer, [-1, 0, 0, 0, 0]] remoteExec ["addPlayerScores", 2, false];
 	//Rating penalty
-	_killer addRating -1000;
+	[_killer, -1000] remoteExec ["addRating", _killer, false];
 }
 else
 {
@@ -52,5 +60,5 @@ else
 	//Broadcast score bonus to server
 	[_killer, [1, 0, 0, 0, 0]] remoteExec ["addPlayerScores", 2, false];
 	//Rating bonus
-	_killer addRating 200;
+	[_killer, 200] remoteExec ["addRating", _killer, false];
 };
