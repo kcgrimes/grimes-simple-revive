@@ -189,7 +189,7 @@ sleep 2.5;
 
 //Execute AI tracking for AI's revive behavior
 [_unit] spawn {
-	//private ["_unit", "_aiReviver", "_aiGuard"];
+	private ["_unit", "_aiReviver", "_aiGuard"];
 	_unit = _this select 0;
 	//Cycle through AI role assignments as long as unit is unconscious
 	//bug - use of Call for Help concept, or keep it automatic?
@@ -215,7 +215,7 @@ sleep 2.5;
 			};
 			
 			//Obtain array of potential rescuers from men within a certain distance
-			//private ["_arrayPotentialRescuers", "_arrayPotentialRescuersCount"];
+			private ["_arrayPotentialRescuers", "_arrayPotentialRescuersCount"];
 			_arrayPotentialRescuers = [];
 			{
 				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not unconscious
