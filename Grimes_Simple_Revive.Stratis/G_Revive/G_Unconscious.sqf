@@ -237,7 +237,7 @@ sleep 2.5;
 						{
 							//Possible replacement, make sure is reasonable before replacing
 								//Must be 50m closer to victim than current assigned reviver
-							if ((_aiReviver distance _unit) > ((_x distance _unit) + 50)) then {
+							if ((_aiReviver distance _unit) > ((_x distance _unit) + 30)) then {
 								//Replace current reviver with new
 								_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
 								_aiReviver = _x;
@@ -270,7 +270,7 @@ sleep 2.5;
 					{
 						//Possible replacement, make sure is reasonable before replacing
 							//Must be 50m closer to victim than current assigned guard
-						if ((_aiGuard distance _unit) > ((_x distance _unit) + 50)) then {
+						if ((_aiGuard distance _unit) > ((_x distance _unit) + 30)) then {
 							//Replace current guard with new
 							_aiGuard setVariable ["G_AI_rescueRole", [0, objNull], true];
 							_aiGuard = _x;

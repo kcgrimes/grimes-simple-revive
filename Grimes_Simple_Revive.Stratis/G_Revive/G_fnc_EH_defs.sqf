@@ -53,6 +53,10 @@ G_fnc_Revive_AI_Behavior = {
 			_victim = (_unit getVariable "G_AI_rescueRole") select 1;
 			//Allow AI to move more freely to victim, but still detect and engage enemies
 			_unit setBehaviour "SAFE";
+			_unit disableAI "TARGET";
+			_unit disableAI "SUPPRESSION";
+			_unit disableAI "COVER";
+			_unit disableAI "AUTOCOMBAT";
 			//Determine assigned role
 			if ((_rescueRoleArray select 0) == 1) then {
 				//AI is reviver
@@ -99,6 +103,10 @@ G_fnc_Revive_AI_Behavior = {
 			//Unassigned from role, so resume previous behavior
 			if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
 				//Return to default behavior
+				_unit enableAI "TARGET";
+				_unit enableAI "SUPPRESSION";
+				_unit enableAI "COVER";
+				_unit enableAI "AUTOCOMBAT";
 				_unit setBehaviour "AWARE";
 				//Regroup to squad leader
 				_unit doFollow (leader (group _unit));
