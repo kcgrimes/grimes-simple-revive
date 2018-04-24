@@ -114,8 +114,7 @@ G_fnc_Revive_AI_Behavior = {
 			_unit enableAI "COVER";
 			_unit enableAI "AUTOCOMBAT";
 			_unit setBehaviour "AWARE";
-			//Stop current move
-			doStop _unit;
+			//Allow time for commands to settle
 			sleep 1;
 			//Regroup to squad leader
 			_unit doFollow (leader _unit);
