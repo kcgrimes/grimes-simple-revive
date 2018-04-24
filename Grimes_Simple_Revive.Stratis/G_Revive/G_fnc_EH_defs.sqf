@@ -91,6 +91,11 @@ G_fnc_Revive_AI_Behavior = {
 				_unit moveTo (getPos _victim);
 				//If in range, start guarding
 				if (_unit distance _victim < 20) then {
+					//Have regrouped AI reset move
+					_unit doMove (getPos _unit);
+					//Have stopped AI reset move
+					_unit moveTo (getPos _unit);
+					//Increase awareness
 					//bug - this changes behavior of entire group, which could have adverse effects
 					_unit setBehaviour "AWARE";
 					//Stop loop to allow "patrol"
@@ -107,6 +112,9 @@ G_fnc_Revive_AI_Behavior = {
 			_unit enableAI "COVER";
 			_unit enableAI "AUTOCOMBAT";
 			_unit setBehaviour "AWARE";
+			//Stop current move
+			doStop _unit;
+			sleep 1;
 			//Regroup to squad leader
 			_unit doFollow (leader (group _unit));
 		};
