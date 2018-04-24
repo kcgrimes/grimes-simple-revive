@@ -76,7 +76,7 @@ G_fnc_Revive_AI_Behavior = {
 					//Wait for revive to end one way or another
 					waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
 				};
-				sleep 3;
+				sleep 2;
 			};
 		}
 		else
@@ -92,7 +92,7 @@ G_fnc_Revive_AI_Behavior = {
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
 				//If in range, start guarding
-				if (_unit distance _victim < 20) then {
+				if (_unit distance _victim < 10) then {
 					//Have regrouped AI reset move
 					_unit doMove (getPos _unit);
 					//Have stopped AI reset move
@@ -103,7 +103,7 @@ G_fnc_Revive_AI_Behavior = {
 					//Stop loop to allow "patrol"
 					waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
 				};
-				sleep 3;
+				sleep 2;
 			};
 		};
 		//Unassigned from role, so resume previous behavior
