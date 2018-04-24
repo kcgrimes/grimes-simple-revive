@@ -496,7 +496,6 @@ else
 	};
 	
 	//Display downs remaining for players
-	//bug - do AI units properly count downs?
 	if (isPlayer _unit) then {
 		//Display text depending on downs remaining
 		if (G_Revive_DownsPerLife > 0) then {
