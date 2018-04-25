@@ -62,7 +62,7 @@ if (G_Revive_System) then {
 	//Common conditions for action when revive is enabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		(((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
+		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
 	};
 }
 else
@@ -70,7 +70,7 @@ else
 	//Common conditions for action when revive is disabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		(((_target distance _this) < 6) && (_target != _this) && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
+		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
 	};
 };
 
@@ -131,9 +131,6 @@ G_fnc_MRV_init = {
 	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
 	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
-	//Store local action ID locally for later removal
-	_MRV setVariable ["G_MRV_Action_ID", _deployActionID];
-	_MRV setVariable ["G_MRV_Undeploy_ID", _undeployActionID];
 };
 
 //Define function to handle vehicle being locked to enemy
@@ -179,15 +176,6 @@ if (G_isServer) then {
 	};
 };
 
-//Define function for easier remoteExec for handling local MRV actions onKilled
-G_fnc_MRV_onKilled_removeAction = {
-	private ["_MRV"];
-	_MRV = _this select 0;
-	//Remove Deploy and Undeploy actions from MRV
-	_MRV removeAction (_MRV getVariable "G_MRV_Action_ID");
-	_MRV removeAction (_MRV getVariable "G_MRV_Undeploy_ID");
-};
-
 //Define function for handling MRV onKilled
 G_fnc_MRV_onKilled_EH = {
 	private ["_MRV", "_MRV_Logic"];
@@ -201,8 +189,6 @@ G_fnc_MRV_onKilled_EH = {
 			_MRV = _this select 0;
 			//Get MRV Logic from MRV
 			_MRV_Logic = _MRV getVariable "G_MRV_Logic";
-			//Remove local Deploy and Undeploy actions on all machines
-			[_MRV] remoteExecCall ["G_fnc_MRV_onKilled_removeAction", 0, true];
 			//If MRV is deployed, Undeploy it
 			if (_MRV_Logic getVariable "G_MRV_Deployed") then {
 				[_MRV, "", "", [_MRV_Logic]] call G_fnc_MRV_UnDeploy_Action;
@@ -249,9 +235,6 @@ G_fnc_MRV_onRespawn = {
 	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
 	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
-	//Store local action ID locally for later removal
-	_MRV setVariable ["G_MRV_Action_ID", _deployActionID];
-	_MRV setVariable ["G_MRV_Undeploy_ID", _undeployActionID];
 
 	//Manage MRV locking if enabled
 	if (G_isServer && G_Mobile_Respawn_Locked) then {
