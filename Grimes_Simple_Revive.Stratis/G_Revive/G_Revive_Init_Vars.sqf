@@ -13,6 +13,8 @@ if (typeName G_Revive_AI_Unconscious != "ARRAY") then {_validationFailed pushBac
 if ((typeName G_Revive_Time_Limit != "SCALAR") || (G_Revive_Time_Limit < -1)) then {_validationFailed pushBack "G_Revive_Time_Limit must be a number greater than or equal to -1!"};
 if (typeName G_Allow_GiveUp != "BOOL") then {_validationFailed pushBack "G_Allow_GiveUp must be true/false!"};
 if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) then {_validationFailed pushBack "G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
+if (typeName G_Revive_addonRadio_muteTransmit != "BOOL") then {_validationFailed pushBack "G_Revive_addonRadio_muteTransmit must be true/false!"};
+if (typeName G_Revive_addonRadio_muteReceive != "BOOL") then {_validationFailed pushBack "G_Revive_addonRadio_muteReceive must be true/false!"};
 if (typeName G_Revive_Can_Revive != "ARRAY") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
 {
 	if (typeName _x != "STRING") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};

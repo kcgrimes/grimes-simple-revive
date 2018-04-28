@@ -268,3 +268,69 @@ if (G_isClient) then {
 		((_this select 0) displayCtrl 1002) ctrlSetText _text;
 	};
 };
+
+//Define player-only function for addon radio handling
+if (G_isClient) then {
+	//Determine whether to modify TFAR or ACRE2
+	if (isClass (configFile >> "CfgPatches" >> "task_force_radio")) then {
+		//Define function to handle TFAR
+		G_fnc_muteAddonRadio = {
+			//_this select 0 is local player
+			//Check if muting or unmuting
+			if (_this select 0) then {
+				if (G_Revive_addonRadio_muteReceive) then {
+					//Save current volume
+					player setVariable ["G_save_tf_globalVolume", player getVariable ["tf_globalVolume", 1]];
+					//Mute local radio volume
+					player setVariable ["tf_globalVolume", 0], true;
+				};
+				if (G_Revive_addonRadio_muteTransmit) then {
+					//Prevent transmission
+					player setVariable ["tf_unable_to_use_radio", true, true];
+				};
+			}
+			else
+			{
+				if (G_Revive_addonRadio_muteReceive) then {
+					//Resume previous volume
+					player setVariable ["tf_globalVolume", player getVariable ["G_save_tf_globalVolume", 1], true];
+				};
+				if (G_Revive_addonRadio_muteTransmit) then {
+					//Allow transmission
+					player setVariable ["tf_unable_to_use_radio", false, true];
+				};
+			};
+		};
+	}
+	else
+	{
+		//Define function to handle ACRE2
+		G_fnc_muteAddonRadio = {
+			//_this select 0 is local player
+			//Check if muting or unmuting
+			if (_this select 0) then {
+				if (G_Revive_addonRadio_muteReceive) then {
+					//Save current volume
+					player setVariable ["G_save_acreVolume", [] call acre_api_fnc_getGlobalVolume];
+					//Mute radio volume
+					[0] call acre_api_fnc_setGlobalVolume;
+				};
+				if (G_Revive_addonRadio_muteTransmit) then {
+					//Prevent transmission
+					player setVariable ["acre_sys_core_isDisabled", true, true];
+				};
+			}
+			else
+			{
+				if (G_Revive_addonRadio_muteReceive) then {
+					//Resume previous volume
+					[player getVariable ["G_save_acreVolume", 1]] call acre_api_fnc_setGlobalVolume;
+				};
+				if (G_Revive_addonRadio_muteTransmit) then {
+					//Allow transmission
+					player setVariable ["acre_sys_core_isDisabled", false, true];
+				};
+			};
+		};
+	};
+};

@@ -127,6 +127,11 @@ if (_bypass) exitWith {
 	};
 };
 
+//Handle addon radios if enabled
+if ((isPlayer _unit) && (G_Revive_addonRadio_muteTransmit || G_Revive_addonRadio_muteReceive)) then {
+	[true] spawn G_fnc_muteAddonRadio;
+};
+
 //Black out the screen with text for unconscious player
 if (isPlayer _unit) then {
 	//Disable keyboard/mouse input
@@ -532,6 +537,11 @@ else
 	if (G_Custom_Exec_3 != "") then {
 		[] execVM G_Custom_Exec_3;
 	};
+};
+
+//Handle addon radios if enabled
+if ((isPlayer _unit) && (G_Revive_addonRadio_muteTransmit || G_Revive_addonRadio_muteReceive)) then {
+	[false] spawn G_fnc_muteAddonRadio;
 };
 
 //Reset Reviver variable

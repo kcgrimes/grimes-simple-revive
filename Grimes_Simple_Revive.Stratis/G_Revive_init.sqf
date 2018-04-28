@@ -13,6 +13,8 @@ G_Revive_AI_Unconscious = [WEST, EAST, RESISTANCE, CIVILIAN]; //Array of sides o
 G_Revive_Time_Limit = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
 G_Allow_GiveUp = true; //Allow player to force death while unconscious. true = enabled, false = disabled.
 G_Revive_DownsPerLife = 0; //Number of times unit can go Unconscious in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
+G_Revive_addonRadio_muteTransmit = false; //Mute radio transmissions in addons ACRE2 or TFAR while unconscious. true = enabled, false = disabled. 
+G_Revive_addonRadio_muteReceive = false; //Mute radio reception in addons ACRE2 or TFAR while unconscious. true = enabled, false = disabled. 
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
 G_Revive_actionTime = 10; //Time (in seconds) required for reviver to complete revive action
 G_Revive_Requirement = 0; //1 or greater = number of FAKs (single use) or Medikit (unlimited use) needed to revive (and treat still). 0 = Those items only needed to treat, not revive (stock).
