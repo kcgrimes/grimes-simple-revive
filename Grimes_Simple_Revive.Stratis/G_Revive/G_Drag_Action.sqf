@@ -46,5 +46,5 @@ waitUntil {sleep 0.1; (!(_unit getVariable "G_Dragged") || !(alive _unit) || (_r
 
 //If unit or rescuer died, handle in Drop function
 if ((!alive _unit) || (!(_unit getVariable "G_Unconscious")) || (_rescuer getVariable "G_Unconscious")) then {
-	[_unit, _rescuer, _dropActionID] spawn G_fnc_actionDrop;
+	[_rescuer, "", _dropActionID, _unit] spawn G_fnc_actionDrop;
 };
