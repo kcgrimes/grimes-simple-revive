@@ -271,7 +271,7 @@ if (G_isClient) then {
 
 //Define player-only function for addon radio handling
 if (G_isClient) then {
-	//Determine whether to modify TFAR or ACRE2
+	//Determine if using TFAR or ACRE2
 	if (isClass (configFile >> "CfgPatches" >> "task_force_radio")) then {
 		//Define function to handle TFAR
 		G_fnc_muteAddonRadio = {
