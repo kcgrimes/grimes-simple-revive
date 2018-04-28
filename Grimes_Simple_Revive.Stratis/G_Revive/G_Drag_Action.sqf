@@ -17,7 +17,7 @@ _rescuer setVariable ["G_Dragging", true, true];
 [_unit, "AinjPpneMrunSnonWnonDb_still"] remoteExecCall ["switchMove", 0, false];
 
 //Attach unit to rescuer
-_unit attachTo [_rescuer, [0.1,1.01,0.1]];
+_unit attachTo [_rescuer, [0, 1.1, 0.05]];
 //Orient unit to be set appropriately
 [_unit, 180] remoteExecCall ["setDir", _unit, false];
 
