@@ -21,7 +21,7 @@ if (G_Revive_System) then {
 	_unit addEventHandler 
 	[	"Killed",
 		{
-			[_this select 0] execVM "G_Revive\G_Killed.sqf";
+			[_this select 0] spawn G_fnc_onKilled;
 		}
 	];
 
@@ -29,7 +29,7 @@ if (G_Revive_System) then {
 	_unit addEventHandler 
 	[	"Respawn",
 		{
-			[_this select 0] execVM "G_Revive\G_Respawn.sqf";
+			[_this select 0] spawn G_fnc_onRespawn;;
 		}
 	];
 };

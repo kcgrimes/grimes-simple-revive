@@ -19,6 +19,16 @@ G_fnc_Revive_resetVariables = {
 	_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
 };
 
+//Define Unconscious-state script
+G_fnc_unconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
+//Define onKill script
+G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
+//Define onKilled script
+G_fnc_onKilled = compile preprocessFileLineNumbers "G_Revive\G_Killed.sqf";
+//Define onRespawn script
+G_fnc_onRespawn = compile preprocessFileLineNumbers "G_Revive\G_Respawn.sqf";
+
+//Define revive-related actions
 G_fnc_actionRevive = compile preprocessFileLineNumbers "G_Revive\G_Revive_Action.sqf";
 G_fnc_actionDrag = compile preprocessFileLineNumbers "G_Revive\G_Drag_Action.sqf";
 G_fnc_actionCarry = compile preprocessFileLineNumbers "G_Revive\G_Carry_Action.sqf";

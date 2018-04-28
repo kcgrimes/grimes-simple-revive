@@ -183,23 +183,19 @@ if (G_Unit_Tag) then {
 	};
 };
 
-//Define Unconscious-state script
-G_fnc_unconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
-//Define onKill script
-G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
-
 //Call mandatory definitions for revive system if enabled
 if (G_Revive_System) then {
 	[] call compile preprocessFileLineNumbers "G_Revive\G_fnc_EH_defs.sqf";
 };
 
-//bug - consider preprecessing G_Killed and G_Revive here or near here
-//Define EH to handle revive/respawn system
+//Create function that will:
+	//Create public object variables as enabled,
+	//add EHs for revive system if enabled, 
+	//add Fixed Spawn EH to AI if enabled,
+	//add respawn EH for Unit Tags if enabled
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
 //Execute G_fnc_EH on all players and AI by side as enabled
-//bug - does this need to be more specifically localized?
-	//particularly for AI on isServer
 {
 	if (isPlayer _x) then {
 		//Is a player
