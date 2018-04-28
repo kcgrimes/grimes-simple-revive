@@ -42,7 +42,7 @@ player createDiaryRecord ["G_Revive",
 	<br/>
 	<br/>* To Revive an Unconscious teammate, simply approach them and use the Revive action.
 	<br/>
-	<br/>* To Drag or Carry any Unconscious unit (doesn't have to be a teammate!), simply approach them and use the Drag or Carry action. NOTE: Sometimes the animation will force a certain position. If you are in Drag and not moving, simply hit 2xC (toggle combat pace) and you will be able to move again (the issue is the game's Walk mechanic).
+	<br/>* To Drag or Carry any Unconscious unit (doesn't have to be a teammate!), simply approach them and use the Drag or Carry action. 
 	<br/>
 	<br/>* To Load a wounded teammate into a vehicle, simply move them or the vehicle within range and use the Load action on the Unconscious unit. If a unit is killed in a vehicle, they will have to be Unloaded first.
 	<br/>

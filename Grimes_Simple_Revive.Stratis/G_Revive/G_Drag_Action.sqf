@@ -25,6 +25,22 @@ _unit attachTo [_rescuer, [0.1,1.01,0.1]];
 private ["_dropActionID"];
 _dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 1.5, true, true, ""];
 
+//Temp fix for stuck due to combat pace
+//Detect lack of movement and provide notice
+if (isPlayer _rescuer) then {
+	private ["_startPos"];
+	_startPos = getPos _rescuer;
+	[_rescuer, _startPos] spawn {
+		params ["_rescuer", "_startPos"];
+		sleep 5;
+		if ((_rescuer distance _startPos) < 2) then {
+			titleText [format["Exit Combat Pace via %1", (actionKeysNamesArray "TactToggle") select 0], "PLAIN", 1]; 
+			sleep 1; 
+			titleFadeOut 4;
+		};
+	};
+};
+
 //Wait for Drop or someone to die
 waitUntil {sleep 0.1; (!(_unit getVariable "G_Dragged") || !(alive _unit) || (_rescuer getVariable "G_Unconscious"));};  
 
