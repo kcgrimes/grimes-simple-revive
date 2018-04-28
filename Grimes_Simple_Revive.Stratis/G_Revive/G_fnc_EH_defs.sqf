@@ -72,6 +72,8 @@ G_fnc_Revive_AI_Behavior = {
 		if ((_rescueRoleArray select 0) == 1) then {
 			//AI is reviver
 			//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
+			private ["_distCount"];
+			_distCount = 0;
 			while {((!(_unit getVariable "G_Unconscious")) && (alive _unit) && (_victim getVariable "G_Unconscious") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
 				//Prevent AI from stopping
 				//bug - is this stop necessary?
@@ -80,6 +82,14 @@ G_fnc_Revive_AI_Behavior = {
 				_unit doMove (getPos _victim);
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
+				//Fix for AI getting "stuck" near objects or unable to reach victim:
+				//If close, add a point until it has been long enough, then setPos to victim
+				if ((_unit distance _victim < 7) && (isNull (_victim getVariable "G_Reviver"))) then {
+					_distCount = _distCount + 1;
+				};
+				if (_distCount > 9) then {
+					_unit setPos (getPos _victim);
+				};
 				//If in range, perform revive action
 				if ((_unit distance _victim < 2) && (isNull (_victim getVariable "G_Reviver"))) then {
 					[_victim, _unit] spawn G_fnc_actionRevive;
