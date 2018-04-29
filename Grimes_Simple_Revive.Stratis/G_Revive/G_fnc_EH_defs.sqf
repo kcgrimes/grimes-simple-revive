@@ -42,8 +42,8 @@ G_fnc_actionDrop = compile preprocessFileLineNumbers "G_Revive\G_Drop_Action.sqf
 
 //Define function to check common conditions in revive-related actions
 G_fnc_Revive_Actions_Cond = {
-	params ["_target", "_this"];
-	((_target != _this) && !(_this getVariable "G_Incapacitated") && (_target getVariable "G_Incapacitated") && ((_target distance _this) < 1.75) && !(_target getVariable "G_Dragged") && !(_target getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && (isNull (_target getVariable "G_Reviver")) && (isNull (_this getVariable "G_Reviving")) && (isNull (_target getVariable "G_Loaded")))
+	params ["_target", "_this", "_distReq"];
+	((_target != _this) && !(_this getVariable "G_Incapacitated") && (_target getVariable "G_Incapacitated") && ((_target distance _this) < _distReq) && !(_target getVariable "G_Dragged") && !(_target getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && (isNull (_target getVariable "G_Reviver")) && (isNull (_this getVariable "G_Reviving")) && (isNull (_target getVariable "G_Loaded")))
 };
 
 //Define function to add all revive-related actions
@@ -51,11 +51,11 @@ G_fnc_Revive_Actions = {
 	private ["_unit", "_side", "_reviveActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
 	_unit = _this select 0;
 	_side = _unit getVariable "G_Side";
-	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
+	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
-	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [_side], 1.5, true, true, "", format["(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
+	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
+	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
+	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [_side], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 };
 
@@ -94,14 +94,14 @@ G_fnc_Revive_AI_Behavior = {
 				_unit moveTo (getPos _victim);
 				//Fix for AI getting "stuck" near objects or unable to reach victim:
 				//If close and eligible, add a point until it has been long enough, then setPos to victim
-				if ((_unit distance _victim < 7) && ([_victim, _unit] call G_fnc_Revive_Actions_Cond)) then {
+				if ([_victim, _unit, 7] call G_fnc_Revive_Actions_Cond) then {
 					_distCount = _distCount + 1;
 				};
 				if (_distCount > 9) then {
 					_unit setPos (getPos _victim);
 				};
 				//If in range, perform revive action
-				if ([_victim, _unit] call G_fnc_Revive_Actions_Cond) then {
+				if ([_victim, _unit, 2] call G_fnc_Revive_Actions_Cond) then {
 					[_victim, _unit] spawn G_fnc_actionRevive;
 					//Wait for revive to end one way or another
 					waitUntil {((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
