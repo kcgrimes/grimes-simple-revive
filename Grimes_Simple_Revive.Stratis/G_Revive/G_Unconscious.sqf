@@ -539,8 +539,8 @@ else
 	};
 	
 	//Custom execution
-	if (G_Custom_Exec_3 != "") then {
-		[] execVM G_Custom_Exec_3;
+	if (G_Custom_Exec_5 != "") then {
+		[] execVM G_Custom_Exec_5;
 	};
 };
 
