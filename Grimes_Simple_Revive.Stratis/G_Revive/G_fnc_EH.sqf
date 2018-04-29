@@ -76,7 +76,7 @@ if (G_Revive_System) then {
 	_unit setVariable ["selections", []];
 	_unit setVariable ["gethit", []];
 
-	//Add the HandleDamage EH to execute Unconscious state instead of death
+	//Add the HandleDamage EH to execute Incapacitated state instead of death
 	_unit addEventHandler 
 	[	"HandleDamage",
 		{
@@ -110,10 +110,10 @@ if (G_Revive_System) then {
 			if (_curDmg >= 1) then {
 				//Damage is fatal, so make it just under fatal so unit is not actually killed
 				_newDmg = 0.99;
-				//Whoever _unit is local to will execute Unconscious state publically
+				//Whoever _unit is local to will execute Incapacitated state publically
 				if (local _unit) then {
 					_unit allowDamage false;
-					_unit spawn G_fnc_enterUnconsciousState;
+					_unit spawn G_fnc_enterIncapacitatedState;
 					//Execute code for the killer
 					[_unit, _source] spawn G_fnc_onKill;
 				};

@@ -1,4 +1,4 @@
-//Unload unconscious
+//Unload incapacitated
 //Local to executor (not _unit)
 private ["_vehicle", "_unloadActionID", "_unit"];
 _vehicle = _this select 0;
@@ -13,7 +13,7 @@ moveOut _unit;
 //Wait for unit to be out of vehicle before executing animations to prevent wrong animation
 waitUntil {sleep 0.1; (vehicle _unit == _unit)};
 
-//Execute Unconscious animation (still required despite playAction "Unconscious")
+//Execute Incapacitated animation (still required despite playAction "Unconscious")
 [_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
 [_unit, "UnconsciousFaceDown"] remoteExecCall ["switchMove", 0, true];
 

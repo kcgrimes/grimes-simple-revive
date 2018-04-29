@@ -9,18 +9,18 @@ G_Briefing = true; //true = information, how to, and credits will be displayed o
 
 //Revive
 G_Revive_System = true; //Whether the revive system will be used or not. true = enabled, false = disabled.
-G_Revive_AI_Unconscious = [WEST, EAST, RESISTANCE, CIVILIAN]; //Array of sides of AI that will utilize revive system
+G_Revive_AI_Incapacitated = [WEST, EAST, RESISTANCE, CIVILIAN]; //Array of sides of AI that will utilize revive system
 G_Revive_Time_Limit = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
-G_Allow_GiveUp = true; //Allow player to force death while unconscious. true = enabled, false = disabled.
-G_Revive_DownsPerLife = 0; //Number of times unit can go Unconscious in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
-G_Revive_addonRadio_muteTransmit = false; //Mute radio transmissions in addons ACRE2 or TFAR while unconscious. true = enabled, false = disabled. 
-G_Revive_addonRadio_muteReceive = false; //Mute radio reception in addons ACRE2 or TFAR while unconscious. true = enabled, false = disabled. 
+G_Allow_GiveUp = true; //Allow player to force death while incapacitated. true = enabled, false = disabled.
+G_Revive_DownsPerLife = 0; //Number of times unit can go Incapacitated in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
+G_Revive_addonRadio_muteTransmit = false; //Mute radio transmissions in addons ACRE2 or TFAR while incapacitated. true = enabled, false = disabled. 
+G_Revive_addonRadio_muteReceive = false; //Mute radio reception in addons ACRE2 or TFAR while incapacitated. true = enabled, false = disabled. 
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
 G_Revive_actionTime = 10; //Time (in seconds) required for reviver to complete revive action
 G_Revive_Requirement = 0; //1 or greater = number of FAKs (single use) or Medikit (unlimited use) needed to revive (and treat still). 0 = Those items only needed to treat, not revive (stock).
-G_Revive_Black_Screen = false; //true = While Unconscious/waiting for revive, screen stays black. false = Screen goes black at death then fades back in, with surroundings visible.
+G_Revive_Black_Screen = false; //true = While Incapacitated/waiting for revive, screen stays black. false = Screen goes black at death then fades back in, with surroundings visible.
 G_Revive_Action_Color = "#FFCC00"; //HTML color code that will be the color of the Revive, Drag, Carry, and Load/Unload action text. Default is Orange. 
-G_Revive_Load_Types = ["Car","Tank","Helicopter","Ship"]; //Array of strings of kinds of vehicles that unconscious units can be loaded into
+G_Revive_Load_Types = ["Car","Tank","Helicopter","Ship"]; //Array of strings of kinds of vehicles that incapacitated units can be loaded into
 G_Eject_Occupants = false; //If killed while in a vehicle, the revivable unit is ejected from the vehicle. True = enabled, false = disabled.
 G_Explosion_Eject_Occupants = true; //Once the wreck of an exploded vehicle comes to a stop (air or land), the occupants will be ejected and revivable. True to enable, false to disable (units will bypass revive and be forced to respawn).
 G_Revive_Reward = 0; //0 = No lives rewarded for revive. 1 and up = number of lives rewarded for reviving. (CAN be a decimal)
@@ -73,7 +73,7 @@ G_Unit_Tag = true; //Refers to unit "name tags" that display over unit's head on
 
 //Custom Executions
 //Note - By default they will execute on AI as well. Read comment to side.
-G_Custom_Exec_1 = ""; //File executed when unit is set Unconscious (NOT "killed"). _incapacitatedUnit = _this select 0, and is local.
+G_Custom_Exec_1 = ""; //File executed when unit is set Incapacitated (NOT "killed"). _incapacitatedUnit = _this select 0, and is local.
 G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed). _killedUnit = _this select 0, and is local.
 G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed. _respawnedUnit = _this select 0, and is local.
 G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. Newly spawned MRV = _this select 0, and is local. 

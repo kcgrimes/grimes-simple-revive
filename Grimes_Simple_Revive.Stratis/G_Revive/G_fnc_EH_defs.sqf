@@ -2,7 +2,7 @@
 //Local to executor
 
 //Define revive-related variables based on data type
-G_Revive_boolVars = ["G_Unconscious", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying"];
+G_Revive_boolVars = ["G_Incapacitated", "G_Dragged", "G_Carried", "G_Dragging", "G_Carrying"];
 G_Revive_objVars = ["G_Reviver", "G_Reviving", "G_Loaded"];
 
 //Define function to reset revive variables and broadcast them
@@ -19,11 +19,11 @@ G_fnc_Revive_resetVariables = {
 	_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
 };
 
-//Define function for entering Unconscious-state script
-G_fnc_enterUnconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
-//Define function for cleanly exiting Unconscious-state script
-G_fnc_exitUnconsciousState = {
-	_this setVariable ["G_Unconscious", false, true];
+//Define function for entering Incapacitated-state script
+G_fnc_enterIncapacitatedState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
+//Define function for cleanly exiting Incapacitated-state script
+G_fnc_exitIncapacitatedState = {
+	_this setVariable ["G_Incapacitated", false, true];
 };
 //Define onKill script
 G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
@@ -43,7 +43,7 @@ G_fnc_actionDrop = compile preprocessFileLineNumbers "G_Revive\G_Drop_Action.sqf
 //Define function to check common conditions in revive-related actions
 G_fnc_Revive_Actions_Cond = {
 	params ["_target", "_this"];
-	((_target != _this) && !(_this getVariable "G_Unconscious") && (_target getVariable "G_Unconscious") && ((_target distance _this) < 1.75) && !(_target getVariable "G_Dragged") && !(_target getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && (isNull (_target getVariable "G_Reviver")) && (isNull (_this getVariable "G_Reviving")) && (isNull (_target getVariable "G_Loaded")))
+	((_target != _this) && !(_this getVariable "G_Incapacitated") && (_target getVariable "G_Incapacitated") && ((_target distance _this) < 1.75) && !(_target getVariable "G_Dragged") && !(_target getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && (isNull (_target getVariable "G_Reviver")) && (isNull (_this getVariable "G_Reviving")) && (isNull (_target getVariable "G_Loaded")))
 };
 
 //Define function to add all revive-related actions
@@ -56,7 +56,7 @@ G_fnc_Revive_Actions = {
 	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [_side], 1.5, true, true, "", format["(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
-	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
+	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadUnconscious_ca.paa' size='3' shadow='2'/>"];
 };
 
 //Define function to create revive-oriented AI behavior
@@ -81,10 +81,10 @@ G_fnc_Revive_AI_Behavior = {
 		//Determine assigned role
 		if ((_rescueRoleArray select 0) == 1) then {
 			//AI is reviver
-			//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
+			//Cycle behavior as long as victim is incapacitated and rescuer is not, and rescuer has role
 			private ["_distCount"];
 			_distCount = 0;
-			while {((!(_unit getVariable "G_Unconscious")) && (alive _unit) && (_victim getVariable "G_Unconscious") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
+			while {((!(_unit getVariable "G_Incapacitated")) && (alive _unit) && (_victim getVariable "G_Incapacitated") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
 				//Prevent AI from stopping
 				//bug - is this stop necessary?
 				_unit stop false;
@@ -104,7 +104,7 @@ G_fnc_Revive_AI_Behavior = {
 				if ((_unit distance _victim < 2) && (isNull (_victim getVariable "G_Reviver"))) then {
 					[_victim, _unit] spawn G_fnc_actionRevive;
 					//Wait for revive to end one way or another
-					waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
+					waitUntil {((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
 				};
 				sleep 2;
 			};
@@ -112,8 +112,8 @@ G_fnc_Revive_AI_Behavior = {
 		else
 		{
 			//AI is guard
-			//Cycle behavior as long as victim is unconscious and rescuer is not, and rescuer has role
-			while {((!(_unit getVariable "G_Unconscious")) && (_victim getVariable "G_Unconscious") && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
+			//Cycle behavior as long as victim is incapacitated and rescuer is not, and rescuer has role
+			while {((!(_unit getVariable "G_Incapacitated")) && (_victim getVariable "G_Incapacitated") && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
 				//Prevent AI from stopping
 				//bug - is this stop necessary?
 				_unit stop false;
@@ -131,7 +131,7 @@ G_fnc_Revive_AI_Behavior = {
 					//bug - this changes behavior of entire group, which could have adverse effects
 					_unit setBehaviour "AWARE";
 					//Stop loop to allow "patrol"
-					waitUntil {((_unit getVariable "G_Unconscious") || (!(_victim getVariable "G_Unconscious")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
+					waitUntil {((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
 				};
 				sleep 2;
 			};
@@ -166,7 +166,7 @@ G_fnc_moveInCargoToUnloadAction = {
 		_unit moveInCargo _vehicle;
 		//Wait for unit to be in vehicle before executing animation to prevent wrong animation
 		waitUntil {sleep 0.1; (vehicle _unit != _unit)};
-		//Perform Unconscious animation manually due to lack of setUnconscious support in vehicle
+		//Perform Incapacitated animation manually due to lack of setUnconscious support in vehicle
 			//This should have global effect, but does not, so it is here and broaadcasted
 		[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
 		//Set vehicle side to unit's side for action condition
@@ -176,7 +176,7 @@ G_fnc_moveInCargoToUnloadAction = {
 	
 	//Add Unload action for unit to vehicle
 	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
-	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
+	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadUnconscious_ca.paa' size='3' shadow='2'/>"];
 	
 	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
 	[_unit, _vehicle, _unloadActionID] spawn {
@@ -184,8 +184,8 @@ G_fnc_moveInCargoToUnloadAction = {
 		_unit = _this select 0;
 		_vehicle = _this select 1;
 		_unloadActionID = _this select 2;
-		//Wait for unit to be unloaded or no longer unconscious
-		waitUntil {sleep 0.3; ((vehicle _unit != _vehicle) || (isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Unconscious")))};
+		//Wait for unit to be unloaded or no longer incapacitated
+		waitUntil {sleep 0.3; ((vehicle _unit != _vehicle) || (isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Incapacitated")))};
 		
 		//Remove the Unload action from the vehicle
 		_vehicle removeAction _unloadActionID;
@@ -210,14 +210,14 @@ if (G_isClient) then {
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
 			private ["_array", "_arrayDistance", "_unit0", "_unit1", "_unit2", "_unit3", "_unit4", "_text"];
-			//Continue cycling while player is unconscious and dialog is open
-			while {((player getVariable "G_Unconscious") && (dialog))} do {
+			//Continue cycling while player is incapacitated and dialog is open
+			while {((player getVariable "G_Incapacitated") && (dialog))} do {
 				//Get array of all "men" within 500m, including player
 				_array = nearestObjects [player, ["CAManBase"], 500];
 				_arrayDistance = [];
 				{
-					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not unconscious
-					if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
+					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not incapacitated
+					if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
 						//Add to array with distance from player
 						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
 					};

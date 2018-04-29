@@ -16,7 +16,7 @@ class G_Revive_Dialog
 			y = 0.91 * safezoneH + safezoneY;
 			w = 0.07 * safezoneW;
 			h = 0.03 * safezoneH;
-			action = "closeDialog 0; player setVariable [""G_Unconscious"", false, true];";
+			action = "closeDialog 0; player setVariable [""G_Incapacitated"", false, true];";
 		};
 	};
 	
@@ -51,7 +51,7 @@ class G_Revive_Dialog
 		class G_Frame_Bottom: RscText
 		{
 			idc = 1003;
-			text = "\n\nYou are Unconscious and awaiting revive."; //--- ToDo: Localize;
+			text = "\n\nYou are Incapacitated and awaiting revive."; //--- ToDo: Localize;
 			font = TahomaB;
 			sizeEx = 0.04;
 			style = 530;

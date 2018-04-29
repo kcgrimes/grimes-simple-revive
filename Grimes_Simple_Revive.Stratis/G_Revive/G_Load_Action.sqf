@@ -1,4 +1,4 @@
-//Load unconscious
+//Load incapacitated
 //Local to _rescuer
 
 private ["_unit", "_rescuer", "_side", "_vehicle"];

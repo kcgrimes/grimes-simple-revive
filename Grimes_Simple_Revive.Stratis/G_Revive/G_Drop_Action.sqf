@@ -12,7 +12,7 @@ _rescuer removeAction _dropActionID;
 //Handle drop from Drag or Drop
 if (_unit getVariable "G_Dragged") then {
 	//From Drag
-	if (_rescuer getVariable "G_Unconscious") then {
+	if (_rescuer getVariable "G_Incapacitated") then {
 		//Rescuer was incapacitated, so set both as incapacitated
 		[_rescuer, "UnconsciousFaceDown"] remoteExec ["switchMove", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
@@ -40,7 +40,7 @@ if (_unit getVariable "G_Dragged") then {
 else
 {
 	//From Carry
-	if (_rescuer getVariable "G_Unconscious") then {
+	if (_rescuer getVariable "G_Incapacitated") then {
 		//Rescuer was incapacitated, so set both as incapacitated
 		[_rescuer, "UnconsciousFaceDown"] remoteExec ["switchMove", 0, true];
 		[_unit, "UnconsciousFaceDown"] remoteExecCall ["playMoveNow", 0, true];
@@ -51,7 +51,7 @@ else
 	}
 	else
 	{
-		if ((!alive _unit) || (!(_unit getVariable "G_Unconscious"))) then {
+		if ((!alive _unit) || (!(_unit getVariable "G_Incapacitated"))) then {
 			//Unit died, reset rescuer animation
 			[_rescuer, ""] remoteExec ["switchMove", 0, true];
 		}

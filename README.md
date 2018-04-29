@@ -74,18 +74,18 @@ Parameters:
 ////Editable parameters, sorted by category and relevance - Please adjust values to suit your application.
 //Generic
 G_PvP = true; //true = PvP mission where there are more than one playable sides (PvP, TvT, etc), false = players only on one side (CoOp, SP, etc).
-G_Enemy_AI_Unconscious = true; //true = Enemy AI can be revived, dragged, and carried by enemy players (only recommended for PvP), false = disabled
+G_Enemy_AI_Incapacitated = true; //true = Enemy AI can be revived, dragged, and carried by enemy players (only recommended for PvP), false = disabled
 	G_Friendly_Side = WEST; //Side of friendly units if the above is false
 G_Briefing = true; //true = information, how to, and credits will be displayed on ingame briefing screen. Can be used in conjunction with your own briefing. false = disabled. 
 
 //Revive
 G_Revive_System = true; //Whether the revive system will be used or not. true = enabled, false = disabled.
 G_Revive_Time_Limit = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
-G_Revive_DownsPerLife = 0; //Number of times unit can go Unconscious in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
+G_Revive_DownsPerLife = 0; //Number of times unit can go Incapacitated in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
 G_Revive_Time_To = 10; //Time (in seconds) required for reviver to complete revive action
 G_Revive_Requirement = 0; //1 or greater = number of FAKs (single use) or Medikit (unlimited use) needed to revive (and treat still). 0 = Those items only needed to treat, not revive (stock).
-G_Revive_Black_Screen = 0; //1 = While Unconscious/waiting for revive, screen stays black. 0 = Screen goes black at death then fades back in, with surroundings visible.
+G_Revive_Black_Screen = 0; //1 = While Incapacitated/waiting for revive, screen stays black. 0 = Screen goes black at death then fades back in, with surroundings visible.
 G_Revive_Action_Color = "#FFCC00"; //HTML color code that will be the color of the Revive, Drag, Carry, and Load/Unload action text. Default is Orange. 
 G_Revive_Load_Types = ["Car","Tank","Helicopter","Truck"]; //Add or remove strings of types of units that wounded can be loaded into
 G_Eject_Occupants = false; //If killed while in a vehicle, the revivable unit is ejected from the vehicle. True = enabled, false = disabled.
@@ -141,7 +141,7 @@ G_Unit_Tag = true; //Refers to unit "name tags" that display over unit's head on
 
 //Custom Executions
 //Note - By default they will execute on AI as well. Read comment to side.
-G_Custom_Exec_1 = ""; //File executed when unit is set Unconscious (NOT "killed")
+G_Custom_Exec_1 = ""; //File executed when unit is set Incapacitated (NOT "killed")
 G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed)
 G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed
 G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. The newly spawned MRV = _this select 0

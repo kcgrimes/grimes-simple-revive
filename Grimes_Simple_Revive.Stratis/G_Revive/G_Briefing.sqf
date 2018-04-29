@@ -40,11 +40,11 @@ player createDiaryRecord ["G_Revive",
 	<br/><font size='18'>How To Use</font>
 	<br/>     Below is some information relating to the in-game utilization of Grimes Simple Revive. 
 	<br/>
-	<br/>* To Revive an Unconscious teammate, simply approach them and use the Revive action.
+	<br/>* To Revive an Incapacitated teammate, simply approach them and use the Revive action.
 	<br/>
-	<br/>* To Drag or Carry any Unconscious unit (doesn't have to be a teammate!), simply approach them and use the Drag or Carry action. 
+	<br/>* To Drag or Carry any Incapacitated unit (doesn't have to be a teammate!), simply approach them and use the Drag or Carry action. 
 	<br/>
-	<br/>* To Load a wounded teammate into a vehicle, simply move them or the vehicle within range and use the Load action on the Unconscious unit. If a unit is killed in a vehicle, they will have to be Unloaded first.
+	<br/>* To Load a wounded teammate into a vehicle, simply move them or the vehicle within range and use the Load action on the Incapacitated unit. If a unit is killed in a vehicle, they will have to be Unloaded first.
 	<br/>
 	<br/>* If the Mobile Respawn Vehicle system is being used, simply approach the team's MRV and use the Deploy/Undeploy actions to Deploy/Undeploy the vehicle. This allows for teammates to spawn on it.
 	<br/>

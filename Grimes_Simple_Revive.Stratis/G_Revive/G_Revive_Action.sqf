@@ -80,18 +80,18 @@ if (isPlayer _rescuer) then {
 private ["_endTime"];
 _endTime = time + G_Revive_actionTime;
 //Until the end time is reached, make sure the revive animation continues to play as long as revive is not aborted and nobody is incapacitated/killed
-while {(time < _endTime) && (!isNull (_rescuer getVariable "G_Reviving")) && (alive _unit) && (!(_rescuer getVariable "G_Unconscious")) && (alive _rescuer)} do {
+while {(time < _endTime) && (!isNull (_rescuer getVariable "G_Reviving")) && (alive _unit) && (!(_rescuer getVariable "G_Incapacitated")) && (alive _rescuer)} do {
 	//Execute revive animation
 	[_rescuer, "AinvPknlMstpSnonWrflDr_medic3"] remoteExec ["playMoveNow", 0, false];
 	//Wait for revive animation to be set
 	waitUntil {sleep 0.05; ((animationState _rescuer) == "AinvPknlMstpSnonWrflDr_medic3")};
 	//Wait for revive animation to be finished, abort, or something happens
-	waitUntil {sleep 0.05; (!(time < _endTime) || (isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Unconscious") || (!alive _rescuer) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"))};
+	waitUntil {sleep 0.05; (!(time < _endTime) || (isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Incapacitated") || (!alive _rescuer) || ((animationState _rescuer) != "AinvPknlMstpSnonWrflDr_medic3"))};
 };
 
 //Wait for revive timer or abort
 //bug - is this not always true here?
-waitUntil {sleep 0.1; (!(time < _endTime) || (isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Unconscious") || (!alive _rescuer))};
+waitUntil {sleep 0.1; (!(time < _endTime) || (isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Incapacitated") || (!alive _rescuer))};
 //Either way, reset reviver animation to kneeling position to prevent revive animation cycling
 [_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["playMoveNow", 0, true];
 [_rescuer, "AmovPknlMstpSrasWrflDnon"] remoteExecCall ["switchMove", 0, true];
@@ -102,16 +102,16 @@ if (isPlayer _rescuer) then {
 };
 
 //Exit if revive was aborted, the victim died, or the rescuer was incapacitated
-if ((isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Unconscious") || (!alive _rescuer)) exitWith {
+if ((isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer getVariable "G_Incapacitated") || (!alive _rescuer)) exitWith {
 	//Reset revive action variables
 	_rescuer setVariable ["G_Reviving", objNull, true];
 	_unit setVariable ["G_Reviver", objNull, true];
 };
 
 //Revive action is stopped; reset variables
-_unit setVariable ["G_Unconscious", false, true];
+_unit setVariable ["G_Incapacitated", false, true];
 _rescuer setVariable ["G_Reviving", objNull, true];
-//_unit's "G_Reviver" is reset with abort or later after its use in G_Unconscious
+//_unit's "G_Reviver" is reset with abort or later after its use in G_Incapacitated
 
 //Handle revive announcement depending on use of life rewarding system
 //Obtain number of lives (or determine if unlimited with -1)

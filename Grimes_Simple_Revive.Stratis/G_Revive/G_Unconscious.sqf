@@ -1,17 +1,17 @@
-//Handle unconscious state
+//Handle incapacitated state
 //Local to _unit
 private ["_unit"];
 _unit = _this;
 
-//If the unit is already unconscious or is not local to the executer, and is not JIP, exit
-if (((_unit getVariable "G_Unconscious") || !(local _unit)) && (!G_isJIP)) exitWith {};
+//If the unit is already incapacitated or is not local to the executer, and is not JIP, exit
+if (((_unit getVariable "G_Incapacitated") || !(local _unit)) && (!G_isJIP)) exitWith {};
 
 //Prevent further damage/being killed
 if (isDamageAllowed _unit) then {
 	_unit allowDamage false;
 };
 
-//Broadcast unconscious-state animation
+//Broadcast incapacitated-state animation
 _unit setUnconscious true;
 
 //Prevent being further engaged by enemies
@@ -20,15 +20,15 @@ _unit setCaptive true;
 //Prepare to add mock delay to revive actions to prevent animation failures
 _unit setVariable ["G_Dragged", true, true];
 
-//Set unit as unconscious and broadcast
-_unit setVariable ["G_Unconscious", true, true];
+//Set unit as incapacitated and broadcast
+_unit setVariable ["G_Incapacitated", true, true];
 
 //Add parallel delay to revive-related actions
 [_unit] spawn {
 	private ["_unit"];
 	_unit = _this select 0;
 	sleep 2.5;
-	//Set unit as unconscious and broadcast
+	//Set unit as incapacitated and broadcast
 	_unit setVariable ["G_Dragged", false, true];
 };
 
@@ -38,8 +38,8 @@ _bypass = false;
 //If already Loaded, define vehicle that unit is in
 _vehicle = _unit getVariable "G_Loaded";
 if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
-	//Unit is unconscious inside a vehicle
-	//If not yet Loaded, define vehicle that unit is going unconscious in
+	//Unit is incapacitated inside a vehicle
+	//If not yet Loaded, define vehicle that unit is going incapacitated in
 	if (isNull _vehicle) then {
 		_vehicle = vehicle _unit;
 	};
@@ -94,12 +94,12 @@ if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 }
 else
 {
-	//Unit unconscious outside vehicle, give time for ragdoll animation
+	//Unit incapacitated outside vehicle, give time for ragdoll animation
 	sleep 3;
 };
 
-//Handle bypassing Unconscious based on downs per life
-//bug - should this be done in the HandleDamage EH before Unconscious is even executed? Probably.
+//Handle bypassing Incapacitated based on downs per life
+//bug - should this be done in the HandleDamage EH before Incapacitated is even executed? Probably.
 if (G_Revive_DownsPerLife > 0) then {
 	private ["_downCount"];
 	//Add 1 to current down count
@@ -112,10 +112,10 @@ if (G_Revive_DownsPerLife > 0) then {
 	_unit setVariable ["G_Downs", _downCount, true];
 };
 
-//If bypass is activated, set not Unconscious, kill, and proceed to onKilled
+//If bypass is activated, set not Incapacitated, kill, and proceed to onKilled
 if (_bypass) exitWith {
 	_unit setVariable ["G_Loaded", objNull, true];
-	_unit setVariable ["G_Unconscious", false, true];
+	_unit setVariable ["G_Incapacitated", false, true];
 	_unit setDamage 1;
 	//Add killed message for AI for consistency
 	if ((!isPlayer _unit) && (G_Revive_Messages > 0)) then {
@@ -132,7 +132,7 @@ if ((isPlayer _unit) && (G_Revive_addonRadio_muteTransmit || G_Revive_addonRadio
 	[true] spawn G_fnc_muteAddonRadio;
 };
 
-//Black out the screen with text for unconscious player
+//Black out the screen with text for incapacitated player
 if (isPlayer _unit) then {
 	//Disable keyboard/mouse input
 	disableUserInput true;
@@ -142,13 +142,13 @@ if (isPlayer _unit) then {
 		//Run in parallel because of suspension
 		[] spawn {
 			sleep 3;
-			//Display unconscious announcement text for a few seconds
-			titleText ["You are Unconscious. Wait for teammate to revive you.", "BLACK IN", 4]; 
+			//Display incapacitated announcement text for a few seconds
+			titleText ["You are Incapacitated. Wait for teammate to revive you.", "BLACK IN", 4]; 
 		};
 	};
 };
 
-//Create unconscious dialog for player
+//Create incapacitated dialog for player
 //bug - check locality for this, make sure only be executed on one machine
 if (isPlayer _unit) then {
 	[_unit] spawn {
@@ -156,7 +156,7 @@ if (isPlayer _unit) then {
 		_unit = _this select 0;
 		//Wait a few seconds before opening dialog
 		sleep 3.25;
-		while {(_unit getVariable "G_Unconscious")} do {
+		while {(_unit getVariable "G_Incapacitated")} do {
 			//Open dialog
 			_reviveDialog = createDialog "G_Revive_Dialog";
 			if (!G_Allow_GiveUp) then {
@@ -196,24 +196,24 @@ sleep 2.5;
 [_unit] spawn {
 	private ["_unit", "_aiReviver", "_aiGuard"];
 	_unit = _this select 0;
-	//Cycle through AI role assignments as long as unit is unconscious
+	//Cycle through AI role assignments as long as unit is incapacitated
 	//bug - use of Call for Help concept, or keep it automatic?
 	//By default, reviver and guard are unassigned
 	_aiReviver = objNull;
 	_aiGuard = objNull;
-	while {(_unit getVariable "G_Unconscious")} do {
+	while {(_unit getVariable "G_Incapacitated")} do {
 		//Only cycle for AI help if not inside a vehicle
-		while {((_unit getVariable "G_Unconscious") && (vehicle _unit == _unit))} do {
+		while {((_unit getVariable "G_Incapacitated") && (vehicle _unit == _unit))} do {
 			//If aiReviver is assigned and incapacitated, unassign them
 			if (!isNull _aiReviver) then {
-				if ((_aiReviver getVariable "G_Unconscious") || (!alive _aiReviver)) then {
+				if ((_aiReviver getVariable "G_Incapacitated") || (!alive _aiReviver)) then {
 					_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
 					_aiReviver = objNull;
 				};
 			};
 			//If aiGuard is assigned and incapacitated, unassign them
 			if (!isNull _aiGuard) then {
-				if ((_aiGuard getVariable "G_Unconscious") || (!alive _aiGuard)) then {
+				if ((_aiGuard getVariable "G_Incapacitated") || (!alive _aiGuard)) then {
 					_aiGuard setVariable ["G_AI_rescueRole", [0, objNull], true];
 					_aiGuard = objNull;
 				};
@@ -223,10 +223,10 @@ sleep 2.5;
 			private ["_arrayPotentialRescuers", "_arrayPotentialRescuersCount"];
 			_arrayPotentialRescuers = [];
 			{
-				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not unconscious
+				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not incapacitated
 					//bug - consider what "friendly" means vs "same side"
 					//This system always runs with AI; players are not considered for roles
-				if ((_x != _unit) && (!isPlayer _x) && ((_unit getVariable "G_Side") == (_x getVariable "G_Side")) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Unconscious")) then {
+				if ((_x != _unit) && (!isPlayer _x) && ((_unit getVariable "G_Side") == (_x getVariable "G_Side")) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
 					//Add to array, ordered by distance ascending
 					_arrayPotentialRescuers pushBack _x;
 				};
@@ -306,7 +306,7 @@ sleep 2.5;
 			sleep 5;
 		};
 		
-		//Unit no longer unconscious, or is in vehicle, so disregard any rescuing AI by resetting variables
+		//Unit no longer incapacitated, or is in vehicle, so disregard any rescuing AI by resetting variables
 		if (!isNull _aiReviver) then {
 			_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
 			_aiReviver = objNull;
@@ -326,9 +326,9 @@ _reviveTimer = G_Revive_Time_Limit;
 //Check if revive timer is unlimited
 if (_reviveTimer > -1) then {
 	//Revive timer is limited
-	//Cycle count in unconscious state so long as unit is unconscious, not timed out, is alive, and is still local to the executor
+	//Cycle count in incapacitated state so long as unit is incapacitated, not timed out, is alive, and is still local to the executor
 	//bug - why the local check? 
-	while {(_unit getVariable "G_Unconscious") && (_reviveTimer > 0) && (alive _unit) && (local _unit)} do 
+	while {(_unit getVariable "G_Incapacitated") && (_reviveTimer > 0) && (alive _unit) && (local _unit)} do 
 	{
 		//If unit is not currently being revived, count down
 		if (isNull (_unit getVariable "G_Reviver")) then {
@@ -382,9 +382,9 @@ if (_reviveTimer > -1) then {
 else
 {
 	//Revive timer is unlimited
-	//Cycle in unconscious state so long as unit is unconscious, is alive, and is still local to the executor
+	//Cycle in incapacitated state so long as unit is incapacitated, is alive, and is still local to the executor
 	//bug - why the local check?
-	while {(_unit getVariable "G_Unconscious") && (alive _unit) && (local _unit)} do 
+	while {(_unit getVariable "G_Incapacitated") && (alive _unit) && (local _unit)} do 
 	{
 		//Handle vehicle if unit is in one
 		private ["_breakOut", "_vehicle"];
@@ -424,17 +424,17 @@ else
 //If unit no longer local, exit scope
 //bug - why the local check?
 if (!local _unit) exitWith {};
-//No longer unconscious, and still local
+//No longer incapacitated, and still local
 
-//Close the unconscious dialog
+//Close the incapacitated dialog
 closeDialog 0;
 
 //Determine how to proceed based on status change
-if ((_unit getVariable "G_Unconscious") && ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded")))) then {
+if ((_unit getVariable "G_Incapacitated") && ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded")))) then {
 	//Unit did not get revived (timer ran out or aborted), is in exploded vehicle without ejection, or is dead
-	//Remove from Unconscious, and kill unit
+	//Remove from Incapacitated, and kill unit
 	_unit setVariable ["G_Loaded", objNull, true];
-	_unit setVariable ["G_Unconscious", false, true];
+	_unit setVariable ["G_Incapacitated", false, true];
 	_unit setDamage 1;
 	//Add killed message for AI for consistency
 	if ((!isPlayer _unit) && (G_Revive_Messages > 0)) then {		
@@ -455,7 +455,7 @@ else
 	//Set unit to full health
 	//bug - Make option to have certain damage, requiring further treatment?
 	_unit setDamage 0;
-	//Remove from Unconscious
+	//Remove from Incapacitated
 	_unit setUnconscious false;
 	
 	//If under water, must manually execute swimming animation

@@ -66,7 +66,7 @@ if (G_isClient) then {
 		//bug - consider formatting differently to allow for syntax highlighting/easier reading
 		call compile format ["G_Unit_Tag_%1 = false;", _a];
 		_ehID = addMissionEventHandler["Draw3D", format["
-			private ['_unit', '_color', '_height', '_alpha','_distp','_isUnconscious','_exists'];
+			private ['_unit', '_color', '_height', '_alpha','_distp','_isIncapacitated','_exists'];
 			_unit = (G_Unit_Tags_Logic getVariable 'G_Revive_Player_List') select %1;
 			if ((name _unit) == 'Error: No Unit') then {
 				call compile format ['G_Unit_Tag_%1 = true', %1];
@@ -75,13 +75,13 @@ if (G_isClient) then {
 			if ((_distp <= G_Unit_Tag_Distance) and ((player getVariable 'G_Side') == (_unit getVariable 'G_Side'))) then {
 				if ((G_Unit_Tag_Display == 1) and !(cursorTarget == _unit)) exitWith {};
 				_alpha = (-0.02*(_distp))+(0.025*(G_Unit_Tag_Distance));
-				_isUnconscious = false;
+				_isIncapacitated = false;
 				_exists = false;
-				if (!isNil {_unit getVariable 'G_Unconscious'}) then {
-					_isUnconscious = _unit getVariable 'G_Unconscious';
+				if (!isNil {_unit getVariable 'G_Incapacitated'}) then {
+					_isIncapacitated = _unit getVariable 'G_Incapacitated';
 					_exists = true;
 				};
-				if (((_isUnconscious or (!_exists)) or (!alive _unit)) and (G_Revive_System)) then {
+				if (((_isIncapacitated or (!_exists)) or (!alive _unit)) and (G_Revive_System)) then {
 					_color = [1,0,0,_alpha];
 				} else {
 					if (_unit in units player) then {

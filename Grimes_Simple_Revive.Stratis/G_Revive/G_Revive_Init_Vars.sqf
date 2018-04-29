@@ -6,10 +6,10 @@ if (typeName G_Briefing != "BOOL") then {_validationFailed pushBack "G_Briefing 
 
 //Revive
 if (typeName G_Revive_System != "BOOL") then {_validationFailed pushBack "G_Revive_System must be true/false!"};
-if (typeName G_Revive_AI_Unconscious != "ARRAY") then {_validationFailed pushBack "G_Revive_AI_Unconscious must be an array of sides!"};
+if (typeName G_Revive_AI_Incapacitated != "ARRAY") then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be an array of sides!"};
 {
-	if (typeName _x != "SIDE") then {_validationFailed pushBack "G_Revive_AI_Unconscious must be array containing only WEST, EAST, RESISTANCE, or CIVILIAN!"};
-} forEach G_Revive_AI_Unconscious;
+	if (typeName _x != "SIDE") then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be array containing only WEST, EAST, RESISTANCE, or CIVILIAN!"};
+} forEach G_Revive_AI_Incapacitated;
 if ((typeName G_Revive_Time_Limit != "SCALAR") || (G_Revive_Time_Limit < -1)) then {_validationFailed pushBack "G_Revive_Time_Limit must be a number greater than or equal to -1!"};
 if (typeName G_Allow_GiveUp != "BOOL") then {_validationFailed pushBack "G_Allow_GiveUp must be true/false!"};
 if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) then {_validationFailed pushBack "G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
@@ -223,16 +223,16 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 	else
 	{
 		//Is an AI
-		if ((side _x) in G_Revive_AI_Unconscious) then {
+		if ((side _x) in G_Revive_AI_Incapacitated) then {
 			[_x] spawn G_fnc_EH;
 		};
 	};
 } forEach allUnits;
 
-//Handle loading game as JIP into an unconscious unit
+//Handle loading game as JIP into an incapacitated unit
 if (G_Revive_System && G_isJIP) then {
-	if (player getVariable "G_Unconscious") then {
-		player spawn G_fnc_enterUnconsciousState;
+	if (player getVariable "G_Incapacitated") then {
+		player spawn G_fnc_enterIncapacitatedState;
 	};
 };
 
