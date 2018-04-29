@@ -245,9 +245,11 @@ G_fnc_MRV_onRespawn = {
 	//Add MRV onkilled EH
 	[_MRV, _MRV_Logic] spawn G_fnc_MRV_onKilled_EH;
 
-	//Custom execution
-	if (G_Custom_Exec_4 != "") then {
-		[_MRV] execVM G_Custom_Exec_4;
+	if (local _MRV) then {
+		//Custom execution
+		if (G_Custom_Exec_4 != "") then {
+			[_MRV] spawn G_fnc_Custom_Exec_4;
+		};
 	};
 };
 

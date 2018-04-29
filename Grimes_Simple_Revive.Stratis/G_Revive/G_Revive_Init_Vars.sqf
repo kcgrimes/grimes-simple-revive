@@ -185,6 +185,23 @@ if (G_Unit_Tag) then {
 	};
 };
 
+//Define functions for custom executions
+if (G_Custom_Exec_1 != "") then {
+	G_fnc_Custom_Exec_1 = compile preprocessFileLineNumbers G_Custom_Exec_1;
+};
+if (G_Custom_Exec_2 != "") then {
+	G_fnc_Custom_Exec_2 = compile preprocessFileLineNumbers G_Custom_Exec_2;
+};
+if (G_Custom_Exec_3 != "") then {
+	G_fnc_Custom_Exec_3 = compile preprocessFileLineNumbers G_Custom_Exec_3;
+};
+if (G_Custom_Exec_4 != "") then {
+	G_fnc_Custom_Exec_4 = compile preprocessFileLineNumbers G_Custom_Exec_4;
+};
+if (G_Custom_Exec_5 != "") then {
+	G_fnc_Custom_Exec_5 = compile preprocessFileLineNumbers G_Custom_Exec_5;
+};
+
 //Call mandatory definitions for revive system if enabled
 if (G_Revive_System) then {
 	[] call compile preprocessFileLineNumbers "G_Revive\G_fnc_EH_defs.sqf";

@@ -73,11 +73,11 @@ G_Unit_Tag = true; //Refers to unit "name tags" that display over unit's head on
 
 //Custom Executions
 //Note - By default they will execute on AI as well. Read comment to side.
-G_Custom_Exec_1 = ""; //File executed when unit is set Unconscious (NOT "killed")
-G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed)
-G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed
-G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. The newly spawned MRV = _this select 0
-G_Custom_Exec_5 = ""; //File executed when unit is revived
+G_Custom_Exec_1 = ""; //File executed when unit is set Unconscious (NOT "killed"). _incapacitatedUnit = _this select 0, and is local.
+G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed). _killedUnit = _this select 0, and is local.
+G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed. _respawnedUnit = _this select 0, and is local.
+G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. Newly spawned MRV = _this select 0, and is local. 
+G_Custom_Exec_5 = ""; //File executed when unit is revived. _revivedUnit = _this select 0, and is local. _rescuer = _this select 1. 
 
 ////DO NOT EDIT
 [] execVM "G_Revive\G_Revive_Init_Vars.sqf";

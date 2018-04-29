@@ -185,7 +185,7 @@ _unit disableAI "FSM";
 
 //Custom execution
 if (G_Custom_Exec_1 != "") then {
-	[] execVM G_Custom_Exec_1;
+	[_unit] spawn G_fnc_Custom_Exec_1;
 };
 
 //Wait for game to catch up
@@ -540,7 +540,7 @@ else
 	
 	//Custom execution
 	if (G_Custom_Exec_5 != "") then {
-		[] execVM G_Custom_Exec_5;
+		[_unit, _rescuer] spawn G_fnc_Custom_Exec_5;
 	};
 };
 

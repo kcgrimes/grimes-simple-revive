@@ -10,7 +10,7 @@ waitUntil {(!isNil {_unit getVariable "G_Lives"})};
 
 //Custom execution
 if (G_Custom_Exec_2 != "") then {
-	[] execVM G_Custom_Exec_2;
+	[_unit] spawn G_fnc_Custom_Exec_2;
 };
 
 //Handle life count if spawns are limited and this is not the initial spawn

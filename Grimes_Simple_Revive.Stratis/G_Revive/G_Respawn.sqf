@@ -39,7 +39,7 @@ if (G_Squad_Leader_Spawn) then {
 
 //Custom execution
 if (G_Custom_Exec_3 != "") then {
-	[] execVM G_Custom_Exec_3;
+	[_unit] spawn G_fnc_Custom_Exec_3;
 };
 
 if (isPlayer _unit) then {
