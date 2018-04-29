@@ -119,7 +119,7 @@ G_Mobile_Respawn_EAST = [MobileRespawnEAST];
 G_Mobile_Respawn_GUER = [MobileRespawnGUER];
 G_Mobile_Respawn_CIV = [];
 G_Mobile_Respawn_Locked = true; //Lock enemy MRVs so MRVs can only be accessed by their own team. true = enabled, false = disabled.
-G_Mobile_Respawn_Moveable = false; //true = Deployed mobile respawn can be moved while remaining deployed, false = Deployed mobile respawn is immobile. 
+G_Mobile_Respawn_Movable = false; //true = Deployed mobile respawn can be moved while remaining deployed, false = Deployed mobile respawn is immobile. 
 G_Mobile_Respawn_Wreck = 10; //Time (in seconds) after mobile respawn is destroyed before the wreck is deleted
 G_Mobile_Respawn_RespTimer = 20; //Time (in seconds) for mobile respawn to respawn at starting position/direction
 G_Mobile_Respawn_Marker = true; //Displays marker on map indicating MRV's position. true = enabled, false = disabled.

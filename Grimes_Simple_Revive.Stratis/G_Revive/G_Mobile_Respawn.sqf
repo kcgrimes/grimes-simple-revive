@@ -18,8 +18,8 @@ G_fnc_MRV_Deploy_Action = {
 	//Store respawn ID
 	_mobile setVariable ["G_MRV_SpawnID", _mobileRespawnID, true];
 
-	//Handle MRV if not moveable
-	if !(G_Mobile_Respawn_Moveable) then {
+	//Handle MRV if not movable
+	if !(G_Mobile_Respawn_Movable) then {
 		private ["_anchor"];
 		//Create empty helipad as anchor and position it on MRV
 		_anchor = "Land_HelipadEmpty_F" createVehicle (getPos _mobile);
@@ -46,7 +46,7 @@ G_fnc_MRV_UnDeploy_Action = {
 	_mobileRespawnID call BIS_fnc_removeRespawnPosition; 
 
 	//Detach and delete helipad anchor if used
-	if !(G_Mobile_Respawn_Moveable) then {
+	if !(G_Mobile_Respawn_Movable) then {
 		private ["_anchor"];
 		_anchor = attachedTo _mobile;
 		detach _mobile;
@@ -75,7 +75,7 @@ else
 };
 
 //Define functions for more specific MRV action conditions
-if (G_Mobile_Respawn_Moveable) then {
+if (G_Mobile_Respawn_Movable) then {
 	//Deployed MRV is movable
 	//Condition for Deploy action
 	G_fnc_MRV_Deploy_actionCondition = {
@@ -128,7 +128,7 @@ G_fnc_MRV_init = {
 	//Define logic from MRV (on all machines now)
 	_MRV_Logic = _MRV getVariable "G_MRV_Logic";
 	
-	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
+	//Add Deploy and Undeploy actions, with conditions, to MRV based on Movable setting
 	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
 };
@@ -232,7 +232,7 @@ G_fnc_MRV_onRespawn = {
 	//Get MRV side from game logic
 	_side = _MRV_Logic getVariable "G_Side";
 	
-	//Add Deploy and Undeploy actions, with conditions, to MRV based on Moveable setting
+	//Add Deploy and Undeploy actions, with conditions, to MRV based on Movable setting
 	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
 

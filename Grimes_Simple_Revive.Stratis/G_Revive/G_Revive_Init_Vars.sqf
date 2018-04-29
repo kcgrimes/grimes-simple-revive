@@ -48,7 +48,7 @@ if ((typeName G_AI_Fixed_Spawn_WEST != "STRING") || (typeName G_AI_Fixed_Spawn_E
 //Mobile Respawn Vehicle
 if ((typeName G_Mobile_Respawn_WEST != "ARRAY") || (typeName G_Mobile_Respawn_EAST != "ARRAY") || (typeName G_Mobile_Respawn_GUER != "ARRAY") || (typeName G_Mobile_Respawn_CIV != "ARRAY")) then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be an array of vehicle names. If not in use, still have empty array ([])."};
 if (typeName G_Mobile_Respawn_Locked != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Locked must be true/false!"};
-if (typeName G_Mobile_Respawn_Moveable != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Moveable must be true/false!"};
+if (typeName G_Mobile_Respawn_Movable != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Movable must be true/false!"};
 if ((typeName G_Mobile_Respawn_Wreck != "SCALAR") || (G_Mobile_Respawn_Wreck < 0)) then {_validationFailed pushBack "G_Mobile_Respawn_Wreck must be a number greater than or equal to 0!"};
 if ((typeName G_Mobile_Respawn_RespTimer != "SCALAR") || (G_Mobile_Respawn_RespTimer < 0)) then {_validationFailed pushBack "G_Mobile_Respawn_RespTimer must be a number greater than or equal to 0!"};
 if (typeName G_Mobile_Respawn_Marker != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Marker must be true/false!"};
