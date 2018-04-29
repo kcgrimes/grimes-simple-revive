@@ -93,15 +93,15 @@ G_fnc_Revive_AI_Behavior = {
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
 				//Fix for AI getting "stuck" near objects or unable to reach victim:
-				//If close, add a point until it has been long enough, then setPos to victim
-				if ((_unit distance _victim < 7) && (isNull (_victim getVariable "G_Reviver"))) then {
+				//If close and eligible, add a point until it has been long enough, then setPos to victim
+				if ((_unit distance _victim < 7) && ([_victim, _unit] call G_fnc_Revive_Actions_Cond)) then {
 					_distCount = _distCount + 1;
 				};
 				if (_distCount > 9) then {
 					_unit setPos (getPos _victim);
 				};
 				//If in range, perform revive action
-				if ((_unit distance _victim < 2) && (isNull (_victim getVariable "G_Reviver"))) then {
+				if ([_victim, _unit] call G_fnc_Revive_Actions_Cond) then {
 					[_victim, _unit] spawn G_fnc_actionRevive;
 					//Wait for revive to end one way or another
 					waitUntil {((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
