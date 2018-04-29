@@ -19,8 +19,12 @@ G_fnc_Revive_resetVariables = {
 	_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
 };
 
-//Define Unconscious-state script
-G_fnc_unconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
+//Define function for entering Unconscious-state script
+G_fnc_enterUnconsciousState = compile preprocessFileLineNumbers "G_Revive\G_Unconscious.sqf";
+//Define function for cleanly exiting Unconscious-state script
+G_fnc_exitUnconsciousState = {
+	_this setVariable ["G_Unconscious", false, true];
+};
 //Define onKill script
 G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
 //Define onKilled script

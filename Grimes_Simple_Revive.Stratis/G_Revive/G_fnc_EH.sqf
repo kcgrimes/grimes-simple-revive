@@ -113,7 +113,7 @@ if (G_Revive_System) then {
 				//Whoever _unit is local to will execute Unconscious state publically
 				if (local _unit) then {
 					_unit allowDamage false;
-					_unit spawn G_fnc_unconsciousState;
+					_unit spawn G_fnc_enterUnconsciousState;
 					//Execute code for the killer
 					[_unit, _source] spawn G_fnc_onKill;
 				};

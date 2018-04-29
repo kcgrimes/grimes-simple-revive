@@ -215,7 +215,7 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 //Handle loading game as JIP into an unconscious unit
 if (G_Revive_System && G_isJIP) then {
 	if (player getVariable "G_Unconscious") then {
-		player spawn G_fnc_unconsciousState;
+		player spawn G_fnc_enterUnconsciousState;
 	};
 };
 

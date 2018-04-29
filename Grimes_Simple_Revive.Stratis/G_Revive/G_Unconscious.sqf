@@ -430,8 +430,8 @@ if (!local _unit) exitWith {};
 closeDialog 0;
 
 //Determine how to proceed based on status change
-if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded"))) then {
-	//Unit did not get revived (timer ran out or aborted), or is dead
+if ((_unit getVariable "G_Unconscious") && ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded")))) then {
+	//Unit did not get revived (timer ran out or aborted), is in exploded vehicle without ejection, or is dead
 	//Remove from Unconscious, and kill unit
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Unconscious", false, true];
@@ -451,7 +451,7 @@ if ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_uni
 }
 else
 {
-	//Unit was revived
+	//Unit was revived by rescuer or script
 	//Set unit to full health
 	//bug - Make option to have certain damage, requiring further treatment?
 	_unit setDamage 0;
@@ -489,6 +489,11 @@ else
 	_unit allowDamage true;
 	private ["_rescuer", "_downs"];
 	_rescuer = _unit getVariable "G_Reviver";
+	//If revived by script command, make rescuer self
+	//bug - better way to do this?
+	if (isNull _rescuer) then {
+		_rescuer = _unit;
+	};
 	_downs = _unit getVariable "G_Downs";
 	
 	//Announce revive
