@@ -56,7 +56,7 @@ G_fnc_Revive_Actions = {
 	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [_side], 1.5, true, true, "", format["(([_target, _this] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
-	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadUnconscious_ca.paa' size='3' shadow='2'/>"];
+	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 };
 
 //Define function to create revive-oriented AI behavior
@@ -176,7 +176,7 @@ G_fnc_moveInCargoToUnloadAction = {
 	
 	//Add Unload action for unit to vehicle
 	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
-	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadUnconscious_ca.paa' size='3' shadow='2'/>"];
+	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	
 	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
 	[_unit, _vehicle, _unloadActionID] spawn {
