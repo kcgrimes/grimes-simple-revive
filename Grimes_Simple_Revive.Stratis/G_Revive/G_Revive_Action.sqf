@@ -6,8 +6,9 @@ _unit = _this select 0;
 _rescuer = _this select 1;
 
 //Handle First Aid Kit (FAK) requirement if enabled
+	//Only for players
 _hasItem = 0;
-if (G_Revive_Requirement > 0) then {
+if ((isPlayer _rescuer) && (G_Revive_Requirement > 0)) then {
 	//1 or more FAK, or Medikit, is required
 	//Get array of rescuer's items
 	private ["_rescitemsArray"];
@@ -38,8 +39,9 @@ if (G_Revive_Requirement > 0) then {
 };
 
 //If FAK requirement is enabled and not achieved, exit with error message and reset variables
-if ((G_Revive_Requirement > 0) and (_hasItem < G_Revive_Requirement)) exitWith {
-	titleText [format["You require either %2 First Aid Kit(s) or a single Medikit to revive %1!",name _unit,G_Revive_Requirement],"PLAIN",1]; 
+	//Only for players
+if ((isPlayer _rescuer) && (G_Revive_Requirement > 0) && (_hasItem < G_Revive_Requirement)) exitWith {
+	titleText [format["You require either %2 First Aid Kit(s) or a single Medikit to revive %1!", name _unit, G_Revive_Requirement], "PLAIN", 1]; 
 	sleep 1; 
 	titleFadeOut 4;
 };
