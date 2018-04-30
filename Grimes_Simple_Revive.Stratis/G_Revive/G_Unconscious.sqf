@@ -202,8 +202,8 @@ sleep 2.5;
 	_aiReviver = objNull;
 	_aiGuard = objNull;
 	while {(_unit getVariable "G_Incapacitated")} do {
-		//Only cycle for AI help if not inside a vehicle
-		while {((_unit getVariable "G_Incapacitated") && (vehicle _unit == _unit))} do {
+		//Only cycle for AI help if on ground or in stopped vehicle
+		while {((_unit getVariable "G_Incapacitated") && ((vehicle _unit == _unit) || (speed _unit < 1)))} do {
 			//If aiReviver is assigned and incapacitated, unassign them
 			if (!isNull _aiReviver) then {
 				if ((_aiReviver getVariable "G_Incapacitated") || (!alive _aiReviver)) then {
@@ -306,7 +306,7 @@ sleep 2.5;
 			sleep 5;
 		};
 		
-		//Unit no longer incapacitated, or is in vehicle, so disregard any rescuing AI by resetting variables
+		//Unit no longer incapacitated, or vehicle is moving, so disregard any rescuing AI by resetting variables
 		if (!isNull _aiReviver) then {
 			_aiReviver setVariable ["G_AI_rescueRole", [0, objNull], true];
 			_aiReviver = objNull;

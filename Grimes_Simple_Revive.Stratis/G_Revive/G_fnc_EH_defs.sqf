@@ -91,6 +91,11 @@ G_fnc_Revive_AI_Behavior = {
 				_unit doMove (getPos _victim);
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
+				//Handle victim in vehicle
+				if ((vehicle _victim != _victim) && ((_unit distance _victim) < 6)) then {
+					//Victim's vehicle is nearby, so unload them
+					[vehicle _victim, "", "", [_victim]] spawn G_fnc_actionUnload;
+				};
 				//Fix for AI getting "stuck" near objects or unable to reach victim:
 				//If close and eligible, add a point until it has been long enough, then setPos to victim
 				if ([_victim, _unit, 7] call G_fnc_Revive_Actions_Cond) then {
@@ -158,18 +163,21 @@ G_fnc_moveInCargoToUnloadAction = {
 	_side = _this select 2;
 	
 	if (local _unit) then {
-		//Command AI to stay in vehicle
-		_unit assignAsCargo _vehicle;
-		//Move unit into vehicle
-		_unit moveInCargo _vehicle;
-		//Wait for unit to be in vehicle before executing animation to prevent wrong animation
-		waitUntil {sleep 0.1; (vehicle _unit != _unit)};
-		//Perform Incapacitated animation manually due to lack of setUnconscious support in vehicle
-			//This should have global effect, but does not, so it is here and broaadcasted
-		[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
-		//Set vehicle side to unit's side for action condition
-		//bug - is this reset later? 
-		_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
+		[_unit, _vehicle] spawn {
+			params ["_unit", "_vehicle"];
+			//Command AI to stay in vehicle
+			_unit assignAsCargo _vehicle;
+			//Move unit into vehicle
+			_unit moveInCargo _vehicle;
+			//Wait for unit to be in vehicle before executing animation to prevent wrong animation
+			waitUntil {sleep 0.1; (vehicle _unit != _unit)};
+			//Perform Incapacitated animation manually due to lack of setUnconscious support in vehicle
+				//This should have global effect, but does not, so it is here and broaadcasted
+			[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
+			//Set vehicle side to unit's side for action condition
+			//bug - is this reset later? 
+			_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
+		};
 	};
 	
 	//Add Unload action for unit to vehicle
