@@ -61,6 +61,7 @@ G_fnc_Revive_Actions = {
 
 //Define function to create revive-oriented AI behavior
 G_fnc_Revive_AI_Behavior = {
+	//_unit is local
 	private ["_unit", "_rescueRoleArray", "_victim"];
 	_unit = _this select 0; 
 	//bug - is true the right condition here?
@@ -91,6 +92,14 @@ G_fnc_Revive_AI_Behavior = {
 				_unit doMove (getPos _victim);
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
+				//Handle reviver in vehicle
+				if ((vehicle _unit != _unit) && ((_unit distance _victim) < 30) && ((speed _unit) < 1)) then {
+					//Reviver vehicle is stopped near victim, so disembark
+					//Order unit to be out of vehicle
+					unassignVehicle _unit;
+					//Manually remove unit from vehicle
+					moveOut _unit;
+				};
 				//Handle victim in vehicle
 				if ((vehicle _victim != _victim) && ((_unit distance _victim) < 6)) then {
 					//Victim's vehicle is nearby, so unload them
@@ -125,6 +134,14 @@ G_fnc_Revive_AI_Behavior = {
 				_unit doMove (getPos _victim);
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
+				//Handle guard in vehicle
+				if ((vehicle _unit != _unit) && ((_unit distance _victim) < 30) && ((speed _unit) < 1) && ((gunner vehicle _unit) != _unit)) then {
+					//Guard vehicle is stopped near victim and guard is not gunner, so disembark
+					//Order unit to be out of vehicle
+					unassignVehicle _unit;
+					//Manually remove unit from vehicle
+					moveOut _unit;
+				};
 				//If in range, start guarding
 				if (_unit distance _victim < 10) then {
 					//Have regrouped AI reset move
@@ -210,6 +227,40 @@ G_fnc_moveInCargoToUnloadAction = {
 	};
 };
 
+G_fnc_menWithinRadius = {
+	params ["_centerObj", "_radius"];
+	private ["_arrayAll", "_arrayReturn"];
+	//Get array of all men and appropriate vehicles within defined radius of center object
+	_arrayAll = nearestObjects [_centerObj, ["Man", "Car", "Tank", "Helicopter", "Plane", "Ship"], _radius];
+	//Cycle through all objects and find the men to add to array of men to be returned
+	_arrayReturn = [];
+	{
+		//_x is object
+		//Make sure object is alive
+		if (alive _x) then {
+			//Determine how to handle alive object
+			if (_x isKindOf "Man") then {
+				//Object is man, add to array
+				_arrayReturn pushBack _x;
+			}
+			else
+			{
+				//Object is vehicle
+				//Cycle through crew to pick out man
+				{
+					//_x is crew member
+					//Make sure crew member is alive
+					if (alive _x) then {
+						//Crew member is alive, add to array
+						_arrayReturn pushBack _x;
+					};
+				} forEach crew _x;
+			};
+		};
+	} forEach _arrayAll;
+	_arrayReturn;
+};
+
 //Define player-only incapacitation dialog
 if (G_isClient) then {
 	//Define function for "nearest rescuer" text
@@ -226,7 +277,7 @@ if (G_isClient) then {
 						//Add to array with distance from player
 						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
 					};
-				} forEach nearestObjects [player, ["Man"], 500];
+				} forEach ([player, 500] call G_fnc_menWithinRadius);
 				
 				//Define empty variables for unit names
 				_unit0 = "";
@@ -245,7 +296,7 @@ if (G_isClient) then {
 				//Output nearest rescuers
 				((_this select 0) displayCtrl 1001) ctrlSetText _text;
 				//Update list every 5 seconds
-				sleep 5;
+				sleep 10;
 			};
 		};
 	};

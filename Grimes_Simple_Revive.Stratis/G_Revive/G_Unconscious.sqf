@@ -231,7 +231,7 @@ sleep 2.5;
 					//Add to array, ordered by distance ascending
 					_arrayPotentialRescuers pushBack _x;
 				};
-			} forEach nearestObjects [_unit, ["Man"], 500];
+			} forEach ([player, 500] call G_fnc_menWithinRadius);
 
 			//Get slot for last potential rescuer
 			_arrayPotentialRescuersCount = (count _arrayPotentialRescuers) - 1;
