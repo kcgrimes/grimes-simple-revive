@@ -76,7 +76,6 @@ G_fnc_Revive_AI_Behavior = {
 		_unit setBehaviour "SAFE";
 		_unit disableAI "TARGET";
 		_unit disableAI "SUPPRESSION";
-		_unit disableAI "COVER";
 		_unit disableAI "AUTOCOMBAT";
 		//Determine assigned role
 		if ((_rescueRoleArray select 0) == 1) then {
@@ -141,7 +140,6 @@ G_fnc_Revive_AI_Behavior = {
 			//Return to default behavior
 			_unit enableAI "TARGET";
 			_unit enableAI "SUPPRESSION";
-			_unit enableAI "COVER";
 			_unit enableAI "AUTOCOMBAT";
 			_unit setBehaviour "AWARE";
 			//Allow time for commands to settle
