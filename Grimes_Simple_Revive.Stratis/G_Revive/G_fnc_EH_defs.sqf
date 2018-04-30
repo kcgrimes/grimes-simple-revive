@@ -215,11 +215,10 @@ if (G_isClient) then {
 	//Define function for "nearest rescuer" text
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
-			private ["_array", "_arrayDistance", "_unit0", "_unit1", "_unit2", "_unit3", "_unit4", "_text"];
+			private ["_arrayDistance", "_unit0", "_unit1", "_unit2", "_unit3", "_unit4", "_text"];
 			//Continue cycling while player is incapacitated and dialog is open
 			while {((player getVariable "G_Incapacitated") && (dialog))} do {
-				//Get array of all "men" within 500m, including player
-				_array = nearestObjects [player, ["Man"], 500];
+				//Get array of all "men" within 500m, including player and dead bodies
 				_arrayDistance = [];
 				{
 					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not incapacitated
@@ -227,7 +226,7 @@ if (G_isClient) then {
 						//Add to array with distance from player
 						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
 					};
-				} forEach _array;
+				} forEach nearestObjects [player, ["Man"], 500];
 				
 				//Define empty variables for unit names
 				_unit0 = "";

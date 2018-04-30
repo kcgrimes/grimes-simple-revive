@@ -221,6 +221,7 @@ sleep 2.5;
 			
 			//Obtain array of potential rescuers from men within a certain distance
 			private ["_arrayPotentialRescuers", "_arrayPotentialRescuersCount"];
+			//Get array of all "men" within 500m, including player and dead bodies
 			_arrayPotentialRescuers = [];
 			{
 				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not incapacitated
