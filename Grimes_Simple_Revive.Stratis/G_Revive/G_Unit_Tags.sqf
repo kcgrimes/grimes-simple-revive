@@ -28,7 +28,7 @@ if (G_isServer) then {
 	//Add all units to player list
 	{
 		//bug - is this check necessary?
-		if (_x isKindOf "CAManBase") then {
+		if (_x isKindOf "Man") then {
 			//Assign Tag Number to unit and broadcast
 			_x setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
 			//Add unit and tag number to player list
@@ -122,7 +122,7 @@ if (G_isClient) then {
 				G_Unit_Tags_Key_Pressed = false;
 				//Execute Unit Tag handling for each unit
 				{
-					if (_x isKindOf "CAManBase") then {
+					if (_x isKindOf "Man") then {
 						[_x, (_x getVariable "G_Unit_Tag_Number")] spawn G_fnc_Unit_Tag_Exec;
 					};
 				} forEach allUnits;
@@ -137,7 +137,7 @@ if (G_isClient) then {
 			//Cursor over unit to display
 			{
 				//Execute Unit Tag handling for each unit
-				if (_x isKindOf "CAManBase") then {
+				if (_x isKindOf "Man") then {
 					[_x, (_x getVariable "G_Unit_Tag_Number")] spawn G_fnc_Unit_Tag_Exec;
 				};
 			} forEach allUnits;
@@ -147,7 +147,7 @@ if (G_isClient) then {
 			//Always visible
 			{
 				//Execute Unit Tag handling for each unit
-				if (_x isKindOf "CAManBase") then {
+				if (_x isKindOf "Man") then {
 					[_x, (_x getVariable "G_Unit_Tag_Number")] spawn G_fnc_Unit_Tag_Exec;
 				};
 			} forEach allUnits;

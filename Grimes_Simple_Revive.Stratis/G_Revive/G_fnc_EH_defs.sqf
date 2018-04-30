@@ -219,7 +219,7 @@ if (G_isClient) then {
 			//Continue cycling while player is incapacitated and dialog is open
 			while {((player getVariable "G_Incapacitated") && (dialog))} do {
 				//Get array of all "men" within 500m, including player
-				_array = nearestObjects [player, ["CAManBase"], 500];
+				_array = nearestObjects [player, ["Man"], 500];
 				_arrayDistance = [];
 				{
 					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not incapacitated

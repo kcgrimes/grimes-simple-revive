@@ -230,7 +230,7 @@ sleep 2.5;
 					//Add to array, ordered by distance ascending
 					_arrayPotentialRescuers pushBack _x;
 				};
-			} forEach nearestObjects [_unit, ["CAManBase"], 500];
+			} forEach nearestObjects [_unit, ["Man"], 500];
 
 			//Get slot for last potential rescuer
 			_arrayPotentialRescuersCount = (count _arrayPotentialRescuers) - 1;
