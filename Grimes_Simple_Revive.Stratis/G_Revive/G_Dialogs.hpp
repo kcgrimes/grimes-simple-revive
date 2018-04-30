@@ -16,7 +16,7 @@ class G_Revive_Dialog
 			y = 0.91 * safezoneH + safezoneY;
 			w = 0.07 * safezoneW;
 			h = 0.03 * safezoneH;
-			action = "closeDialog 0; player setVariable [""G_Incapacitated"", false, true];";
+			action = "closeDialog 0; player setDamage 1;";
 		};
 	};
 	
