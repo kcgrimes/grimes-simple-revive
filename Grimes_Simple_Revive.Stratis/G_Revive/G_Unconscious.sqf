@@ -238,10 +238,39 @@ sleep 2.5;
 			
 			//Attempt to select closest (eligible) AI for reviver and broadcast variable so he comes
 			{
+				private ["_hasItem"];
+				_hasItem = 0;
 				//Check if potential is eligible to revive based on setting; exit after code if they are the one
-				//bug - check for FAKs/Medikit, if required?
-				if (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) exitWith {
-					//Eligible to revive
+				if (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) then {
+					//Unit able to revive
+					//Handle First Aid Kit (FAK) requirement if enabled
+					if (G_Revive_Requirement > 0) then {
+						//1 or more FAK, or Medikit, is required
+						//Get array of rescuer's items
+						private ["_rescitemsArray"];
+						_rescitemsArray = items _x;
+						//Handle Medikit
+						if ("Medikit" in (_rescitemsArray)) then {
+							//Has Medikit, so meet requirement
+							_hasItem = _hasItem + G_Revive_Requirement;
+						};
+						//Handle FAKs if no Medikit
+						if (_hasItem < G_Revive_Requirement) then {
+							//No Medikit, so cycle through array of items
+							{
+								//If item is FAK, +1 to count
+								if (_x isEqualTo "FirstAidKit") then {
+									if (_hasItem < G_Revive_Requirement) then {
+										_hasItem = _hasItem + 1;
+									};
+								};
+							} forEach _rescitemsArray;
+						};
+					};
+
+					//If FAK requirement is enabled and not achieved, skip this unit
+					if ((G_Revive_Requirement > 0) && (_hasItem < G_Revive_Requirement)) exitWith {};
+					
 					//Check if potential is different than current
 					if (_aiReviver != _x) then {
 						//Potential is different; check if is replacement or not
@@ -267,6 +296,12 @@ sleep 2.5;
 						};
 					};
 				};
+				//If current reviver is not eligible, make sure aiReviver goes unassigned
+				if ((_aiReviver == _x) && (G_Revive_Requirement > 0) && (_hasItem < G_Revive_Requirement)) exitWith {
+					_aiReviver = objNull;
+				};
+				//If eligible and not replaced, keep current reviver
+				if (_aiReviver == _x) exitWith {};
 				//If by last option of potentials no one is selected, then make sure aiReviver goes unassigned
 				if (_x == (_arrayPotentialRescuers select _arrayPotentialRescuersCount)) then {
 					_aiReviver = objNull;
@@ -295,7 +330,7 @@ sleep 2.5;
 						};
 					};
 				};
-				//No exitWith like aiRevive, but same reason - if eligible and not replaced, keep current guard
+				//If eligible/nonexistent and not replaced, keep current guard
 				if (_aiGuard == _x) exitWith {};
 				//If by last option of potentials no one is selected, then make sure aiGuard goes unassigned
 				if (_x == (_arrayPotentialRescuers select _arrayPotentialRescuersCount)) then {

@@ -6,7 +6,7 @@ _unit = _this select 0;
 _rescuer = _this select 1;
 
 //Handle First Aid Kit (FAK) requirement if enabled
-	//Only for players
+	//Only for players here because an AI would have already done this
 _hasItem = 0;
 if ((isPlayer _rescuer) && (G_Revive_Requirement > 0)) then {
 	//1 or more FAK, or Medikit, is required
@@ -29,17 +29,11 @@ if ((isPlayer _rescuer) && (G_Revive_Requirement > 0)) then {
 				};
 			};
 		} forEach _rescitemsArray;
-		//If FAK requirement achieved, remove only the required number of FAKs
-		if (_hasItem >= G_Revive_Requirement) then {
-			for "_i" from 1 to G_Revive_Requirement do {
-				_rescuer removeItem "FirstAidKit";
-			};
-		};
 	};
 };
 
 //If FAK requirement is enabled and not achieved, exit with error message and reset variables
-	//Only for players
+	//Only for players here because an AI would have already done this
 if ((isPlayer _rescuer) && (G_Revive_Requirement > 0) && (_hasItem < G_Revive_Requirement)) exitWith {
 	titleText [format["You require either %2 First Aid Kit(s) or a single Medikit to revive %1!", name _unit, G_Revive_Requirement], "PLAIN", 1]; 
 	sleep 1; 
@@ -110,7 +104,8 @@ if ((isNull (_rescuer getVariable "G_Reviving")) || (!alive _unit) || (_rescuer 
 	_unit setVariable ["G_Reviver", objNull, true];
 };
 
-//Revive action is stopped; reset variables
+//Revive action was successful
+//Reset variables
 _unit setVariable ["G_Incapacitated", false, true];
 _rescuer setVariable ["G_Reviving", objNull, true];
 //_unit's "G_Reviver" is reset with abort or later after its use in G_Incapacitated
@@ -145,5 +140,16 @@ else
 		//Format and display text
 		titleText [format["You have revived %1!", name _unit], "PLAIN", 1]; 
 		titleFadeOut 4;
+	};
+};
+
+//Handle First Aid Kit (FAK) requirement if enabled
+if (G_Revive_Requirement > 0) then {
+	//If has Medikit, no action, otherwise remove validated amount of FAKs
+	if (!("Medikit" in (items _rescuer))) then {
+		//No Medikit, so remove required number of FAKs
+		for "_i" from 1 to G_Revive_Requirement do {
+			_rescuer removeItem "FirstAidKit";
+		};
 	};
 };
