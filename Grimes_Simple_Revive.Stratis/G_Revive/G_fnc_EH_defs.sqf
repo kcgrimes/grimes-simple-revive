@@ -110,7 +110,7 @@ G_fnc_Revive_AI_Behavior = {
 				if ([_victim, _unit, 7] call G_fnc_Revive_Actions_Cond) then {
 					_distCount = _distCount + 1;
 				};
-				if (_distCount > 9) then {
+				if (_distCount > 6) then {
 					_unit setPos (getPos _victim);
 				};
 				//If in range, perform revive action
