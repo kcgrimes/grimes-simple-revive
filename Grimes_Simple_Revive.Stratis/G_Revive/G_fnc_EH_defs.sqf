@@ -50,11 +50,11 @@ G_fnc_Revive_Actions_Cond = {
 G_fnc_Revive_Actions = {
 	private ["_unit", "_reviveActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
 	_unit = _this select 0;
-	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, side _target] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
+	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
 	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, side _target] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
+	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 };
 
