@@ -153,7 +153,7 @@ if (G_Unit_Tag) then {
 	//If JIP need to resume, if initial need to start (for client and server)
 	if (G_isJIP) then {
 		//Is JIP
-		//bug - why is this statement even here?
+		//Assign Tag Number to unit and broadcast
 		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
 		//Add unit and tag number to player list
 		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, player];
@@ -233,6 +233,42 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 if (G_Revive_System && G_isJIP) then {
 	if (player getVariable "G_Incapacitated") then {
 		player spawn G_fnc_enterIncapacitatedState;
+	};
+};
+
+//Create server-side function for easier init of enabled systems on AI created post-init
+G_fnc_initNewAI = {
+	//Local to server
+	if (!G_isServer) exitWith {};
+	private ["_arrayNewAI"];
+	_arrayNewAI = _this;
+	//Init Revive if enabled
+	if (G_Revive_System) then {
+		{
+			[_x] remoteExec ["G_fnc_EH", 0, true];
+		} forEach _arrayNewAI;
+	};
+	//Add to Unit Tags list if enabled, treating like a JIP of multiple units
+	if (G_Unit_Tag) then {
+		private ["_var"];
+		{
+			//Assign Tag Number to unit and broadcast
+			_x setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
+			//Add unit and tag number to player list
+			(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, _x];
+			//Add one to tag number list
+			//bug - what if this JIP is a replacement? Is this appropriate?
+			G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
+		} forEach _arrayNewAI;
+		//Obtain complete local player list
+		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
+		//Broadcast player list
+		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
+		//Wait for broadcast
+		//bug - is this necessary?
+		sleep 1;
+		//Broadcast tag number counter
+		publicVariable "G_Unit_Tag_Num_List";
 	};
 };
 
