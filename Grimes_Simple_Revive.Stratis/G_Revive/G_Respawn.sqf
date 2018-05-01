@@ -13,7 +13,6 @@ setPlayerRespawnTime G_Respawn_Time;
 //Set system variables
 _unit call G_fnc_Revive_resetVariables;
 _unit setVariable ["G_Downs", 0, true];
-_unit setCaptive false;
 _unit setVariable ["G_Side", side _unit, true];
 _unit enableAI "MOVE";
 _unit enableAI "FSM";

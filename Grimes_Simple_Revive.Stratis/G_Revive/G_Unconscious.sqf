@@ -11,11 +11,8 @@ if (isDamageAllowed _unit) then {
 	_unit allowDamage false;
 };
 
-//Broadcast incapacitated-state animation
+//Broadcast incapacitated-state status and animation
 _unit setUnconscious true;
-
-//Prevent being further engaged by enemies
-_unit setCaptive true;
 
 //Prepare to add mock delay to revive actions to prevent animation failures
 _unit setVariable ["G_Dragged", true, true];
@@ -225,7 +222,12 @@ sleep 2.5;
 			{
 				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not incapacitated
 					//This system always runs with AI; players are not considered for roles
-				if ((_x != _unit) && (!isPlayer _x) && ([side _unit, side _x] call BIS_fnc_sideIsFriendly) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
+				if (_x != _unit) then {
+					systemChat str (side _unit);
+					systemChat str (side _x);
+					systemchat str ([side _unit, side _x] call BIS_fnc_sideIsFriendly);
+				};
+				if ((_x != _unit) && (!isPlayer _x) && ([side _x, side _unit] call BIS_fnc_sideIsFriendly) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
 					//Add to array, ordered by distance ascending
 					_arrayPotentialRescuers pushBack _x;
 				};
@@ -338,6 +340,9 @@ sleep 2.5;
 
 			//Wait magic amount of seconds before re-checking
 			sleep 5;
+			
+			systemChat str _aiReviver;
+			systemChat str _aiGuard;
 		};
 		
 		//Unit no longer incapacitated, or vehicle is moving, so disregard any rescuing AI by resetting variables
@@ -493,7 +498,7 @@ else
 	//Set unit to full health
 	//bug - Make option to have certain damage, requiring further treatment?
 	_unit setDamage 0;
-	//Remove from Incapacitated
+	//Remove from incapacitated-state
 	_unit setUnconscious false;
 	
 	//If under water, must manually execute swimming animation
@@ -517,8 +522,6 @@ else
 			};
 		};
 	};
-	//Allow unit to be engaged by AI
-	_unit setCaptive false;
 	//Allow AI unit to move
 	_unit enableAI "MOVE";
 	//Allow scripted AI responses
