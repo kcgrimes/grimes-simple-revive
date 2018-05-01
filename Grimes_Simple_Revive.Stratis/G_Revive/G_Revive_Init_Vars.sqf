@@ -136,55 +136,6 @@ if ((G_Briefing) && (G_isClient)) then {
 	[] execVM "G_Revive\G_Briefing.sqf";
 };
 
-//If MRVs are in use, execute MRV script
-if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER + G_Mobile_Respawn_CIV) > 0) then {
-	[] execVM "G_Revive\G_Mobile_Respawn.sqf";
-};
-
-//If Squad Leader spawn or markers are enabled, execute associated script for player
-//bug - why not rework and use with AI too?
-if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
-	[player] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
-};
-
-//If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
-if (G_Unit_Tag) then {
-	private ["_var", "_handle"];
-	//If JIP need to resume, if initial need to start (for client and server)
-	if (G_isJIP) then {
-		//Is JIP
-		//Assign Tag Number to unit and broadcast
-		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
-		//Add unit and tag number to player list
-		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, player];
-		//Obtain complete local player list
-		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
-		//Broadcast player list
-		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
-		//Add one to tag number list
-		//bug - what if this JIP is a replacement? Is this appropriate?
-		G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
-		publicVariable "G_Unit_Tag_Num_List";
-		//Wait for variable broadcasts
-		sleep 1;
-		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
-		if (G_Unit_Tag_Display != 0) then {
-			//Wait for Unit Tags to process
-			waitUntil {sleep 0.1; scriptDone _handle};
-			[player, (player getVariable "G_Unit_Tag_Number")] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
-		};
-	}
-	else
-	{
-		//Fresh start for client and server
-		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
-		if (G_Unit_Tag_Display != 0) then {
-			//Wait for Unit Tags to process
-			waitUntil {sleep 0.1; scriptDone _handle};
-		};
-	};
-};
-
 //Define functions for custom executions
 if (G_Custom_Exec_1 != "") then {
 	G_fnc_Custom_Exec_1 = compile preprocessFileLineNumbers G_Custom_Exec_1;
@@ -233,6 +184,55 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 if (G_Revive_System && G_isJIP) then {
 	if (player getVariable "G_Incapacitated") then {
 		player spawn G_fnc_enterIncapacitatedState;
+	};
+};
+
+//If MRVs are in use, execute MRV script
+if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_GUER + G_Mobile_Respawn_CIV) > 0) then {
+	[] execVM "G_Revive\G_Mobile_Respawn.sqf";
+};
+
+//If Squad Leader spawn or markers are enabled, execute associated script for player
+//bug - why not rework and use with AI too?
+if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
+	[player] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
+};
+
+//If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
+if (G_Unit_Tag) then {
+	private ["_var", "_handle"];
+	//If JIP need to resume, if initial need to start (for client and server)
+	if (G_isJIP) then {
+		//Is JIP
+		//Assign Tag Number to unit and broadcast
+		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
+		//Add unit and tag number to player list
+		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, player];
+		//Obtain complete local player list
+		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
+		//Broadcast player list
+		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
+		//Add one to tag number list
+		//bug - what if this JIP is a replacement? Is this appropriate?
+		G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
+		publicVariable "G_Unit_Tag_Num_List";
+		//Wait for variable broadcasts
+		sleep 1;
+		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
+		if (G_Unit_Tag_Display != 0) then {
+			//Wait for Unit Tags to process
+			waitUntil {sleep 0.1; scriptDone _handle};
+			[player, (player getVariable "G_Unit_Tag_Number")] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
+		};
+	}
+	else
+	{
+		//Fresh start for client and server
+		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
+		if (G_Unit_Tag_Display != 0) then {
+			//Wait for Unit Tags to process
+			waitUntil {sleep 0.1; scriptDone _handle};
+		};
 	};
 };
 
