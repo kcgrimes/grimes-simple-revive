@@ -56,6 +56,10 @@ if (G_isServer || _specialJIP) then {
 	if (isNil {_unit getVariable "G_Side"}) then {
 		_unit setVariable ["G_Side", side _unit, true];
 	};
+	//Define unit renegade status
+	if (isNil {_unit getVariable "G_isRenegade"}) then {
+		_unit setVariable ["G_isRenegade", false, true];
+	};
 	//Define current number of downs
 	if ((G_Revive_DownsPerLife > 0) && (isNil {_unit getVariable "G_Downs"})) then {
 		_unit setVariable ["G_Downs", 0, true];
@@ -69,6 +73,28 @@ if (G_isServer || _specialJIP) then {
 //System variables only being defined on server and client's own player,
 //so all other clients need to wait for definitions with or without revive enabled
 waitUntil {(!isNil {_unit getVariable "G_Lives"})};
+
+//Handle rating detection for object variable G_isRenegade
+_unit addEventHandler ["HandleRating", {
+	//Local to _unit
+	params ["_unit", "_ratingAdded"];
+	//Check if rating exceeds renegade limit
+	if (((rating _unit) + _ratingAdded) < -2000) then {
+		//Is renegade, so set variable as such if not already done
+		if (!(_unit getVariable "G_isRenegade")) then {
+			_unit setVariable ["G_isRenegade", true, true];
+		};
+	}
+	else
+	{
+		//Is no longer renegade, so set variable as such if not already done
+		if (_unit getVariable "G_isRenegade") then {
+			_unit setVariable ["G_isRenegade", false, true];
+		};
+	};
+	//Return normal value
+	_ratingAdded
+}];
 
 //If revive is enabled, add the components that "make it work"
 if (G_Revive_System) then {
@@ -113,9 +139,11 @@ if (G_Revive_System) then {
 				//Whoever _unit is local to will execute Incapacitated state publically
 				if (local _unit) then {
 					_unit allowDamage false;
+					private ["_preIncapSide"];
+					_preIncapSide = side _unit;
 					_unit spawn G_fnc_enterIncapacitatedState;
 					//Execute code for the killer
-					[_unit, _source] spawn G_fnc_onKill;
+					[_unit, _preIncapSide, _source] spawn G_fnc_onKill;
 				};
 				//Output new (total) damage value
 				_newDmg;

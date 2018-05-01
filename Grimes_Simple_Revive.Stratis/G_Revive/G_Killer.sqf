@@ -1,8 +1,9 @@
 //Manages unit that kills unit
 //Local to _unit
-private ["_unit", "_killer", "_noKiller"];
+private ["_unit", "_unitPreIncapSide", "_killer", "_noKiller"];
 _unit = _this select 0;
-_killer = _this select 1;
+_unitPreIncapSide = _this select 1;
+_killer = _this select 2;
 
 _noKiller = false;
 //If unit was killed by environment, exit
@@ -40,7 +41,7 @@ if (G_Revive_Messages > 0) then {
 	
 //Check if teamkill (considering renegade)
 private ["_killer_lives"];
-if ([side _unit, side _killer] call BIS_fnc_sideIsFriendly) then {
+if ([side _killer, _unitPreIncapSide] call BIS_fnc_sideIsFriendly) then {
 	//Is teamkill
 	//Handle life penalty if enabled
 	if (G_TK_Penalty != 0) then {
@@ -52,14 +53,36 @@ if ([side _unit, side _killer] call BIS_fnc_sideIsFriendly) then {
 	};
 	//Broadcast score deduction to server
 	[_killer, [-1, 0, 0, 0, 0]] remoteExec ["addPlayerScores", 2, false];
-	//Rating penalty
-	[_killer, -1000] remoteExec ["addRating", _killer, false];
+	//Handle killer's rating local to killer
+	[_killer, {
+		//Rating penalty
+		_this addRating -1000;
+		//Handle rating detection for object variable G_isRenegade
+		//Check if rating exceeds renegade limit
+		if ((rating _this) < -2000) then {
+			//Is renegade, so set variable as such if not already done
+			if (!(_this getVariable "G_isRenegade")) then {
+				_this setVariable ["G_isRenegade", true, true];
+			};
+		};
+	}] remoteExecCall ["call", _killer, false];
 }
 else
 {
 	//Not a teamkill
 	//Broadcast score bonus to server
 	[_killer, [1, 0, 0, 0, 0]] remoteExec ["addPlayerScores", 2, false];
-	//Rating bonus
-	[_killer, 200] remoteExec ["addRating", _killer, false];
+	//Handle killer's rating local to killer
+	[_killer, {
+		//Rating bonus
+		_this addRating 200;
+		//Handle rating detection for object variable G_isRenegade
+		//Check if rating exceeds renegade limit
+		if ((rating _this) >= -2000) then {
+			//Is no longer renegade, so set variable as such if not already done
+			if (_this getVariable "G_isRenegade") then {
+				_this setVariable ["G_isRenegade", false, true];
+			};
+		};
+	}] remoteExecCall ["call", _killer, false];
 };
