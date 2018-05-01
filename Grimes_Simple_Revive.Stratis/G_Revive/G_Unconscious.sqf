@@ -149,7 +149,6 @@ if (isPlayer _unit) then {
 };
 
 //Create incapacitated dialog for player
-//bug - check locality for this, make sure only be executed on one machine
 if (isPlayer _unit) then {
 	[_unit] spawn {
 		private ["_unit", "_reviveDialog", "_timeDialog"], 
@@ -461,8 +460,10 @@ else
 if (!local _unit) exitWith {};
 //No longer incapacitated, and still local
 
-//Close the incapacitated dialog
-closeDialog 0;
+if (isPlayer _unit) then {
+	//Close the incapacitated dialog
+	closeDialog 0;
+};
 
 //Determine how to proceed based on status change
 if ((_unit getVariable "G_Incapacitated") && ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded")))) then {
@@ -479,9 +480,11 @@ if ((_unit getVariable "G_Incapacitated") && ((isNull (_unit getVariable "G_Revi
 		};
 		[format["%1 was killed", name _unit]] remoteExec ["systemChat", _target, false];
 	};
-	//If on black screen, bring back normal view
-	if (G_Revive_Black_Screen) then {
-		titleText ["", "BLACK IN", 1]; 
+	if (isPlayer _unit) then {
+		//If on black screen, bring back normal view
+		if (G_Revive_Black_Screen) then {
+			titleText ["", "BLACK IN", 1]; 
+		};
 	};
 }
 else

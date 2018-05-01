@@ -167,8 +167,10 @@ if (G_isServer) then {
 				//Remove unit from vehicle
 				_unit action ["eject", _MRV];
 				//Announce kick out using MRV's display name
-				[[format["You are not on the right team to enter %1!", getText (configFile >> "CfgVehicles" >> typeOf _MRV >> "displayName")], "PLAIN", 1]] remoteExecCall ["titleText", _unit, false];
-				4 remoteExecCall ["titleFadeOut", _unit, false];
+				if (isPlayer _unit) then {
+					[[format["You are not on the right team to enter %1!", getText (configFile >> "CfgVehicles" >> typeOf _MRV >> "displayName")], "PLAIN", 1]] remoteExecCall ["titleText", _unit, false];
+					4 remoteExecCall ["titleFadeOut", _unit, false];
+				};
 			};
 		}];
 	};
