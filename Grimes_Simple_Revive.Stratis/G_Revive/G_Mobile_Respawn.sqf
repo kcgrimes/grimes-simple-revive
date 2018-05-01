@@ -8,13 +8,12 @@ _MRV_Array = [[G_Mobile_Respawn_WEST, WEST], [G_Mobile_Respawn_EAST, EAST], [G_M
 //Define functions for MRV action
 G_fnc_MRV_Deploy_Action = {
 	//MRV Deployment
-	private ["_mobile", "_side", "_MRV_Logic", "_mobileRespawnID"];
+	private ["_mobile", "_MRV_Logic", "_mobileRespawnID"];
 	_mobile = _this select 0;
-	_side = _this select 3 select 0;
-	_MRV_Logic = _this select 3 select 1;
+	_MRV_Logic = _this select 3 select 0;
 
 	//Create respawn position
-	_mobileRespawnID = [_side, _mobile] call BIS_fnc_addRespawnPosition;
+	_mobileRespawnID = [_MRV_Logic getVariable "G_Side", _mobile] call BIS_fnc_addRespawnPosition;
 	//Store respawn ID
 	_mobile setVariable ["G_MRV_SpawnID", _mobileRespawnID, true];
 
@@ -62,7 +61,7 @@ if (G_Revive_System) then {
 	//Common conditions for action when revive is enabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
+		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ([side _this, ((_target getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsFriendly))
 	};
 }
 else
@@ -70,7 +69,7 @@ else
 	//Common conditions for action when revive is disabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && ((_this getVariable "G_Side") == ((_target getVariable "G_MRV_Logic") getVariable "G_Side")))
+		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && ([side _this, ((_target getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsFriendly))
 	};
 };
 
@@ -129,7 +128,7 @@ G_fnc_MRV_init = {
 	_MRV_Logic = _MRV getVariable "G_MRV_Logic";
 	
 	//Add Deploy and Undeploy actions, with conditions, to MRV based on Movable setting
-	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
+	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
 };
 
@@ -147,8 +146,7 @@ if (G_isServer) then {
 			//Obtain MRV logic from MRV
 			_MRV_Logic = _MRV getVariable "G_MRV_Logic";
 			//If the MRV and unit side are different, prevent entry
-			//bug - way to make inde friendly, if appropriate? If so, that may be used elsewhere too
-			if ((_MRV_Logic getVariable "G_Side") != (_unit getVariable "G_Side")) then {
+			if ([_MRV_Logic getVariable "G_Side", side _unit] call BIS_fnc_sideIsEnemy) then {
 				//Unit needs to be removed, so handle accordingly
 				//Handle MRV engine
 				private ["_fuel"];
@@ -229,11 +227,9 @@ G_fnc_MRV_onRespawn = {
 	};
 	
 	//bug - a lot of the below is done on init, so consider making a function
-	//Get MRV side from game logic
-	_side = _MRV_Logic getVariable "G_Side";
 	
 	//Add Deploy and Undeploy actions, with conditions, to MRV based on Movable setting
-	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_side, _MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
+	_deployActionID = _MRV addAction [format["<t color='%1'>Deploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_Deploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_Deploy_actionCondition"];
 	_undeployActionID = _MRV addAction [format["<t color='%1'>Undeploy Mobile Respawn</t>", G_Revive_Action_Color], G_fnc_MRV_UnDeploy_Action, [_MRV_Logic], 1.5, true, true, "", "[_target, _this] call G_fnc_MRV_UnDeploy_actionCondition"];	
 
 	//Manage MRV locking if enabled
@@ -376,7 +372,7 @@ G_fnc_MRV_Marker_Creation = {
 	//Create local marker for each client if in PvP
 	if (G_PvP && G_isClient) then {
 		//Check if MRV is on player's side
-		if ((player getVariable "G_Side") == (_MRV_Logic getVariable "G_Side")) then {
+		if ([player getVariable "G_Side", _MRV_Logic getVariable "G_Side"] call BIS_fnc_sideIsFriendly) then {
 			//MRV and player on same side, so create local marker
 			_MRV_mkr = createMarkerLocal [format["G_MRV_mkr_%1", _MRV], getPos _MRV];
 			_MRV_mkr setMarkerColorLocal G_Mobile_Respawn_Mkr_Color;

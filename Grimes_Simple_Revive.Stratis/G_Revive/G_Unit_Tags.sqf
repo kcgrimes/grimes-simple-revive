@@ -72,7 +72,7 @@ if (G_isClient) then {
 				call compile format ['G_Unit_Tag_%1 = true', %1];
 			};
 			_distp = _unit distance player;
-			if ((_distp <= G_Unit_Tag_Distance) and ((player getVariable 'G_Side') == (_unit getVariable 'G_Side'))) then {
+			if ((_distp <= G_Unit_Tag_Distance) and ([side player, side _unit] call BIS_fnc_sideIsFriendly)) then {
 				if ((G_Unit_Tag_Display == 1) and !(cursorTarget == _unit)) exitWith {};
 				_alpha = (-0.02*(_distp))+(0.025*(G_Unit_Tag_Distance));
 				_isIncapacitated = false;

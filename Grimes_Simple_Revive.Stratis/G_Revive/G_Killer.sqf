@@ -38,9 +38,9 @@ if (G_Revive_Messages > 0) then {
 	[format["%1 was incapacitated by %2", name _unit, name _killer]] remoteExec ["systemChat", _target, false];
 };
 	
-//Check if teamkill
+//Check if teamkill (considering renegade)
 private ["_killer_lives"];
-if ((_unit getVariable "G_Side") == (_killer getVariable "G_Side")) then {
+if ([side _unit, side _killer] call BIS_fnc_sideIsFriendly) then {
 	//Is teamkill
 	//Handle life penalty if enabled
 	if (G_TK_Penalty != 0) then {

@@ -48,14 +48,13 @@ G_fnc_Revive_Actions_Cond = {
 
 //Define function to add all revive-related actions
 G_fnc_Revive_Actions = {
-	private ["_unit", "_side", "_reviveActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
+	private ["_unit", "_reviveActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
 	_unit = _this select 0;
-	_side = _unit getVariable "G_Side";
-	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
+	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, side _target] call BIS_fnc_sideIsFriendly) && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
 	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [_side], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
+	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, side _target] call BIS_fnc_sideIsFriendly) && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 };
 
@@ -174,10 +173,9 @@ G_fnc_Revive_AI_Behavior = {
 
 //Define function that handles Load/Unload of player
 G_fnc_moveInCargoToUnloadAction = {
-	private ["_unit", "_vehicle", "_side", "_unloadActionID"];
+	private ["_unit", "_vehicle", "_unloadActionID"];
 	_unit = _this select 0;
 	_vehicle = _this select 1;
-	_side = _this select 2;
 	
 	if (local _unit) then {
 		[_unit, _vehicle] spawn {
@@ -191,14 +189,11 @@ G_fnc_moveInCargoToUnloadAction = {
 			//Perform Incapacitated animation manually due to lack of setUnconscious support in vehicle
 				//This should have global effect, but does not, so it is here and broaadcasted
 			[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
-			//Set vehicle side to unit's side for action condition
-			//bug - is this reset later? 
-			_vehicle setVariable ["G_Side", _unit getVariable "G_Side", true];
 		};
 	};
 	
 	//Add Unload action for unit to vehicle
-	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "((_this getVariable ""G_Side"") == (_target getVariable ""G_Side"")) && ((_target distance _this) < 5) and ((speed _target) < 1)"];
+	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "([side _this, side _target] call BIS_fnc_sideIsFriendly) && ((_target distance _this) < 5) && ((speed _target) < 1)"];
 	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	
 	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
@@ -273,7 +268,7 @@ if (G_isClient) then {
 				_arrayDistance = [];
 				{
 					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not incapacitated
-					if ((_x != player) && ((player getVariable "G_Side") == (_x getVariable "G_Side")) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
+					if ((_x != player) && ([side player, side _x] call BIS_fnc_sideIsFriendly) && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
 						//Add to array with distance from player
 						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
 					};

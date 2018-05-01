@@ -225,9 +225,8 @@ sleep 2.5;
 			_arrayPotentialRescuers = [];
 			{
 				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not incapacitated
-					//bug - consider what "friendly" means vs "same side"
 					//This system always runs with AI; players are not considered for roles
-				if ((_x != _unit) && (!isPlayer _x) && ((_unit getVariable "G_Side") == (_x getVariable "G_Side")) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
+				if ((_x != _unit) && (!isPlayer _x) && ([side _unit, side _x] call BIS_fnc_sideIsFriendly) && ((((_x getVariable "G_AI_rescueRole") select 0) == 0) || (((_x getVariable "G_AI_rescueRole") select 1) == _unit)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
 					//Add to array, ordered by distance ascending
 					_arrayPotentialRescuers pushBack _x;
 				};
