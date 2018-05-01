@@ -14,6 +14,9 @@ if (isDamageAllowed _unit) then {
 //Broadcast incapacitated-state status and animation
 _unit setUnconscious true;
 
+//Prevent being further engaged by enemies
+_unit setCaptive true;
+
 //Prepare to add mock delay to revive actions to prevent animation failures
 _unit setVariable ["G_Dragged", true, true];
 
@@ -514,6 +517,8 @@ else
 			};
 		};
 	};
+	//Allow unit to be engaged by AI
+	_unit setCaptive false;
 	//Allow AI unit to move
 	_unit enableAI "MOVE";
 	//Allow scripted AI responses
