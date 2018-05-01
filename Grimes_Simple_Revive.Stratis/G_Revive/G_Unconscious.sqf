@@ -355,18 +355,18 @@ sleep 2.5;
 	};
 };
 
-private ["_reviveTimer"];
-_reviveTimer = G_Revive_Time_Limit;
-//Check if revive timer is unlimited
-if (_reviveTimer > -1) then {
-	//Revive timer is limited
+private ["_bleedoutTimer"];
+_bleedoutTimer = G_Revive_bleedoutTime;
+//Check if bleedout timer is unlimited
+if (_bleedoutTimer > -1) then {
+	//Bleedout timer is limited
 	//Cycle count in incapacitated state so long as unit is incapacitated, not timed out, is alive, and is still local to the executor
 	//bug - why the local check? 
-	while {(_unit getVariable "G_Incapacitated") && (_reviveTimer > 0) && (alive _unit) && (local _unit)} do 
+	while {(_unit getVariable "G_Incapacitated") && (_bleedoutTimer > 0) && (alive _unit) && (local _unit)} do 
 	{
 		//If unit is not currently being revived, count down
 		if (isNull (_unit getVariable "G_Reviver")) then {
-			_reviveTimer = _reviveTimer - 1;
+			_bleedoutTimer = _bleedoutTimer - 1;
 		};
 		//Handle vehicle if unit is in one
 		private ["_breakOut", "_vehicle"];
@@ -403,11 +403,11 @@ if (_reviveTimer > -1) then {
 		if (isPlayer _unit) then {
 			//Check environment only if black screen is disabled
 			if (!G_Revive_Black_Screen) then {
-				titleText [format["%1 seconds until auto-respawn, unless you are revived!", _reviveTimer],"PLAIN",1];
+				titleText [format["%1 seconds until bleedout, unless you are revived!", _bleedoutTimer],"PLAIN",1];
 			}
 			else
 			{
-				titleText [format["%1 seconds until auto-respawn, unless you are revived!", _reviveTimer],"BLACK FADED",1];
+				titleText [format["%1 seconds until bleedout, unless you are revived!", _bleedoutTimer],"BLACK FADED",1];
 			};
 		};
 		sleep 1;
@@ -415,7 +415,7 @@ if (_reviveTimer > -1) then {
 }
 else
 {
-	//Revive timer is unlimited
+	//Bleedout timer is unlimited
 	//Cycle in incapacitated state so long as unit is incapacitated, is alive, and is still local to the executor
 	//bug - why the local check?
 	while {(_unit getVariable "G_Incapacitated") && (alive _unit) && (local _unit)} do 
@@ -467,7 +467,7 @@ if (isPlayer _unit) then {
 
 //Determine how to proceed based on status change
 if ((_unit getVariable "G_Incapacitated") && ((isNull (_unit getVariable "G_Reviver")) || (!alive _unit) || (!isNull (_unit getVariable "G_Loaded")))) then {
-	//Unit did not get revived (timer ran out or aborted), is in exploded vehicle without ejection, or is dead
+	//Unit did not get revived (bleedout timer ran out, or Gave Up), is in exploded vehicle without ejection, or is dead
 	//Remove from Incapacitated, and kill unit
 	_unit setVariable ["G_Loaded", objNull, true];
 	_unit setVariable ["G_Incapacitated", false, true];

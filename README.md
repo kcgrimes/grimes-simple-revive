@@ -80,7 +80,7 @@ G_Briefing = true; //true = information, how to, and credits will be displayed o
 
 //Revive
 G_Revive_System = true; //Whether the revive system will be used or not. true = enabled, false = disabled.
-G_Revive_Time_Limit = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
+G_Revive_bleedoutTime = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
 G_Revive_DownsPerLife = 0; //Number of times unit can go Incapacitated in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
 G_Revive_Time_To = 10; //Time (in seconds) required for reviver to complete revive action
