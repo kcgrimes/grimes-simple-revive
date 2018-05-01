@@ -9,13 +9,21 @@ _rescuer = _this select 1;
 _vehicle = (nearestObjects [_unit, G_Revive_Load_Types, 8]) select 0;
 
 //If MRVs are locked, prevent loading into enemy MRV
-if ((G_Mobile_Respawn_Locked) && ((!isNil {(_vehicle getVariable "G_MRV_Logic") getVariable "G_Side"}) && ([side _rescuer, ((_vehicle getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsEnemy))) exitWith {
-	if (isPlayer _rescuer) then {
-		titleText [format["You cannot load %1 into %2 because the vehicle belongs to the other team!", name _unit, getText (configFile >> "CfgVehicles" >> typeOf _vehicle >> "displayName")], "PLAIN", 1]; 
-		sleep 1; 
-		titleFadeOut 4;
+private ["_breakOut"];
+_breakOut = false;
+if ((G_Mobile_Respawn_Locked) && (!isNil {_vehicle getVariable "G_MRV_Logic"})) then {
+	//Is locked MRV, so check side
+	if ([side _rescuer, ((_vehicle getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsEnemy) then {
+		//Not friendly, so break out and announce
+		_breakOut = true;
+		if (isPlayer _rescuer) then {
+			titleText [format["You cannot load %1 into %2 because the vehicle belongs to the other team!", name _unit, getText (configFile >> "CfgVehicles" >> typeOf _vehicle >> "displayName")], "PLAIN", 1]; 
+			sleep 1; 
+			titleFadeOut 4;
+		};
 	};
 };
+if (_breakOut) exitWith {};
 
 //If vehicle has no open cargo positions, exit
 if ((_vehicle emptyPositions "cargo") < 1) exitWith {

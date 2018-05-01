@@ -191,9 +191,9 @@ G_fnc_moveInCargoToUnloadAction = {
 			[_unit, "Unconscious"] remoteExec ["playAction", 0, true];
 		};
 	};
-	
+
 	//Add Unload action for unit to vehicle
-	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "([side _this, side _target] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && ((_target distance _this) < 5) && ((speed _target) < 1)"];
+	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.2, true, true, "", "([side _this, side _target] call BIS_fnc_sideIsFriendly) && ((_target distance _this) < 5) && ((speed _target) < 1)"];
 	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	
 	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
