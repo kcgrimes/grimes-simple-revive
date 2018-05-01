@@ -96,6 +96,9 @@ class ScenarioData
 	author="KC Grimes";
 	overviewText="Simple revive script that utilizes stock functions in a simple, user-friendly, and quality manner.";
 	overViewPicture="G_Revive_loadScreen.paa";
+	respawnDialog=0;
+	respawn=3;
+	respawnDelay=10.1183;
 	class Header
 	{
 		gameType="Sandbox";
@@ -137,7 +140,7 @@ class CustomAttributes
 										"STRING"
 									};
 								};
-								value="None";
+								value="MenuPosition";
 							};
 						};
 					};

@@ -8,8 +8,6 @@ setPlayerRespawnTime G_Respawn_Time;
 
 [_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
 
-//BIS_fnc_respawnMenuPosition running in parallel
-
 //Set system variables
 _unit call G_fnc_Revive_resetVariables;
 _unit setVariable ["G_Downs", 0, true];

@@ -65,5 +65,3 @@ if (playerRespawnTime < 1 || !isPlayer _unit) exitWith {};
 if (playerRespawnTime < 3) then {
 	setPlayerRespawnTime (playerRespawnTime + 3);
 };
-
-//BIS_fnc_respawnMenuPosition running in parallel
