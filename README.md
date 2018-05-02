@@ -140,23 +140,27 @@ G_Custom_Exec_5 = ""; //File executed when unit is revived. _revivedUnit = _this
 This README is intended to provide detailed information as to the purpose, function, FAQs, and minor troubleshooting for this script in addition to installation, uninstallation, and maintenance tips. For further information or specifics in the code, the user should read the comments to the code within the script files. Any further questions or comments can be directed to the author. 
 
 Functions:
+```
 G_fnc_initNewAI
 Intended to execute the Revive and Unit Tags systems (if enabled) on units that lack these systems, particularly units created post-init.
 Parameter: Array - List of units to be added cycled through init
 Return: None
 Ex: [_unit1, _unit2] spawn G_fnc_initNewAI;
-
+```
+```
 G_fnc_enterIncapacitatedState
 A means of forcing a revive-enabled unit into the incapacitated state. 
 Parameter: Object - Revive-enabled unit
 Return: None
 Ex: _unit1 spawn G_fnc_enterIncapacitatedState;
-
+```
+```
 G_fnc_exitIncapacitatedState
 A means of forcing a revive-enabled unit out of the incapcitated state and back to their feet. 
 Parameter: Object - Revive-enabled unit
 Return: None
 Ex: _unit1 spawn G_fnc_exitIncapacitatedState;
+```
 
 ## Tests
 
