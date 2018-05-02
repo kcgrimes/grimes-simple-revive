@@ -1,22 +1,25 @@
 ## Grimes Simple Revive
 
-Created with user-friendliness and quality assurance in mind, Grimes Simple Revive is a Revive script for ArmA 3 that sets itself apart from other Revive Scripts due to the fact that it is exceptionally organized and simplified for ease-of-use by mission editors of all levels. Although this script contains a variety of features on top of its original action-based Revive System, all features, in addition to already having default values set, are organized by relevancy in a simple way that allows editors to adapt this script to their mission. 
+Created with user-friendliness and quality assurance in mind, Grimes Simple Revive is a Revive script for Arma 3 that sets itself apart from other Revive Scripts due to the fact that it is exceptionally organized and simplified for ease-of-use by mission editors of all levels, while still offering unique features. Although this script contains a variety of features on top of its original action-based Revive System, all features, in addition to already having default values set, are organized by relevancy in a simple way that allows editors to adapt this script to their mission, including enabling/disabling features as desired. 
 
 Highlights:
-* Singleplayer (SP), Multiplayer (MP), Dedicated Server, & Join-In-Progress (JIP) Support
-	* For SP, simply run your SP mission as an MP Host. This allows for the use of parameters anyway, allowing you to make your mission more diverse!
-* Minimal setup required, quick and easy installation
-* Integrated value checking system to ensure the script is being utilized effectively
-* Revive your teammates, whether they are players or AI
+* Singleplayer (SP), Multiplayer (MP), PvP/TvT/COOP, Save/Load, Dedicated Server, & Join-In-Progress (JIP) Support
+	* For SP, consider running your SP mission as an MP Host. This allows for the use of parameters anyway, allowing you to make your mission more diverse!
+* Minimal setup required; quick and easy installation
+* Integrated parameter validation system to ensure the script is being utilized effectively
+* Revive your teammates, whether they are players or AI, including in water
 * Drag & Carry players and AI, whether they are your teammates or not
 * Load incapacitated teammates into vehicles, and Unload them at your destination
-* Utilization of the stock Respawn Menu for use of multiple respawn points
-* Available limitless Mobile Respawn Vehicle and Squad Leader Respawn systems
-* Utilization of BIS functions and dialogs wherever possible to be as stock as possible
+* AI will operate in a guard-rescuer pair to realistically navigate to and revive teammates (even when vehicles are involved)
+	* AI inclusion is by side and requires no extra work, and individual exclusions from the script can be made by name
+* Integrate with your respawn settings: works with all respawn types, including the highly recommended Respawn Menu for respawn point selection
+* Available Mobile Respawn Vehicle (MRV) and Squad Leader Respawn systems which include optional markers
+* Utilization of BI functions and dialogs wherever possible to be as stock and fast as possible
+* Available immersive options such as black screen and muting ACRE2/TFAR while incapacitated
 * Available “unit tags” that mark friendly players and AI on your HUD
 * Available Spectator Mode for use when lives run out
-* Pre-placed custom execution lines to run your own scripts within this one
-* Loads of other large and small features! Check out G_Revive_init.sqf
+* Available pre-placed custom execution lines to run your own scripts within this one
+* Loads of other large and small features! Check out the parameters for more details. 
 
 This package includes an application of the script as part of an example mission. 
 
@@ -40,62 +43,47 @@ At this time, there is no “installer” for the script, and it is instead a si
 	1. Steam Workshop: http://steamcommunity.com/sharedfiles/filedetails/?id=1349229256
 2. Extract the “Grimes_Simple_Revive.stratis” folder and place it somewhere on your computer that is easily accessible, such as Desktop or your MP Missions folder.
 3. In the folder that contains your mission.sqm (ie, “my_mission.stratis”), do the following:
-	1. If you haven’t already created a description.ext file, simply copy the provided one into your mission folder. If you already have your own description.ext, simply copy and paste the following line into it. Be sure to not have any respawn-related settings in place, as they will conflict with this file (for custom use, just edit the file).
+	1. If you haven’t already created a description.ext file, simply copy the provided one into your mission folder. If you already have your own description.ext, simply copy and paste the following line into it. Note: If you already have a defines.hpp or similarly purposed file, you may need to check for conflicts.
 	```
 	#include "G_Revive\G_Desc_Include.hpp"
 	```
-	2. If you haven’t already created an init.sqf file, simply copy the provided one into your mission folder. If you already have your own init.sqf, simply copy and paste the following lines into it. 
+	2. If you haven’t already created an init.sqf file, simply copy the provided one into your mission folder. If you already have your own init.sqf, simply copy and paste the following line into it. Note: This line must go towards the top, specifically before any suspension statements (waitUntil, sleep, etc.).
 	```
-	G_isDedicated = false;
-	G_isServer = false;
-	G_isClient = false;
-	G_isJIP = false;
-	if (isDedicated) then {
-		G_isDedicated = true;
-		G_isServer = true;
-	}
-	else
-	{
-		if (isServer) then {G_isServer = true};
-		G_isClient = true;
-		if (isNull player) then {G_isJIP = true};
-		waitUntil {!isNull player};
-	};
-
 	[] execVM "G_Revive_init.sqf";
 	```
 	3. Copy and Paste the G_Revive_init.sqf file and the G_Revive folder into your mission folder. 
 4. That is all that is required for the file implementation! Depending on your settings, you will still need make some edits in the in-game editor. 
-	1. If using respawn, create markers named “respawn_west_0”, “respawn_west_1”, etc. for the desired side.
-	1. If using the mobile respawn vehicle, be sure to name your vehicle in the Name field when you double-click on the vehicle in the editor.
+	1. If using respawn, adjust the editor-based respawn settings as you desire, and remember to create markers named “respawn_west_0”, “respawn_west_1”, etc. for the desired side if necessary. 
+	1. If using the Mobile Respawn Vehicle (MRV), be sure to name your vehicle in the Name field when you double-click on the vehicle in the editor.
 
 Parameters:  
 ```
 ////Editable parameters, sorted by category and relevance - Please adjust values to suit your application.
 //Generic
-G_PvP = true; //true = PvP mission where there are more than one playable sides (PvP, TvT, etc), false = players only on one side (CoOp, SP, etc).
-G_Enemy_AI_Incapacitated = true; //true = Enemy AI can be revived, dragged, and carried by enemy players (only recommended for PvP), false = disabled
-	G_Friendly_Side = WEST; //Side of friendly units if the above is false
 G_Briefing = true; //true = information, how to, and credits will be displayed on ingame briefing screen. Can be used in conjunction with your own briefing. false = disabled. 
 
 //Revive
 G_Revive_System = true; //Whether the revive system will be used or not. true = enabled, false = disabled.
+G_Revive_AI_Incapacitated = [WEST, EAST, RESISTANCE, CIVILIAN]; //Array of sides of AI that will utilize revive system
+G_Revive_Unit_Exclusion = []; //Array of variable names of units to exclude from the revive system
 G_Revive_bleedoutTime = 300; //Amount of time (in seconds) unit is available to be revived, before being forced to respawn. If -1, no time limit.
+G_Allow_GiveUp = true; //Allow player to force death while incapacitated. true = enabled, false = disabled.
 G_Revive_DownsPerLife = 0; //Number of times unit can go Incapacitated in single life. 0 = Unlimited, integer > 0 = limit of downs per life.
+G_Revive_addonRadio_muteTransmit = false; //Mute radio transmissions in addons ACRE2 or TFAR while incapacitated. true = enabled, false = disabled. 
+G_Revive_addonRadio_muteReceive = false; //Mute radio reception in addons ACRE2 or TFAR while incapacitated. true = enabled, false = disabled. 
 G_Revive_Can_Revive = []; //Classnames of units that can revive. Wrap in quotes, separate by commas. If empty, all can revive.
-G_Revive_Time_To = 10; //Time (in seconds) required for reviver to complete revive action
+G_Revive_actionTime = 10; //Time (in seconds) required for reviver to complete revive action
 G_Revive_Requirement = 0; //1 or greater = number of FAKs (single use) or Medikit (unlimited use) needed to revive (and treat still). 0 = Those items only needed to treat, not revive (stock).
-G_Revive_Black_Screen = 0; //1 = While Incapacitated/waiting for revive, screen stays black. 0 = Screen goes black at death then fades back in, with surroundings visible.
+G_Revive_Black_Screen = false; //true = While Incapacitated/waiting for revive, screen stays black. false = Screen goes black at death then fades back in, with surroundings visible.
 G_Revive_Action_Color = "#FFCC00"; //HTML color code that will be the color of the Revive, Drag, Carry, and Load/Unload action text. Default is Orange. 
-G_Revive_Load_Types = ["Car","Tank","Helicopter","Truck"]; //Add or remove strings of types of units that wounded can be loaded into
+G_Revive_Load_Types = ["Car","Tank","Helicopter","Plane","Ship"]; //Array of strings of kinds of vehicles that incapacitated units can be loaded into
 G_Eject_Occupants = false; //If killed while in a vehicle, the revivable unit is ejected from the vehicle. True = enabled, false = disabled.
 G_Explosion_Eject_Occupants = true; //Once the wreck of an exploded vehicle comes to a stop (air or land), the occupants will be ejected and revivable. True to enable, false to disable (units will bypass revive and be forced to respawn).
 G_Revive_Reward = 0; //0 = No lives rewarded for revive. 1 and up = number of lives rewarded for reviving. (CAN be a decimal)
 G_TK_Penalty = 0; //Amount of lives a Team Killer loses per team kill. Note, must be negative to be negative result (Ex. Value of -2 means 2 lives lost per TK) (CAN be a decimal)
+G_Revive_Messages = 1; //Chat messages upon incapacitation and revive. 0 = None. 1 = Friendly only. 2 = All.
 
 //Respawn/Initial Spawn
-G_Init_Start = 0; //0 = starting position is editor-placed position. 1 = starting position is random spawn marker. 2 = On start, player is presented with menu to select spawn position (NOTE: For the menu to work at start, you must go to G_Revive\G_Desc_Include.hpp, find respawnOnStart, and change it to 1. As well, if you do this, G_JIP_Start must also be 2.)
-G_JIP_Start = 0; //0 = JIP starting position is editor-placed position (or position of unit JIPing to). 1 = JIP starting position is random spawn marker. 2 = On start for JIP, player is presented with menu to select spawn position (NOTE: For the menu to work at start, you must go to G_Revive\G_Desc_Include.hpp, find respawnOnStart, and change it to 1. As well, if you do this, G_Init_Start must also be 2.)
 G_Respawn_Button = true; //true = Respawn Button enabled, false = Respawn button disabled
 G_Respawn_Time = 10; //Amount of time (in seconds) dead unit must wait before being able to respawn (overrides description.ext setting)
 G_Num_Respawns = 3; //Number of lives/respawns available to players (must be integer). -1 = unlimited, 0 and up are actual values.
@@ -106,7 +94,7 @@ G_Squad_Leader_Marker = true; //Displays marker on map indicating squad leader's
 	G_Squad_Leader_Mkr_Color = "ColorBlack"; //Color of marker
 	G_Squad_Leader_Mkr_Text = "Squad Leader"; //Text beside marker
 	G_Squad_Leader_Mkr_Refresh = 1; //Time (in seconds) between refreshes in marker location. Must be a number greater than 0.
-G_AI_Fixed_Spawn = true; //Upon respawn, the AI will spawn at the marker defined below for their respective side
+G_AI_Fixed_Spawn = true; //Upon respawn, the AI will spawn at the marker defined below for their respective side, as opposed to respawning at random if multiple markers exist
 	G_AI_Fixed_Spawn_WEST = "respawn_west_0";
 	G_AI_Fixed_Spawn_EAST = "respawn_east_0";
 	G_AI_Fixed_Spawn_GUER = "respawn_guerrila_0";
@@ -141,15 +129,34 @@ G_Unit_Tag = true; //Refers to unit "name tags" that display over unit's head on
 
 //Custom Executions
 //Note - By default they will execute on AI as well. Read comment to side.
-G_Custom_Exec_1 = ""; //File executed when unit is set Incapacitated (NOT "killed")
-G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed)
-G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed
-G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. The newly spawned MRV = _this select 0
+G_Custom_Exec_1 = ""; //File executed when unit is set Incapacitated (NOT "killed"). _incapacitatedUnit = _this select 0, and is local.
+G_Custom_Exec_2 = ""; //File executed when unit is killed (not revivable; unit is officially killed). _killedUnit = _this select 0, and is local.
+G_Custom_Exec_3 = ""; //File executed when unit respawns after being killed. _respawnedUnit = _this select 0, and is local.
+G_Custom_Exec_4 = ""; //File executed when MRV respawns after being destroyed. Newly spawned MRV = _this select 0, and is local. 
+G_Custom_Exec_5 = ""; //File executed when unit is revived. _revivedUnit = _this select 0, and is local. _rescuer = _this select 1. 
 ```
-
 ## Documentation
 
 This README is intended to provide detailed information as to the purpose, function, FAQs, and minor troubleshooting for this script in addition to installation, uninstallation, and maintenance tips. For further information or specifics in the code, the user should read the comments to the code within the script files. Any further questions or comments can be directed to the author. 
+
+Functions:
+G_fnc_initNewAI
+Intended to execute the Revive and Unit Tags systems (if enabled) on units that lack these systems, particularly units created post-init.
+Parameter: Array - List of units to be added cycled through init
+Return: None
+Ex: [_unit1, _unit2] spawn G_fnc_initNewAI;
+
+G_fnc_enterIncapacitatedState
+A means of forcing a revive-enabled unit into the incapacitated state. 
+Parameter: Object - Revive-enabled unit
+Return: None
+Ex: _unit1 spawn G_fnc_enterIncapacitatedState;
+
+G_fnc_exitIncapacitatedState
+A means of forcing a revive-enabled unit out of the incapcitated state and back to their feet. 
+Parameter: Object - Revive-enabled unit
+Return: None
+Ex: _unit1 spawn G_fnc_exitIncapacitatedState;
 
 ## Tests
 
