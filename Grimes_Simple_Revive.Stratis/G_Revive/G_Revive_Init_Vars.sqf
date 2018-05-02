@@ -10,6 +10,10 @@ if (typeName G_Revive_AI_Incapacitated != "ARRAY") then {_validationFailed pushB
 {
 	if (typeName _x != "SIDE") then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be array containing only WEST, EAST, RESISTANCE, or CIVILIAN!"};
 } forEach G_Revive_AI_Incapacitated;
+if (typeName G_Revive_Unit_Exclusion != "ARRAY") then {_validationFailed pushBack "G_Revive_Unit_Exclusion must be an array of variable names of units!"};
+{
+	if (typeName _x != "OBJECT") then {_validationFailed pushBack "G_Revive_Unit_Exclusion must be array containing only variable names of units!"};
+} forEach G_Revive_Unit_Exclusion;
 if ((typeName G_Revive_bleedoutTime != "SCALAR") || (G_Revive_bleedoutTime < -1)) then {_validationFailed pushBack "G_Revive_bleedoutTime must be a number greater than or equal to -1!"};
 if (typeName G_Allow_GiveUp != "BOOL") then {_validationFailed pushBack "G_Allow_GiveUp must be true/false!"};
 if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) then {_validationFailed pushBack "G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};

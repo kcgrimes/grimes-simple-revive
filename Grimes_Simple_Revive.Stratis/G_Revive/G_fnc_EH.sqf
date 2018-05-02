@@ -15,7 +15,7 @@ if (G_isClient) then {
 };
 
 //Add onKilled/onRespawn EH's early in case of respawnOnStart
-if (G_Revive_System) then {
+if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
 	//Add onKilled EH to unit
 		//onKilled EH will not trigger for respawnOnStart if there is any sleep between here and init
 	_unit addEventHandler 
@@ -37,6 +37,7 @@ if (G_Revive_System) then {
 //If is server or client's own player, define system variables and broadcast them
 if (G_isServer || _specialJIP) then {
 	if (G_Revive_System) then {
+		//These variables are needed even if excluded, specifically for non-revive components like MRV
 		//Set init variables if not already done, maintaining variables for JIP
 		{
 			if (isNil {_unit getVariable _x}) then {
@@ -97,7 +98,7 @@ _unit addEventHandler ["HandleRating", {
 }];
 
 //If revive is enabled, add the components that "make it work"
-if (G_Revive_System) then {
+if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
 	//Define variables used to track what is damaged with how much damage
 	_unit setVariable ["selections", []];
 	_unit setVariable ["gethit", []];
