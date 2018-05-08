@@ -3,7 +3,7 @@
 private ["_MRV_Array"];
 
 //Define array of MRVs and associated side
-_MRV_Array = [[G_Mobile_Respawn_WEST, WEST], [G_Mobile_Respawn_EAST, EAST], [G_Mobile_Respawn_GUER, RESISTANCE], [G_Mobile_Respawn_CIV, CIVILIAN]];
+_MRV_Array = [[G_Mobile_Respawn_WEST, WEST], [G_Mobile_Respawn_EAST, EAST], [G_Mobile_Respawn_IND, RESISTANCE], [G_Mobile_Respawn_CIV, CIVILIAN]];
 
 //Define functions for MRV action
 G_fnc_MRV_Deploy_Action = {

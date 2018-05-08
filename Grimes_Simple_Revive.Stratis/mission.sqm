@@ -356,7 +356,7 @@ class Mission
 			class Attributes
 			{
 				skill=0.60000002;
-				name="MobileRespawnGUER";
+				name="MobileRespawnIND";
 			};
 			id=197;
 			type="I_MRAP_03_F";

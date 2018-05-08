@@ -188,8 +188,8 @@ if (G_AI_Fixed_Spawn) then {
 						};
 					};
 					case RESISTANCE: {
-						if (G_AI_Fixed_Spawn_GUER != "") then {
-							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_GUER; 
+						if (G_AI_Fixed_Spawn_IND != "") then {
+							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_IND; 
 						};
 					};
 					case CIVILIAN: {

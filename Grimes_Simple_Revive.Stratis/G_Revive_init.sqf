@@ -42,14 +42,14 @@ G_Squad_Leader_Marker = true; //Displays marker on map indicating squad leader's
 G_AI_Fixed_Spawn = true; //Upon respawn, the AI will spawn at the marker defined below for their respective side, as opposed to respawning at random if multiple markers exist
 	G_AI_Fixed_Spawn_WEST = "respawn_west_0";
 	G_AI_Fixed_Spawn_EAST = "respawn_east_0";
-	G_AI_Fixed_Spawn_GUER = "respawn_guerrila_0";
+	G_AI_Fixed_Spawn_IND = "respawn_guerrila_0";
 	G_AI_Fixed_Spawn_CIV = "";
 
 //Mobile Respawn Vehicle
 //Note - To enable, simply add the editor-placed vehicle's name into the appropriate array depending on the intended side. It will not be wrapped in quotes. So, it will be vehname and not "vehname". If multiple vehicles, separate by commas.
 G_Mobile_Respawn_WEST = [MobileRespawnWEST]; 
 G_Mobile_Respawn_EAST = [MobileRespawnEAST];
-G_Mobile_Respawn_GUER = [MobileRespawnGUER];
+G_Mobile_Respawn_IND = [MobileRespawnIND];
 G_Mobile_Respawn_CIV = [];
 G_Mobile_Respawn_Locked = true; //Lock enemy MRVs so MRVs can only be accessed by their own team. true = enabled, false = disabled.
 G_Mobile_Respawn_Movable = false; //true = Deployed mobile respawn can be moved while remaining deployed, false = Deployed mobile respawn is immobile. 
