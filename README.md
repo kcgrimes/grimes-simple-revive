@@ -166,6 +166,10 @@ Ex: _unit1 spawn G_fnc_exitIncapacitatedState;
 
 The script is designed to exit upon critical failure and it will attempt to announce the problem in chat. These types of failures are intended for development, and should never be encountered down the road if they were not encountered at launch, save for software updates. Upon setup or completion of modifications, it is recommended that the user, before launch, run the script in a test environment.
 
+## Changelog
+
+All significant commits (changes) to this project will be associated with an issue in the Issue Tracker. This does not include minor documentation, formatting, readability, or otherwise cleanup-oriented changes. All issues resulting in a commit will be assigned to a Milestone, and the Milestones will be used as a reliable changelog, while the commit history will be comprehensive. Some issues may be related to changes within the same Milestone, and some fixes for bugs caused in the same Milestone may not be associated to an issue but instead the commit they are addressing. 
+
 ## Contributors
 
 Contributions are welcomed and encouraged. Please follow the below guidelines:
