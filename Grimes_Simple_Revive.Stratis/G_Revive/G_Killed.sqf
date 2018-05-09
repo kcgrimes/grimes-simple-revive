@@ -9,7 +9,7 @@ _respawnType = getNumber(missionConfigFile >> "respawn");
 waitUntil {(!isNil {_unit getVariable "G_Lives"})};
 
 //Custom execution
-if (!isNull G_fnc_Custom_Exec_2) then {
+if (!isNil "G_fnc_Custom_Exec_2") then {
 	[_unit] spawn G_fnc_Custom_Exec_2;
 };
 

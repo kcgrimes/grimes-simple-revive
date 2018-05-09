@@ -245,7 +245,7 @@ G_fnc_MRV_onRespawn = {
 
 	if (local _MRV) then {
 		//Custom execution
-		if (!isNull G_fnc_Custom_Exec_4) then {
+		if (!isNil "G_fnc_Custom_Exec_4") then {
 			[_MRV] spawn G_fnc_Custom_Exec_4;
 		};
 	};

@@ -183,7 +183,7 @@ _unit disableAI "MOVE";
 _unit disableAI "FSM";
 
 //Custom execution
-if (!isNull G_fnc_Custom_Exec_1) then {
+if (!isNil "G_fnc_Custom_Exec_1") then {
 	[_unit] spawn G_fnc_Custom_Exec_1;
 };
 
@@ -577,7 +577,7 @@ else
 	};
 	
 	//Custom execution
-	if (!isNull G_fnc_Custom_Exec_5) then {
+	if (!isNil "G_fnc_Custom_Exec_5") then {
 		[_unit, _rescuer] spawn G_fnc_Custom_Exec_5;
 	};
 };
