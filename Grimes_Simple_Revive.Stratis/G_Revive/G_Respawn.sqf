@@ -37,7 +37,7 @@ if (G_Squad_Leader_Spawn) then {
 };
 
 //Custom execution
-if (G_Custom_Exec_3 != "") then {
+if (!isNull G_fnc_Custom_Exec_3) then {
 	[_unit] spawn G_fnc_Custom_Exec_3;
 };
 
