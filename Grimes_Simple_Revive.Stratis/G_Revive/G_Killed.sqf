@@ -5,6 +5,15 @@ private ["_unit", "_respawnType"];
 _unit = _this select 0;
 _respawnType = getNumber(missionConfigFile >> "respawn");
 
+//Handle respawn times
+//bug - No respawn timer for AI? Intended?
+//Ensure at least a 3 second respawn time to allow for code execution
+if (isPlayer _unit) then {
+	if (playerRespawnTime < 3) then {
+		setPlayerRespawnTime 3;
+	};
+};
+
 //For respawnOnStart, allow time for definitions to catch up
 waitUntil {(!isNil {_unit getVariable "G_Lives"})};
 
@@ -53,15 +62,4 @@ if (_noLives) exitWith {
 		//Handle as AI
 		//bug - what to do here to prevent AI from respawning? Possibly delete somehow?
 	};
-};
-
-//Handle respawn times
-//No respawn timer for AI
-//bug - need to look at all this and associated commands for player/AI integration
-//bug - intended...?
-if (playerRespawnTime < 1 || !isPlayer _unit) exitWith {};
-//Ensure at least a 6 second respawn time
-//bug - why?
-if (playerRespawnTime < 3) then {
-	setPlayerRespawnTime (playerRespawnTime + 3);
 };

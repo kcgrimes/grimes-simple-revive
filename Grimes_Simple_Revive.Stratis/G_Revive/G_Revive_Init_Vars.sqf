@@ -129,11 +129,25 @@ else
 
 //Handle respawnOnStart because onKilled EH triggers when respawnOnStart = 1, so without this block the unit will wait full respawn time and lose a life
 if ((getNumber(missionConfigFile >> "respawnOnStart")) == 1) then {
+	//respawnOnStart
+	//Add extra life if lives are limited to account for respawnOnStart
 	if (G_Num_Respawns > -1) then {
 		G_Num_Respawns = G_Num_Respawns + 1;
 	};
+	//Bypass intended respawn time for initial spawn
 	if (G_isClient) then {
 		setPlayerRespawnTime 2;
+	};
+}
+else
+{
+	//No respawnOnStart, so set intended respawn time
+	if (G_isClient) then {
+		//Need to suspend to prevent overwrite by engine, apparently
+		[] spawn {
+			sleep 1;
+			setPlayerRespawnTime G_Respawn_Time;
+		};
 	};
 };
 

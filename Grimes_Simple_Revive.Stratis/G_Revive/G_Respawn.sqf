@@ -4,7 +4,9 @@ private ["_unit"];
 _unit = _this select 0;
 
 //Set next respawn time
-setPlayerRespawnTime G_Respawn_Time;
+if (isPlayer _unit) then {
+	setPlayerRespawnTime G_Respawn_Time;
+};
 
 [_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
 
