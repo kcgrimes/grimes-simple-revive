@@ -15,24 +15,16 @@ if (G_isClient) then {
 };
 
 //Add onKilled/onRespawn EH's early in case of respawnOnStart
-if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
-	//Add onKilled EH to unit
-		//onKilled EH will not trigger for respawnOnStart if there is any sleep between here and init
-	_unit addEventHandler 
-	[	"Killed",
-		{
-			[_this select 0] spawn G_fnc_onKilled;
-		}
-	];
+//Add onKilled EH to unit to handle life count
+	//onKilled EH will not trigger for respawnOnStart if there is any sleep between here and init
+_unit addEventHandler ["Killed", {
+	[_this select 0] spawn G_fnc_onKilled;
+}];
 
-	//Add onRespawn EH to unit to reset revive system and handle spawning
-	_unit addEventHandler 
-	[	"Respawn",
-		{
-			[_this select 0] spawn G_fnc_onRespawn;;
-		}
-	];
-};
+//Add onRespawn EH to unit to reset various variables/systems and handle spawning
+_unit addEventHandler ["Respawn", {
+	[_this select 0] spawn G_fnc_onRespawn;;
+}];
 
 //If is server or client's own player, define system variables and broadcast them
 if (G_isServer || _specialJIP) then {
@@ -49,8 +41,13 @@ if (G_isServer || _specialJIP) then {
 				_unit setVariable [_x, objNull, true];
 			};
 		} forEach G_Revive_objVars;
+		//Define unassigned AI rescue role
 		if (isNil {_unit getVariable "G_AI_rescueRole"}) then {
 			_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
+		};
+		//Define current number of downs
+		if (isNil {_unit getVariable "G_Downs"}) then {
+			_unit setVariable ["G_Downs", 0, true];
 		};
 	};
 	//Define unit side
@@ -60,10 +57,6 @@ if (G_isServer || _specialJIP) then {
 	//Define unit renegade status
 	if (isNil {_unit getVariable "G_isRenegade"}) then {
 		_unit setVariable ["G_isRenegade", false, true];
-	};
-	//Define current number of downs
-	if ((G_Revive_DownsPerLife > 0) && (isNil {_unit getVariable "G_Downs"})) then {
-		_unit setVariable ["G_Downs", 0, true];
 	};
 	//Define current number of lives
 	if (isNil {_unit getVariable "G_Lives"}) then {
@@ -171,73 +164,67 @@ if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
 //If AI Fixed Spawn is defined, add Respawn EH to setPos the AI on respawn
 if (G_AI_Fixed_Spawn) then {
 	if (!isPlayer _unit) then {
-		_unit addEventHandler 
-		[	"Respawn",
-			{
-				private ["_respawnPos"];
-				//Define AI's fixed respawn position based on side
-				switch (side (_this select 0)) do {
-					case WEST: {
-						if (G_AI_Fixed_Spawn_WEST != "") then {
-							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_WEST; 
-						};
-					};
-					case EAST: {
-						if (G_AI_Fixed_Spawn_EAST != "") then {
-							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_EAST; 
-						};
-					};
-					case RESISTANCE: {
-						if (G_AI_Fixed_Spawn_IND != "") then {
-							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_IND; 
-						};
-					};
-					case CIVILIAN: {
-						if (G_AI_Fixed_Spawn_CIV != "") then {
-							_respawnPos = getMarkerPos G_AI_Fixed_Spawn_CIV; 
-						};
+		_unit addEventHandler ["Respawn", {
+			private ["_respawnPos"];
+			//Define AI's fixed respawn position based on side
+			switch (side (_this select 0)) do {
+				case WEST: {
+					if (G_AI_Fixed_Spawn_WEST != "") then {
+						_respawnPos = getMarkerPos G_AI_Fixed_Spawn_WEST; 
 					};
 				};
-				//Wait until the unit is alive (has spawned)
-				waitUntil {alive (_this select 0)};
-				//Immediatly move unit to desired respawn position
-				(_this select 0) setPos _respawnPos;
-			}
-		];
+				case EAST: {
+					if (G_AI_Fixed_Spawn_EAST != "") then {
+						_respawnPos = getMarkerPos G_AI_Fixed_Spawn_EAST; 
+					};
+				};
+				case RESISTANCE: {
+					if (G_AI_Fixed_Spawn_IND != "") then {
+						_respawnPos = getMarkerPos G_AI_Fixed_Spawn_IND; 
+					};
+				};
+				case CIVILIAN: {
+					if (G_AI_Fixed_Spawn_CIV != "") then {
+						_respawnPos = getMarkerPos G_AI_Fixed_Spawn_CIV; 
+					};
+				};
+			};
+			//Wait until the unit is alive (has spawned)
+			waitUntil {alive (_this select 0)};
+			//Immediatly move unit to desired respawn position
+			(_this select 0) setPos _respawnPos;
+		}];
 	};
 };
 
 //Add Respawn EH to all units to handle Unit Tags on respawn, if enabled
 if (G_Unit_Tag) then {
-	_unit addEventHandler 
-	[	"Respawn",
-		{
-			//Local to _unit
-			private ["_unit", "_old", "_num", "_var"];
-			_unit = _this select 0;
-			_old = _this select 1;
-			//Obtain unit tag number from old object
-			_num = _old getVariable "G_Unit_Tag_Number";
-			//Add unit tag number to new object and broadcast
-			_unit setVariable ["G_Unit_Tag_Number", _num, true];
-			//Add unit and tag number to player list
-			(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [_num, _unit];
-			//Obtain complete local player list
-			_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
-			//Broadcast player list
-			G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
-			//Handle display of Unit Tags depending on setting
-			if (G_Unit_Tag_Display != 0) then {
-				//bug - is this spawn necessary? 
-				[_unit, _num] spawn {
-					private ["_unit", "_num"];
-					_unit = _this select 0;
-					_num = _this select 1;
-					//Wait for variable broadcasts
-					sleep 1;
-					[_unit, _num] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
-				};
+	_unit addEventHandler ["Respawn", {
+		//Local to _unit
+		private ["_unit", "_old", "_num", "_var"];
+		_unit = _this select 0;
+		_old = _this select 1;
+		//Obtain unit tag number from old object
+		_num = _old getVariable "G_Unit_Tag_Number";
+		//Add unit tag number to new object and broadcast
+		_unit setVariable ["G_Unit_Tag_Number", _num, true];
+		//Add unit and tag number to player list
+		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [_num, _unit];
+		//Obtain complete local player list
+		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
+		//Broadcast player list
+		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
+		//Handle display of Unit Tags depending on setting
+		if (G_Unit_Tag_Display != 0) then {
+			//bug - is this spawn necessary? 
+			[_unit, _num] spawn {
+				private ["_unit", "_num"];
+				_unit = _this select 0;
+				_num = _this select 1;
+				//Wait for variable broadcasts
+				sleep 1;
+				[_unit, _num] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
 			};
-		}
-	];
+		};
+	}];
 };

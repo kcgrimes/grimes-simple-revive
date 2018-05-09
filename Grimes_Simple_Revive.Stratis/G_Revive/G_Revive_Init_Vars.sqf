@@ -178,6 +178,11 @@ if (G_Revive_System) then {
 	[] call compile preprocessFileLineNumbers "G_Revive\G_fnc_EH_defs.sqf";
 };
 
+//Define onKilled script
+G_fnc_onKilled = compile preprocessFileLineNumbers "G_Revive\G_Killed.sqf";
+//Define onRespawn script
+G_fnc_onRespawn = compile preprocessFileLineNumbers "G_Revive\G_Respawn.sqf";
+
 //Create function that will:
 	//Create public object variables as enabled,
 	//add EHs for revive system if enabled, 

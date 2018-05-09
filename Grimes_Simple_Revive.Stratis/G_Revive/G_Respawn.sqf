@@ -8,19 +8,21 @@ if (isPlayer _unit) then {
 	setPlayerRespawnTime G_Respawn_Time;
 };
 
-[_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
+//Reset Revive system actions and variables
+if (G_Revive_System) then {
+	[_unit] remoteExec ["G_fnc_Revive_Actions", 0, true];
+	_unit call G_fnc_Revive_resetVariables;
+	_unit setCaptive false;
+	_unit enableAI "MOVE";
+	_unit enableAI "FSM";
+	_unit allowDamage true;
+};
 
-//Set system variables
-_unit call G_fnc_Revive_resetVariables;
-_unit setVariable ["G_Downs", 0, true];
-_unit setCaptive false;
+//Reset multi-system variables
 _unit setVariable ["G_Side", side _unit, true];
 _unit setVariable ["G_isRenegade", false, true];
-_unit enableAI "MOVE";
-_unit enableAI "FSM";
-_unit allowDamage true;
 
-//Handle squad leader spawn
+//Handle squad leader spawn if enabled
 if (G_Squad_Leader_Spawn) then {
 	//Execute in parallel because of having to wait on parallel script
 	[_unit] spawn {

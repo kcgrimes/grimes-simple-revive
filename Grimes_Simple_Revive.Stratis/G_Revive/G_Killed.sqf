@@ -5,7 +5,6 @@ private ["_unit", "_respawnType"];
 _unit = _this select 0;
 _respawnType = getNumber(missionConfigFile >> "respawn");
 
-//Handle respawn times
 //bug - No respawn timer for AI? Intended?
 //Ensure at least a 3 second respawn time to allow for code execution
 if (isPlayer _unit) then {

@@ -1,4 +1,4 @@
-//Universal definitions for EHs and more
+//Revive system's definitions for EHs and more
 //Local to executor
 
 //Define revive-related variables based on data type
@@ -17,6 +17,7 @@ G_fnc_Revive_resetVariables = {
 	} forEach G_Revive_objVars;
 	//rescueRole - 0: none, 1: reviver, 2: guard
 	_unit setVariable ["G_AI_rescueRole", [0, objNull], true];
+	_unit setVariable ["G_Downs", 0, true];
 };
 
 //Define function for entering Incapacitated-state script
@@ -25,12 +26,9 @@ G_fnc_enterIncapacitatedState = compile preprocessFileLineNumbers "G_Revive\G_Un
 G_fnc_exitIncapacitatedState = {
 	_this setVariable ["G_Incapacitated", false, true];
 };
+
 //Define onKill script
 G_fnc_onKill = compile preprocessFileLineNumbers "G_Revive\G_Killer.sqf";
-//Define onKilled script
-G_fnc_onKilled = compile preprocessFileLineNumbers "G_Revive\G_Killed.sqf";
-//Define onRespawn script
-G_fnc_onRespawn = compile preprocessFileLineNumbers "G_Revive\G_Respawn.sqf";
 
 //Define revive-related actions
 G_fnc_actionRevive = compile preprocessFileLineNumbers "G_Revive\G_Revive_Action.sqf";
