@@ -198,7 +198,6 @@ G_fnc_onRespawn = compile preprocessFileLineNumbers "G_Revive\G_Respawn.sqf";
 	//Create public object variables as enabled,
 	//add EHs for revive system if enabled, 
 	//add Fixed Spawn EH to AI if enabled,
-	//add respawn EH for Unit Tags if enabled
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
 //Execute G_fnc_EH on all players and AI by side as enabled
@@ -214,7 +213,7 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 			[_x] spawn G_fnc_EH;
 		};
 	};
-} forEach allUnits;
+} forEach (allUnits + allDead);
 
 //Handle loading game as JIP into an incapacitated unit
 if (G_Revive_System && G_isJIP) then {
