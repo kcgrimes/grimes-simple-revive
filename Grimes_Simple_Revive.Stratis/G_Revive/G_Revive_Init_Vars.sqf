@@ -51,6 +51,17 @@ if ((typeName G_AI_Fixed_Spawn_WEST != "STRING") || (typeName G_AI_Fixed_Spawn_E
 
 //Mobile Respawn Vehicle
 if ((typeName G_Mobile_Respawn_WEST != "ARRAY") || (typeName G_Mobile_Respawn_EAST != "ARRAY") || (typeName G_Mobile_Respawn_IND != "ARRAY") || (typeName G_Mobile_Respawn_CIV != "ARRAY")) then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be an array of vehicle names. If not in use, still have empty array ([])."};
+{
+	{
+		if (isNil {_x}) then {
+			_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be array containing only variable names of MRVs!"
+		}
+		else
+		{
+			if (typeName _x != "OBJECT") then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be array containing only variable names of MRVs!"};
+		};
+	} forEach _x;
+} forEach [G_Mobile_Respawn_WEST, G_Mobile_Respawn_EAST, G_Mobile_Respawn_IND, G_Mobile_Respawn_CIV];
 if (typeName G_Mobile_Respawn_Locked != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Locked must be true/false!"};
 if (typeName G_Mobile_Respawn_Movable != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Movable must be true/false!"};
 if ((typeName G_Mobile_Respawn_Wreck != "SCALAR") || (G_Mobile_Respawn_Wreck < 0)) then {_validationFailed pushBack "G_Mobile_Respawn_Wreck must be a number greater than or equal to 0!"};
