@@ -52,7 +52,7 @@ G_fnc_Revive_Actions = {
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
 	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 1.5, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(nearestObjects [_target, %1, 7]) != 0))", G_Revive_Load_Types]];
+	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 1.5, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 };
 
@@ -235,32 +235,29 @@ G_fnc_moveInCargoToUnloadAction = {
 G_fnc_menWithinRadius = {
 	params ["_centerObj", "_radius"];
 	private ["_arrayAll", "_arrayReturn"];
-	//Get array of all men and appropriate vehicles within defined radius of center object
-	_arrayAll = nearestObjects [_centerObj, ["Man", "Car", "Tank", "Helicopter", "Plane", "Ship"], _radius];
+	//Get array of all alive men and appropriate vehicles within defined radius of center object
+	_arrayAll = _centerObj nearEntities [["Man", "Car", "Tank", "Helicopter", "Plane", "Ship"], _radius];
 	//Cycle through all objects and find the men to add to array of men to be returned
 	_arrayReturn = [];
 	{
 		//_x is object
-		//Make sure object is alive
-		if (alive _x) then {
-			//Determine how to handle alive object
-			if (_x isKindOf "Man") then {
-				//Object is man, add to array
-				_arrayReturn pushBack _x;
-			}
-			else
+		//Determine how to handle alive object
+		if (_x isKindOf "Man") then {
+			//Object is man, add to array
+			_arrayReturn pushBack _x;
+		}
+		else
+		{
+			//Object is vehicle
+			//Cycle through crew to pick out man
 			{
-				//Object is vehicle
-				//Cycle through crew to pick out man
-				{
-					//_x is crew member
-					//Make sure crew member is alive
-					if (alive _x) then {
-						//Crew member is alive, add to array
-						_arrayReturn pushBack _x;
-					};
-				} forEach crew _x;
-			};
+				//_x is crew member
+				//Make sure crew member is alive
+				if (alive _x) then {
+					//Crew member is alive, add to array
+					_arrayReturn pushBack _x;
+				};
+			} forEach crew _x;
 		};
 	} forEach _arrayAll;
 	_arrayReturn;

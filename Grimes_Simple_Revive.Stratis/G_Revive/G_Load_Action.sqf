@@ -6,7 +6,7 @@ _unit = _this select 0;
 _rescuer = _this select 1;
 
 //Select nearest vehicle, with 1m increased range from Action condition in case of movement during processing
-_vehicle = (nearestObjects [_unit, G_Revive_Load_Types, 8]) select 0;
+_vehicle = _unit nearEntities [G_Revive_Load_Types, 8] select 0;
 
 //If MRVs are locked, prevent loading into enemy MRV
 private ["_breakOut"];
