@@ -1,156 +1,132 @@
 //Controls 3D Unit Tags
-//Format tag text for player
-if (G_isClient) then {
-	//If tags are to show distance, include it in formatted text
-	if (G_Unit_Tag_ShowDistance) then {
-		G_Unit_Tag_Text = "format['%1 (%2m)', name _unit, ceil(_unit distance player)]";
-	}
-	else
-	{
-		G_Unit_Tag_Text = "name _unit";
-	};
+//Format tag text for player based on distance display setting
+if (G_Unit_Tag_ShowDistance) then {
+	//Include distance calculation
+	G_Unit_Tag_Text = "format['%1 (%2m)', name _x, ceil(_x distance player)]";
+}
+else
+{
+	//Don't include distance
+	G_Unit_Tag_Text = "name _x";
 };
 
-//Create central control on server
-if (G_isServer) then {
-	private ["_hp", "_var"];
-	//Create helipad to be game logic
-	_hp = "Land_HelipadEmpty_F" createVehicle [0,0,0];
-	_hp setVehicleVarName "G_Unit_Tags_Logic";
-	//Make game logic object public
-	//bug - why format it this way?
-	_hp call compile format ["%1 = _this; publicVariable ""%1""", "G_Unit_Tags_Logic"];
-	//Start player list as game logic object variable, but don't broadcast yet
-	//bug - use of "player" is misleading; this list includes AI, as intended
-	G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", [], false];
-	//Start tag number counter, to become public variable
-	G_Unit_Tag_Num_List = 0;
-	//Add all units to player list
-	{
-		//bug - is this check necessary?
-		if (_x isKindOf "Man") then {
-			//Assign Tag Number to unit and broadcast
-			_x setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
-			//Add unit and tag number to player list
-			(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, _x];
-			//+1 to tag number counter
-			G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
-		};
-	} forEach allUnits;
-	//Obtain complete local player list
-	_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
-	//Broadcast player list
-	G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
-	//Wait for broadcast
-	//bug - is this necessary?
-	sleep 1;
-	//Broadcast tag number counter
-	publicVariable "G_Unit_Tag_Num_List";
-};
+//By overall default, show key as pressed
+G_Unit_Tags_Key_Pressed = true;
 
-//Handle Unit Tags on client
-if (G_isClient) then {
-	//Wait for server to make Unit Tag variables public
-	waitUntil {sleep 0.1; !isNil "G_Unit_Tag_Num_List"};
-	waitUntil {sleep 0.1; !isNull G_Unit_Tags_Logic};
-	
-	//bug - able to slow the waitUntil in here?
-	G_fnc_Unit_Tag_Exec = {
-		private ["_unit", "_a", "_ehID"];
-		_unit = _this select 0;
-		//bug - and _a is...?
-		_a = _this select 1;
-		//Do not display own tag
-		if (_unit == player) exitWith {};
-		
-		//bug - consider formatting differently to allow for syntax highlighting/easier reading
-		call compile format ["G_Unit_Tag_%1 = false;", _a];
-		_ehID = addMissionEventHandler["Draw3D", format["
-			private ['_unit', '_color', '_height', '_alpha','_distp','_isIncapacitated','_exists'];
-			_unit = (G_Unit_Tags_Logic getVariable 'G_Revive_Player_List') select %1;
-			if ((name _unit) == 'Error: No Unit') then {
-				call compile format ['G_Unit_Tag_%1 = true', %1];
-			};
-			_distp = _unit distance player;
-			if ((_distp <= G_Unit_Tag_Distance) and ([player getVariable 'G_Side', _unit getVariable 'G_Side'] call BIS_fnc_sideIsFriendly) and !(player getVariable 'G_isRenegade') and !(_unit getVariable 'G_isRenegade')) then {
-				if ((G_Unit_Tag_Display == 1) and !(cursorTarget == _unit)) exitWith {};
-				_alpha = (-0.02*(_distp))+(0.025*(G_Unit_Tag_Distance));
-				_isIncapacitated = false;
-				_exists = false;
-				if (!isNil {_unit getVariable 'G_Incapacitated'}) then {
-					_isIncapacitated = _unit getVariable 'G_Incapacitated';
-					_exists = true;
-				};
-				if (((_isIncapacitated or (!_exists)) or (!alive _unit)) and (G_Revive_System)) then {
-					_color = [1,0,0,_alpha];
-				} else {
-					if (_unit in units player) then {
-						_color = +G_Unit_Tag_SquadColor;
-					}
-					else
-					{
-						_color = +G_Unit_Tag_Color;
+//Create function to execute Unit Tag mission EH
+G_fnc_Unit_Tag_Exec = {
+	//Create EH that Draws name for appropriate units each frame
+	addMissionEventHandler ["Draw3D", {
+		private ["_playerSide", "_unitArray", "_color", "_height", "_alpha", "_unitDistance", "_isIncapacitated"];
+		//If key press is not active when enabled, exit
+		if (!G_Unit_Tags_Key_Pressed) exitWith {};
+		//If player is Renegade, no teammates, so no tags
+		if (player getVariable "G_isRenegade") exitWith {};
+		//Get player's permanent side
+		_playerSide = player getVariable "G_Side";
+		//Create blank array for units to be drawn
+		_unitArray = [];
+		//Select units based on Display setting
+		if (G_Unit_Tag_Display != 1) then {
+			//0 (keydown) or 2 (constant)
+			{
+				//If option is not self and is friendly and not renegade, Draw
+				if (_x != player) then {
+					if (!isNil {_x getVariable "G_Side"}) then {
+						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(_x getVariable "G_isRenegade")) then {
+							_unitArray pushBack _x;
+						};
 					};
-					_color pushBack _alpha;
 				};
-				_height = 0.0053*(_distp)+2;
-				drawIcon3D ['', _color, [(visiblePosition _unit) select 0, (visiblePosition _unit) select 1, ((visiblePosition _unit) select 2) + _height], 0, 0, 0, call compile G_Unit_Tag_Text, 0, 0.03, 'EtelkaMonospacePro'];
+			} forEach (allUnits + allDead);
+		}
+		else
+		{
+			//Based on cursorTarget
+			//If cursorTarget is a friendly unit that is not renegade, Draw
+			if (cursorTarget isKindOf "Man") then {
+				if (!isNil {cursorTarget getVariable "G_Side"}) then {
+					if (([_playerSide, cursorTarget getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(cursorTarget getVariable "G_isRenegade")) then {
+						_unitArray pushBack cursorTarget;
+					};
+				};
 			};
-		",_a, _unit]];
-		call compile format["
-			G_Unit_Tag_%1 = false;
-			_unit = (G_Unit_Tags_Logic getVariable 'G_Revive_Player_List') select %1;
-			waitUntil {G_Unit_Tag_%1};
-			removeMissionEventHandler ['Draw3D', %2];
-		",_a, _ehID];
-	};
-	
-	//Handle display of Unit Tags depending on setting
-	switch (G_Unit_Tag_Display) do {
-		case 0: {
-			//By key press
-			//By default, key is not pressed
-			G_Unit_Tags_Key_Pressed = false;
-			//Common display EH fix
-			waitUntil {sleep 0.1; !isNull (findDisplay 46)};
-			//Add keydown EH for certain keydown to result in true
-			(findDisplay 46) displayAddEventHandler ["KeyDown","if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};"]; 
+		};
+		
+		//Cycle through potential units
+		{
+			//Get distance to unit
+			_unitDistance = _x distance player;
+			//Only draw if close enough
+			if (_unitDistance > G_Unit_Tag_Distance) exitWith {};
+			//Set alpha based on distance
+			_alpha = (-0.02*(_unitDistance))+(0.025*(G_Unit_Tag_Distance));
+			//Check if incapacitated
+			_isIncapacitated = false;
+			if (!isNil {_x getVariable "G_Incapacitated"}) then {
+				_isIncapacitated = _x getVariable "G_Incapacitated";
+			};
+			
+			//Color based on status
+			if (((_isIncapacitated) || (!alive _x)) && (G_Revive_System)) then {
+				//Color red if incapacitated or dead
+				//bug - make this a setting?
+				_color = [1,0,0,_alpha];
+			} 
+			else 
+			{
+				if (_x in units player) then {
+					//Squad member
+					_color = +G_Unit_Tag_SquadColor;
+				}
+				else
+				{
+					//Not squad member
+					_color = +G_Unit_Tag_Color;
+				};
+				//Add alpha to end of color array to complete it
+				_color pushBack _alpha;
+			};
+			//Set height based on distance
+			_height = 0.0053*(_unitDistance)+2;
+			//Draw the name as defined
+			drawIcon3D ["", _color, [(visiblePosition _x) select 0, (visiblePosition _x) select 1, ((visiblePosition _x) select 2) + _height], 0, 0, 0, call compile G_Unit_Tag_Text, 0, 0.03, "EtelkaMonospacePro"];
+		} forEach _unitArray;
+	}];
+};
+
+//Handle display of Unit Tags depending on setting
+switch (G_Unit_Tag_Display) do {
+	case 0: {
+		//By key press
+		//By default, key is not pressed
+		G_Unit_Tags_Key_Pressed = false;
+		//Common display EH fix
+		waitUntil {sleep 0.1; !isNull (findDisplay 46)};
+		//Add keydown EH for certain keydown to result in true
+		(findDisplay 46) displayAddEventHandler ["KeyDown","if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};"]; 
+		//Handle keydown global variable in parallel
+		[] spawn {
 			while {true} do {
 				//Wait for keydown
 				waitUntil {sleep 0.1; G_Unit_Tags_Key_Pressed};
-				//Reset keydown variable
-				G_Unit_Tags_Key_Pressed = false;
-				//Execute Unit Tag handling for each unit
-				{
-					if (_x isKindOf "Man") then {
-						[_x, (_x getVariable "G_Unit_Tag_Number")] spawn G_fnc_Unit_Tag_Exec;
-					};
-				} forEach allUnits;
 				//Wait for display time
 				sleep G_Unit_Tag_Display_Time;
-				//Remove all Draw3D EH's
-				removeAllMissionEventHandlers "Draw3D";
+				//Reset keydown variable
+				G_Unit_Tags_Key_Pressed = false;
 			};
 		};
+		//Execute Unit Tag by key press
+		[] spawn G_fnc_Unit_Tag_Exec;
+	};
 
-		case 1: {
-			//Cursor over unit to display
-			{
-				//Execute Unit Tag handling for each unit
-				if (_x isKindOf "Man") then {
-					[_x, (_x getVariable "G_Unit_Tag_Number")] spawn G_fnc_Unit_Tag_Exec;
-				};
-			} forEach allUnits;
-		};
-		
-		case 2: {
-			//Always visible
-			{
-				//Execute Unit Tag handling for each unit
-				if (_x isKindOf "Man") then {
-					[_x, (_x getVariable "G_Unit_Tag_Number")] spawn G_fnc_Unit_Tag_Exec;
-				};
-			} forEach allUnits;
-		};
+	case 1: {
+		//Cursor over unit to display
+		[] spawn G_fnc_Unit_Tag_Exec;
+	};
+	
+	case 2: {
+		//Always visible
+		[] spawn G_fnc_Unit_Tag_Exec;
 	};
 };

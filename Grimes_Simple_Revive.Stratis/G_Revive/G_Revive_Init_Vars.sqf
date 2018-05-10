@@ -223,78 +223,9 @@ if (((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) && (G_isClient)) then {
 	[player] execVM "G_Revive\G_Squad_Leader_Spawn.sqf";
 };
 
-//If Unit_Tags are enabled, execute associated script depending on new vs. JIP status
-if (G_Unit_Tag) then {
-	private ["_var", "_handle"];
-	//If JIP need to resume, if initial need to start (for client and server)
-	if (G_isJIP) then {
-		//Is JIP
-		//Assign Tag Number to unit and broadcast
-		player setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
-		//Add unit and tag number to player list
-		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, player];
-		//Obtain complete local player list
-		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
-		//Broadcast player list
-		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
-		//Add one to tag number list
-		//bug - what if this JIP is a replacement? Is this appropriate?
-		G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
-		publicVariable "G_Unit_Tag_Num_List";
-		//Wait for variable broadcasts
-		sleep 1;
-		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
-		if (G_Unit_Tag_Display != 0) then {
-			//Wait for Unit Tags to process
-			waitUntil {sleep 0.1; scriptDone _handle};
-			[player, (player getVariable "G_Unit_Tag_Number")] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
-		};
-	}
-	else
-	{
-		//Fresh start for client and server
-		_handle = [] execVM "G_Revive\G_Unit_Tags.sqf";
-		if (G_Unit_Tag_Display != 0) then {
-			//Wait for Unit Tags to process
-			waitUntil {sleep 0.1; scriptDone _handle};
-		};
-	};
-};
-
-//Create server-side function for easier init of enabled systems on AI created post-init
-G_fnc_initNewAI = {
-	//Local to server
-	if (!G_isServer) exitWith {};
-	private ["_arrayNewAI"];
-	_arrayNewAI = _this;
-	//Init Revive if enabled
-	if (G_Revive_System) then {
-		{
-			[_x] remoteExec ["G_fnc_EH", 0, true];
-		} forEach _arrayNewAI;
-	};
-	//Add to Unit Tags list if enabled, treating like a JIP of multiple units
-	if (G_Unit_Tag) then {
-		private ["_var"];
-		{
-			//Assign Tag Number to unit and broadcast
-			_x setVariable ["G_Unit_Tag_Number", G_Unit_Tag_Num_List, true];
-			//Add unit and tag number to player list
-			(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [G_Unit_Tag_Num_List, _x];
-			//Add one to tag number list
-			//bug - what if this JIP is a replacement? Is this appropriate?
-			G_Unit_Tag_Num_List = G_Unit_Tag_Num_List + 1; 
-		} forEach _arrayNewAI;
-		//Obtain complete local player list
-		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
-		//Broadcast player list
-		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
-		//Wait for broadcast
-		//bug - is this necessary?
-		sleep 1;
-		//Broadcast tag number counter
-		publicVariable "G_Unit_Tag_Num_List";
-	};
+//If Unit_Tags are enabled, execute associated script for player
+if (G_Unit_Tag && G_isClient) then {
+	[] execVM "G_Revive\G_Unit_Tags.sqf";
 };
 
 //If player's respawn button is disabled by script, execute loop that prevents use of it

@@ -196,35 +196,3 @@ if (G_AI_Fixed_Spawn) then {
 		}];
 	};
 };
-
-//Add Respawn EH to all units to handle Unit Tags on respawn, if enabled
-if (G_Unit_Tag) then {
-	_unit addEventHandler ["Respawn", {
-		//Local to _unit
-		private ["_unit", "_old", "_num", "_var"];
-		_unit = _this select 0;
-		_old = _this select 1;
-		//Obtain unit tag number from old object
-		_num = _old getVariable "G_Unit_Tag_Number";
-		//Add unit tag number to new object and broadcast
-		_unit setVariable ["G_Unit_Tag_Number", _num, true];
-		//Add unit and tag number to player list
-		(G_Unit_Tags_Logic getVariable "G_Revive_Player_List") set [_num, _unit];
-		//Obtain complete local player list
-		_var = G_Unit_Tags_Logic getVariable "G_Revive_Player_List";
-		//Broadcast player list
-		G_Unit_Tags_Logic setVariable ["G_Revive_Player_List", _var, true];
-		//Handle display of Unit Tags depending on setting
-		if (G_Unit_Tag_Display != 0) then {
-			//bug - is this spawn necessary? 
-			[_unit, _num] spawn {
-				private ["_unit", "_num"];
-				_unit = _this select 0;
-				_num = _this select 1;
-				//Wait for variable broadcasts
-				sleep 1;
-				[_unit, _num] remoteExec ["G_fnc_Unit_Tag_Exec", 0, true];
-			};
-		};
-	}];
-};

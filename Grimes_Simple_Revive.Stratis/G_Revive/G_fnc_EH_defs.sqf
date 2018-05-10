@@ -56,6 +56,20 @@ G_fnc_Revive_Actions = {
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 };
 
+//Create server-side function for easier init of enabled systems on AI created post-init
+G_fnc_initNewAI = {
+	//Local to server
+	if (!G_isServer) exitWith {};
+	private ["_arrayNewAI"];
+	_arrayNewAI = _this;
+	//Init Revive if enabled
+	if (G_Revive_System) then {
+		{
+			[_x] remoteExec ["G_fnc_EH", 0, true];
+		} forEach _arrayNewAI;
+	};
+};
+
 //Define function to create revive-oriented AI behavior
 G_fnc_Revive_AI_Behavior = {
 	//_unit is local
