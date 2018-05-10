@@ -92,6 +92,11 @@ if ((count G_Unit_Tag_SquadColor) != 3) then {_validationFailed pushBack "G_Unit
 //Custom Executions
 if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING") || (typeName G_Custom_Exec_5 != "STRING")) then {_validationFailed pushBack "G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
+//Handle BIS Revive (only on client)
+if (!isDedicated) then {
+	if ([player] call BIS_fnc_reviveEnabled) then {_validationFailed pushBack "BIS Revive must be disabled!"};
+};
+
 //If error messages exist, format and execute a message for each one and exit
 	//Done on all machines to prevent anyone from loading script
 if ((count _validationFailed) > 0) exitWith {
