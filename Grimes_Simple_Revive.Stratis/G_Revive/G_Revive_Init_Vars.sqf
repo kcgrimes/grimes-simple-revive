@@ -218,7 +218,7 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 			[_x] spawn G_fnc_EH;
 		};
 	};
-} forEach (allUnits + allDead);
+} forEach (allUnits + allDeadMen);
 
 //Handle loading game as JIP into an incapacitated unit
 if (G_Revive_System && G_isJIP) then {
