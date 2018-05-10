@@ -38,7 +38,7 @@ G_fnc_Unit_Tag_Exec = {
 						};
 					};
 				};
-			} forEach (allUnits + allDead);
+			} forEach (allUnits + allDeadMen);
 		}
 		else
 		{
