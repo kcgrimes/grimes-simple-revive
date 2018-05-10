@@ -62,12 +62,10 @@ G_fnc_initNewAI = {
 	if (!G_isServer) exitWith {};
 	private ["_arrayNewAI"];
 	_arrayNewAI = _this;
-	//Init Revive if enabled
-	if (G_Revive_System) then {
-		{
-			[_x] remoteExec ["G_fnc_EH", 0, true];
-		} forEach _arrayNewAI;
-	};
+	//Init systems
+	{
+		[_x] remoteExec ["G_fnc_EH", 0, true];
+	} forEach _arrayNewAI;
 };
 
 //Define function to create revive-oriented AI behavior
