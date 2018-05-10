@@ -13,6 +13,7 @@ Highlights:
 * AI will operate in a guard-rescuer pair to realistically navigate to and revive teammates (even when vehicles are involved)
 	* AI inclusion is by side and requires no extra work, and individual exclusions from the script can be made by name
 * Integrate with your respawn settings: works with all respawn types, including the highly recommended Respawn Menu for respawn point selection
+	* The BIS Revive Mode must be Disabled
 * Available Mobile Respawn Vehicle (MRV) and Squad Leader Respawn systems which include optional markers
 * Utilization of BI functions and dialogs wherever possible to be as stock and fast as possible
 * Available immersive options such as black screen and muting ACRE2/TFAR while incapacitated
