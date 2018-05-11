@@ -173,10 +173,13 @@ G_fnc_Revive_AI_Behavior = {
 			_unit enableAI "SUPPRESSION";
 			_unit enableAI "AUTOCOMBAT";
 			_unit setBehaviour "AWARE";
-			//Allow time for commands to settle
-			sleep 1;
-			//Regroup to squad leader
-			_unit doFollow (leader _unit);
+			//Wait for commands to catch up or else regroup won't execute
+			sleep 2;
+			//Make sure unit is still unassigned
+			if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
+				//Regroup to squad leader
+				_unit doFollow (leader _unit);
+			};
 		};
 	};
 };
