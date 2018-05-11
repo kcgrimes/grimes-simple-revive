@@ -175,8 +175,14 @@ G_fnc_Revive_AI_Behavior = {
 			_unit setBehaviour "AWARE";
 			//Wait for commands to catch up or else regroup won't execute
 			sleep 2;
-			//Make sure unit is still unassigned
-			if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
+			//Make sure unit is still unassigned before regrouping if not a leader
+			if ((((_unit getVariable "G_AI_rescueRole") select 0) == 0) && ((leader _unit) != _unit)) then {
+				//Leave then rejoin group to "reset", which doFollow does not accomplish if in "Stop"
+				private _oldGrp = group _unit;
+				[_unit] joinSilent grpNull;
+				[_unit] joinSilent _oldGrp;
+				//Allow time to catch up
+				sleep 0.1;
 				//Regroup to squad leader
 				_unit doFollow (leader _unit);
 			};
