@@ -8,6 +8,7 @@ Highlights:
 * Minimal setup required; quick and easy installation
 * Integrated parameter validation system to ensure the script is being utilized effectively
 * Revive your teammates, whether they are players or AI, including in water
+* Secure incapacitated enemies to take them out of the fight
 * Drag & Carry players and AI, whether they are your teammates or not
 * Load incapacitated teammates into vehicles, and Unload them at your destination
 * AI will operate in a guard-rescuer pair to realistically navigate to and revive teammates (even when vehicles are involved)
