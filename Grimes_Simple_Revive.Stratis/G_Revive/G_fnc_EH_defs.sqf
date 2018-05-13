@@ -93,6 +93,7 @@ G_fnc_Revive_AI_Behavior = {
 		//Execute appropriate behavior up to and including completing revive or guard function
 		_rescueRoleArray = _unit getVariable "G_AI_rescueRole";
 		_victim = (_unit getVariable "G_AI_rescueRole") select 1;
+		private _rescuerVehicle = vehicle _unit;
 		//Allow AI to move more freely to victim, but still detect and engage enemies
 		_unit setBehaviour "SAFE";
 		_unit disableAI "TARGET";
@@ -113,12 +114,15 @@ G_fnc_Revive_AI_Behavior = {
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
 				//Handle reviver in vehicle
-				if ((vehicle _unit != _unit) && ((_unit distance _victim) < 30) && ((speed _unit) < 1)) then {
-					//Reviver vehicle is stopped near victim, so disembark
-					//Order unit to be out of vehicle
-					unassignVehicle _unit;
-					//Manually remove unit from vehicle
-					moveOut _unit;
+				if ((vehicle _unit) != _unit) then {
+					_rescuerVehicle = vehicle _unit;
+					if (((_unit distance _victim) < 30) && ((speed _unit) < 1)) then {
+						//Reviver vehicle is stopped near victim, so disembark
+						//Order unit to be out of vehicle
+						unassignVehicle _unit;
+						//Manually remove unit from vehicle
+						moveOut _unit;
+					};
 				};
 				//Handle victim in vehicle
 				if ((vehicle _victim != _victim) && ((_unit distance _victim) < 6)) then {
@@ -155,12 +159,15 @@ G_fnc_Revive_AI_Behavior = {
 				//Have stopped AI move to victim
 				_unit moveTo (getPos _victim);
 				//Handle guard in vehicle
-				if ((vehicle _unit != _unit) && ((_unit distance _victim) < 30) && ((speed _unit) < 1) && ((gunner vehicle _unit) != _unit)) then {
-					//Guard vehicle is stopped near victim and guard is not gunner, so disembark
-					//Order unit to be out of vehicle
-					unassignVehicle _unit;
-					//Manually remove unit from vehicle
-					moveOut _unit;
+				if ((vehicle _unit) != _unit) then {
+					_rescuerVehicle = vehicle _unit;
+					if (((_unit distance _victim) < 30) && ((speed _unit) < 1) && ((gunner vehicle _unit) != _unit)) then {
+						//Guard vehicle is stopped near victim and guard is not gunner, so disembark
+						//Order unit to be out of vehicle
+						unassignVehicle _unit;
+						//Manually remove unit from vehicle
+						moveOut _unit;
+					};
 				};
 				//If in range, start guarding
 				if (_unit distance _victim < 10) then {
@@ -190,13 +197,51 @@ G_fnc_Revive_AI_Behavior = {
 			_unit setBehaviour "AWARE";
 			//Make sure unit is still unassigned before regrouping if not a leader
 			if ((leader _unit) != _unit) then {
-				//Leave then rejoin group to "reset", which doFollow does not accomplish if in "Stop"
+				//Leave then rejoin group to "reset", which doFollow does not accomplish if in player-commanded "Stop"
 				private _oldGrp = group _unit;
 				[_unit] joinSilent grpNull;
 				[_unit] joinSilent _oldGrp;
 				//Allow time to catch up
 				sleep 0.1;
-				//Regroup to squad leader
+			};
+			//Handle getting back into previous vehicle if applicable or if not already in it
+			if (_rescuerVehicle != vehicle _unit) then {
+				//If rescuer is up and their vehicle is alive and nearby, try to get back in
+				if (!(_unit getVariable "G_Incapacitated") && (alive _unit) && (alive _rescuerVehicle) && ((_rescuerVehicle distance _unit) < 40)) then {
+					//Have regrouped AI move to vehicle
+					_unit doMove (getPos _rescuerVehicle);
+					//Have stopped AI move to vehicle
+					_unit moveTo (getPos _rescuerVehicle);
+					//Wait for unit to be close, the vehicle to be dead, or time to run out
+					private _toVehTimer = time;
+					waitUntil {sleep 1; (((_rescuerVehicle distance _unit) < 8) || (!alive _rescuerVehicle) || ((time - _toVehTimer) > 30))};
+					//Check if able to enter vehicle
+					if (((_rescuerVehicle distance _unit) < 8) && (alive _rescuerVehicle)) then {
+						//Attempt to enter as Driver
+						if ((_rescuerVehicle emptyPositions "Driver") > 0) exitWith {
+							_unit assignAsDriver _rescuerVehicle;
+							_unit action ["getInDriver", _rescuerVehicle];
+						};
+						//Attempt to enter as Gunner
+						if ((_rescuerVehicle emptyPositions "Gunner") > 0) exitWith {
+							_unit assignAsGunner _rescuerVehicle;
+							_unit action ["getInGunner", _rescuerVehicle];
+						};
+						//Attempt to enter as Commander
+						if ((_rescuerVehicle emptyPositions "Commander") > 0) exitWith {
+							_unit assignAsCommander _rescuerVehicle;
+							_unit action ["getInCommander", _rescuerVehicle];
+						};
+						//Attempt to enter as Cargo
+						if ((_rescuerVehicle emptyPositions "Cargo") > 0) exitWith {
+							_unit assignAsCargo _rescuerVehicle;
+							_unit action ["getInCargo", _rescuerVehicle];
+						};
+					};
+				};
+			};
+			//Regroup to squad leader
+			if ((leader _unit) != _unit) then {
 				_unit doFollow (leader _unit);
 			};
 		};
