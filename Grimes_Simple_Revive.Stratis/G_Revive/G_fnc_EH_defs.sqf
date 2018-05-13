@@ -137,7 +137,7 @@ G_fnc_Revive_AI_Behavior = {
 				if ([_victim, _unit, 2] call G_fnc_Revive_Actions_Cond) then {
 					[_victim, _unit] spawn G_fnc_actionRevive;
 					//Wait for revive to end one way or another
-					waitUntil {((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
+					waitUntil {sleep 0.05; ((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
 				};
 				sleep 2;
 			};
@@ -172,12 +172,16 @@ G_fnc_Revive_AI_Behavior = {
 					//bug - this changes behavior of entire group, which could have adverse effects
 					_unit setBehaviour "AWARE";
 					//Stop loop to allow "patrol"
-					waitUntil {((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!(((_unit getVariable "G_AI_rescueRole") select 0) isEqualTo _rescueRoleArray)))};
+					waitUntil {sleep 0.1; ((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
 				};
 				sleep 2;
 			};
 		};
-		//Unassigned from role, so resume previous behavior
+		
+		//Wait for rescue role variable to adjust (could be up to 5 seconds based on rescuer selection script)
+		waitUntil {sleep 0.1; (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))};
+
+		//If no longer assigned a rescue role, resume previous behavior
 		if (((_unit getVariable "G_AI_rescueRole") select 0) == 0) then {
 			//Return to default behavior
 			_unit enableAI "TARGET";
