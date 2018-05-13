@@ -30,8 +30,8 @@ G_fnc_Unit_Tag_Exec = {
 		if (G_Unit_Tag_Display != 1) then {
 			//0 (keydown) or 2 (constant)
 			{
-				//If option is not self and is friendly and not renegade, Draw
-				if (_x != player) then {
+				//If option is not self, is not staying dead, and is friendly and not renegade, Draw
+				if ((_x != player) && ((lifeState _x) != "DEAD")) then {
 					if (!isNil {_x getVariable "G_Side"}) then {
 						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(_x getVariable "G_isRenegade")) then {
 							_unitArray pushBack _x;
