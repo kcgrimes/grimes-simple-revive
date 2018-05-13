@@ -207,15 +207,18 @@ G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
 //Execute G_fnc_EH on all players and AI by side as enabled
 {
-	if (isPlayer _x) then {
-		//Is a player
-		[_x] spawn G_fnc_EH;
-	}
-	else
-	{
-		//Is an AI
-		if ((side _x) in G_Revive_AI_Incapacitated) then {
+	if ((lifeState _x) != "DEAD") then {
+		//Is alive or dead but respawnable/switchable
+		if (isPlayer _x) then {
+			//Is a player
 			[_x] spawn G_fnc_EH;
+		}
+		else
+		{
+			//Is an AI
+			if ((side _x) in G_Revive_AI_Incapacitated) then {
+				[_x] spawn G_fnc_EH;
+			};
 		};
 	};
 } forEach (allUnits + allDeadMen);
