@@ -422,8 +422,8 @@ if (G_isClient && (difficultyOption "groupIndicators" != 0)) then {
 							if (group _x == _playerGroup) then {
 								_icon = "\A3\Ui_f\data\IGUI\Cfg\Revive\overlayIconsGroup\u100_ca.paa";
 							};
-							//Set alpha based on distance
-							private _alpha = (-1/25)*(_x distance player) + 7;
+							//Set alpha based on stock (175,0), (150,1) and y=mx+b
+							private _alpha = -0.04*(_x distance player) + 7;
 							//Eligible, so draw icon matching the stock version
 							drawIcon3D [_icon, [1,1,1,_alpha], visiblePosition _x, 1.4, 1.4, 0, "", 2];
 						};
