@@ -230,6 +230,11 @@ if (G_Revive_System && G_isJIP) then {
 	};
 };
 
+//Handle adding EH for drawing 3D Icons on incapacitated unit
+if (G_isClient && (difficultyOption "groupIndicators" != 0)) then {
+	[] spawn G_fnc_Incapacitated3DIcon;
+};
+
 //If MRVs are in use, execute MRV script
 if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_IND + G_Mobile_Respawn_CIV) > 0) then {
 	[] execVM "G_Revive\G_Mobile_Respawn.sqf";

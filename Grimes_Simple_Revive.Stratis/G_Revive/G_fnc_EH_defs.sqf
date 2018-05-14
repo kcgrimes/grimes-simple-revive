@@ -398,6 +398,40 @@ if (G_isClient) then {
 	};
 };
 
+//Define player-only function for 3D Icon EH for incapacitated units if enabled
+if (G_isClient && (difficultyOption "groupIndicators" != 0)) then {
+	G_fnc_Incapacitated3DIcon = {
+		//Create EH that Draws an icon on incapacitated units each frame
+		addMissionEventHandler ["Draw3D", {
+			//If player is Renegade, no teammates, so no need to draw
+			if (player getVariable "G_isRenegade") exitWith {};
+			//Get player's permanent side
+			private _playerSide = player getVariable "G_Side";
+			private _playerGroup = group player;
+			//Cycle through all living units
+			{
+				//Check if unit is using revive system and not self
+				if ((!isNil {_x getVariable "G_Side"}) && (_x != player)) then {
+					//Revive-enabled unit, so check if within group marker range
+					if ((_x distance player) < 175) then {
+						//Close enough, so check if unit is friendly and incapacitated
+						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(_x getVariable "G_isRenegade") && (_x getVariable "G_Incapacitated")) then {
+							//Default to circular icon
+							private _icon = "\A3\Ui_f\data\IGUI\Cfg\Revive\overlayIcons\u100_ca.paa";
+							//If in player's group, use hexagonal icon
+							if (group _x == _playerGroup) then {
+								_icon = "\A3\Ui_f\data\IGUI\Cfg\Revive\overlayIconsGroup\u100_ca.paa";
+							};
+							//Eligible, so draw icon matching the stock version
+							drawIcon3D [_icon, [1,1,1,1], visiblePosition _x, 1.4, 1.4, 0, "", 2];
+						};
+					};
+				};
+			} forEach allUnits;
+		}];
+	};
+};
+
 //Define player-only function for addon radio handling
 if (G_isClient) then {
 	//Determine if using TFAR or ACRE2
