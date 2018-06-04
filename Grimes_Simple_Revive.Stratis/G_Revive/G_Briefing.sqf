@@ -87,10 +87,22 @@ if (G_Squad_Leader_Marker) then {
 };
 
 if (G_Unit_Tag) then {
-	_dynamicHowTo pushBack "
-	<br/>* The Unit Tag System is enabled! You will either always see friendly unit tags, see them when you cursor over them, or see them after pressing a defined key (Default is Left Alt, but can be edited by mission maker).
+	private _unitTagHowTo = "";
+	switch (G_Unit_Tag_Display) do {
+		case 0: {
+			_unitTagHowTo = format["Unit Tags that are in range will be displayed after pressing %1.", call compile (keyName G_Unit_Tag_Display_Key)];
+		};
+		case 1: {
+			_unitTagHowTo = "Unit Tags will be displayed when cursor-targeting a unit that is in range.";
+		};
+		case 2: {
+			_unitTagHowTo = "Unit Tags will be displayed when in range.";
+		};
+	};
+	_dynamicHowTo pushBack format["
+	<br/>* The Unit Tag System is enabled! %1
 	<br/>
-	";
+	", _unitTagHowTo];
 };
 
 //Execute dynamic How To
