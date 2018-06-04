@@ -29,22 +29,75 @@ player createDiaryRecord ["G_Revive", ["Editor's Notes",
 	"
 ]];
 
-player createDiaryRecord ["G_Revive", ["How To Use", 
-	"
-	<br/><font size='18'>How To Use</font>
-	<br/>Below are some tips relating to the in-game utilization of Grimes Simple Revive. 
+//Prepare dynamic How To based on which systems are enabled and certain associated settings
+private _dynamicHowTo = [];
+if (G_Revive_System ) then {
+	private _incapEnabled = "Players";
+	if ((count G_Revive_AI_Incapacitated) > 0) then {
+		_incapEnabled = format["Players and %1 AI", G_Revive_AI_Incapacitated joinString ", "];
+	};
+	private _reviveClassReq = "Any class can revive Incapacitated teammates.";
+	if ((count G_Revive_Can_Revive) > 0) then {
+		private _reqClass = [];
+		{
+			_reqClass pushBack (getText (configFile >> "CfgVehicles" >> _x >> "displayName"));
+		} forEach G_Revive_Can_Revive;
+		systemChat str _reqClass;
+		_reviveClassReq = format["Only the %1 can revive Incapacitated teammates.", _reqClass joinString ", "];
+	};
+	private _reviveReq = "No First Aid Kits or Medikits are required in order to revive.";
+	if (G_Revive_Requirement > 0) then {
+		_reviveReq = format["A minimum of %1 First Aid Kit(s), or a single Medikit, are required in order to revive.", G_Revive_Requirement];
+	};
+	_dynamicHowTo pushBack format["
+	<br/>* Revive is enabled! %1 can be Incapacitated. To Revive an Incapacitated teammate, simply approach them and use the Revive action.
 	<br/>
-	<br/>* To Revive an Incapacitated teammate, simply approach them and use the Revive action.
+	<br/>* %2
+	<br/>
+	<br/>* %3
 	<br/>
 	<br/>* To Drag or Carry any Incapacitated unit (doesn't have to be a teammate!), simply approach them and use the Drag or Carry action. 
 	<br/>
 	<br/>* To Load an Incapacitated teammate into a vehicle, simply move them or the vehicle within range and use the Load action on the Incapacitated unit. 
 	<br/>
-	<br/>* AI will work in pairs to navigate towards Incapacitated teammates, guard them, and revive them, then returning to their group formation. 
+	<br/>* AI will work in pairs to navigate towards Incapacitated teammates to guard and revive them before returning to their group formation. 
 	<br/>
-	<br/>* If the Mobile Respawn Vehicle (MRV) system is being used, simply approach the team's MRV and use the Deploy/Undeploy actions to Deploy/Undeploy the vehicle. This allows for teammates to spawn on it.
+	", _incapEnabled, _reviveClassReq, _reviveReq];
+};
+
+if (count (G_Mobile_Respawn_WEST + G_Mobile_Respawn_EAST + G_Mobile_Respawn_IND + G_Mobile_Respawn_CIV) > 0) then {
+	_dynamicHowTo pushBack "
+	<br/>* The Mobile Respawn Vehicle (MRV) system is enabled! Simply approach the team's MRV and use the Deploy/Undeploy actions to Deploy/Undeploy the vehicle. This allows for teammates to spawn on it.
 	<br/>
-	<br/>* If the Unit Tag System is enabled, you will either always see friendly unit tags, see them when you cursor over them, or see them after pressing a defined key (Default is Left Alt, but can be edited by mission maker).
+	";
+};
+
+if (G_Squad_Leader_Spawn) then {
+	_dynamicHowTo pushBack "
+	<br/>* The Squad Leader Spawn system is enabled! If your squad leader is alive, you will be able to respawn on them.
 	<br/>
+	";
+};
+
+if (G_Squad_Leader_Marker) then {
+	_dynamicHowTo pushBack "
+	<br/>* The Squad Leader Marker system is enabled! A marker will be placed on the map and updated periodically with the location of your squad leader.
+	<br/>
+	";
+};
+
+if (G_Unit_Tag) then {
+	_dynamicHowTo pushBack "
+	<br/>* The Unit Tag System is enabled! You will either always see friendly unit tags, see them when you cursor over them, or see them after pressing a defined key (Default is Left Alt, but can be edited by mission maker).
+	<br/>
+	";
+};
+
+//Execute dynamic How To
+player createDiaryRecord ["G_Revive", ["How To Use", format[
 	"
+	<br/><font size='18'>How To Use</font>
+	<br/>
+	%1
+	", _dynamicHowTo joinString ""]
 ]];
