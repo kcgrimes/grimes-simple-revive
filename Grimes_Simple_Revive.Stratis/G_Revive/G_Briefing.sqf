@@ -42,7 +42,6 @@ if (G_Revive_System ) then {
 		{
 			_reqClass pushBack (getText (configFile >> "CfgVehicles" >> _x >> "displayName"));
 		} forEach G_Revive_Can_Revive;
-		systemChat str _reqClass;
 		_reviveClassReq = format["Only the %1 can revive Incapacitated teammates.", _reqClass joinString ", "];
 	};
 	private _reviveReq = "No First Aid Kits or Medikits are required in order to revive.";
