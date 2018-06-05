@@ -105,7 +105,7 @@ switch (G_Unit_Tag_Display) do {
 		//Common display EH fix
 		waitUntil {sleep 0.1; !isNull (findDisplay 46)};
 		//Add keydown EH for certain keydown to result in true
-		(findDisplay 46) displayAddEventHandler ["KeyDown","if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};"]; 
+		(findDisplay 46) displayAddEventHandler ["KeyDown", "if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};"]; 
 		//Handle keydown global variable in parallel
 		[] spawn {
 			while {true} do {
@@ -117,6 +117,8 @@ switch (G_Unit_Tag_Display) do {
 				G_Unit_Tags_Key_Pressed = false;
 			};
 		};
+		//Add Loaded MEH to re-add KeyDown handler after Load
+		addMissionEventHandler ["Loaded", "[] spawn {waitUntil {sleep 0.1; !isNull (findDisplay 46)}; (findDisplay 46) displayAddEventHandler [""KeyDown"", ""if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};""];};"];
 		//Execute Unit Tag by key press
 		[] spawn G_fnc_Unit_Tag_Exec;
 	};
