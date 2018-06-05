@@ -231,7 +231,7 @@ if (G_Revive_System && G_isJIP) then {
 };
 
 //Handle adding EH for drawing 3D Icons on incapacitated unit
-if (G_isClient && (difficultyOption "groupIndicators" != 0)) then {
+if ((G_Revive_System) && (G_isClient) && (difficultyOption "groupIndicators" != 0)) then {
 	[] spawn G_fnc_Incapacitated3DIcon;
 };
 
