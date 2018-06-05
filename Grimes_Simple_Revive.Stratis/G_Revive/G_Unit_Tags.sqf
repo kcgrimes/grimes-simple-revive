@@ -118,7 +118,12 @@ switch (G_Unit_Tag_Display) do {
 			};
 		};
 		//Add Loaded MEH to re-add KeyDown handler after Load
-		addMissionEventHandler ["Loaded", "[] spawn {waitUntil {sleep 0.1; !isNull (findDisplay 46)}; (findDisplay 46) displayAddEventHandler [""KeyDown"", ""if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};""];};"];
+		addMissionEventHandler ["Loaded", "
+			[] spawn {
+				waitUntil {sleep 0.1; !isNull (findDisplay 46)}; 
+				(findDisplay 46) displayAddEventHandler [""KeyDown"", ""if ((_this select 1) == G_Unit_Tag_Display_Key) then {G_Unit_Tags_Key_Pressed = true; false;};""];
+			};
+		"];
 		//Execute Unit Tag by key press
 		[] spawn G_fnc_Unit_Tag_Exec;
 	};
