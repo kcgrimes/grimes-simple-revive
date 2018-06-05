@@ -58,13 +58,13 @@ G_fnc_Revive_Actions_Cond = {
 G_fnc_Revive_Actions = {
 	private ["_unit", "_reviveActionID", "_secureActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
 	_unit = _this select 0;
-	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 11, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
+	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 11, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
-	_secureActionID = [_unit, format["<t color='%1'>Secure</t>", G_Revive_Action_Color], "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsEnemy))", "true", {}, {}, G_fnc_actionSecure, {}, [], 1.5, 11, true, false] call BIS_fnc_holdActionAdd;
-	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 10.9, true, true, "", format["(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
+	_secureActionID = [_unit, format["<t color='%1'>Secure</t>", G_Revive_Action_Color], "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsEnemy))", "true", {}, {}, G_fnc_actionSecure, {}, [], 1.5, 11, true, false] call BIS_fnc_holdActionAdd;
+	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 10.9, true, true, "", format["(([_target, _this, 5] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
-	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 10.8, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 10.8, true, true, "", "(([_target, _this, 1.75] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
+	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
+	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 };
 
 //Create server-side function for easier init of enabled systems on AI created post-init
@@ -138,7 +138,7 @@ G_fnc_Revive_AI_Behavior = {
 					_unit setPos (getPos _victim);
 				};
 				//If in range, perform revive action
-				if ([_victim, _unit, 2] call G_fnc_Revive_Actions_Cond) then {
+				if ([_victim, _unit, 2.45] call G_fnc_Revive_Actions_Cond) then {
 					[_victim, _unit] spawn G_fnc_actionRevive;
 					//Wait for revive to end one way or another
 					waitUntil {sleep 0.05; ((_unit getVariable "G_Incapacitated") || (!(_victim getVariable "G_Incapacitated")) || (!((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray)))};
