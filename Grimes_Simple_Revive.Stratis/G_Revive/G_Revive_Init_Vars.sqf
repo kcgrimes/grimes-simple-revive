@@ -211,6 +211,44 @@ if ((G_isJIP) && (isNil {player getVariable "G_Lives"})) then {
 	[player] remoteExec ["G_fnc_EH", -(clientOwner), false];
 };
 
+//Add Loaded MEH to check if, after loading a save, player is joining into previously unused/disabled unit
+	//Similar to other executions in this file, but comments and isClient check removed
+	//bug - this feels dirty, as opposed to just moving these executions into a single function or file
+//bug - difficultyOption "groupIndicators" returns 0 on Load, even if not 0 during initial play
+//bug - why does MRV spawn not need to be in here (for some reason it causes duplicates when included)?
+//bug - Squad Leader Spawn respawn point and marker track the previous unit's leader, so reexecuted, but old is not deleted
+addMissionEventHandler ["Loaded", "
+	[] spawn {
+		waitUntil {!isNull player};
+		if (isNil {player getVariable ""G_Lives""}) then {
+			[player] remoteExec [""G_fnc_EH"", 0, false];
+			
+			if ((G_Revive_System) && (difficultyOption ""groupIndicators"" != 0)) then {
+				[] spawn G_fnc_Incapacitated3DIcon;
+			};
+
+			if ((G_Squad_Leader_Spawn) || (G_Squad_Leader_Marker)) then {
+				[player] execVM ""G_Revive\G_Squad_Leader_Spawn.sqf"";
+			};
+
+			if (G_Unit_Tag) then {
+				[] execVM ""G_Revive\G_Unit_Tags.sqf"";
+			};
+
+			if (!(G_Respawn_Button)) then {
+				[] spawn {
+					private [""_respawnButtonEH""];
+					while {true} do {
+						waitUntil {sleep 0.1; !isNull (findDisplay 49)};
+						_respawnButtonEH = ((findDisplay 49) displayCtrl 1010) ctrlAddEventHandler [""MouseButtonDown"",{(findDisplay 49) closeDisplay 0; titleText [""The Respawn Button is disabled by the host!"",""PLAIN"",1]; titleFadeOut 5;}]; 
+						waitUntil {sleep 0.1; isNull (findDisplay 49)};
+					};
+				};  
+			};
+		};
+	};
+"];
+
 //Execute G_fnc_EH on all players, including self, and AI by side as enabled
 {
 	if ((lifeState _x) != "DEAD") then {
