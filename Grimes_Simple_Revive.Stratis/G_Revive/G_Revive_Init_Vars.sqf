@@ -205,7 +205,13 @@ G_fnc_onRespawn = compile preprocessFileLineNumbers "G_Revive\G_Respawn.sqf";
 	//add Fixed Spawn EH to AI if enabled,
 G_fnc_EH = compile preprocessFileLineNumbers "G_Revive\G_fnc_EH.sqf";
 
-//Execute G_fnc_EH on all players and AI by side as enabled
+//Check if player is joining into previously unused/disabled unit
+if ((G_isJIP) && (isNil {player getVariable "G_Lives"})) then {
+	//Unit has not received public variables/actions, so execute on all machines except player's own (which will happen next)
+	[player] remoteExec ["G_fnc_EH", -(clientOwner), false];
+};
+
+//Execute G_fnc_EH on all players, including self, and AI by side as enabled
 {
 	if ((lifeState _x) != "DEAD") then {
 		//Is alive or dead but respawnable/switchable

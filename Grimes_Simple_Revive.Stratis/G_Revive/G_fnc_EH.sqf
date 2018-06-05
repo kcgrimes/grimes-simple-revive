@@ -4,16 +4,6 @@
 private ["_unit"];
 _unit = _this select 0;
 
-//bug - why is this named specialJIP?
-private ["_specialJIP"];
-_specialJIP = false;
-if (G_isClient) then {
-	if (_unit == player) then {
-		//_unit is client/player executing
-		_specialJIP = true;
-	};
-};
-
 //Add onKilled/onRespawn EH's early in case of respawnOnStart
 //Add onKilled EH to unit to handle life count
 	//onKilled EH will not trigger for respawnOnStart if there is any sleep between here and init
@@ -26,8 +16,8 @@ _unit addEventHandler ["Respawn", {
 	[_this select 0] spawn G_fnc_onRespawn;;
 }];
 
-//If is server or client's own player, define system variables and broadcast them
-if (G_isServer || _specialJIP) then {
+//If unit is local (AI or own player), define system variables and broadcast them
+if (local _unit) then {
 	if (G_Revive_System) then {
 		//These variables are needed even if excluded, specifically for non-revive components like MRV
 		//Set init variables if not already done, maintaining variables for JIP
@@ -64,8 +54,8 @@ if (G_isServer || _specialJIP) then {
 	};
 };
 
-//System variables only being defined on server and client's own player,
-//so all other clients need to wait for definitions with or without revive enabled
+//System variables only being defined on AI/player where local,
+//so all other machines need to wait for definitions
 waitUntil {(!isNil {_unit getVariable "G_Lives"})};
 
 //Handle rating detection for object variable G_isRenegade
