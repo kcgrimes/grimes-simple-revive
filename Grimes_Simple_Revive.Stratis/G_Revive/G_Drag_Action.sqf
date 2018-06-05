@@ -23,7 +23,7 @@ _unit attachTo [_rescuer, [0, 1.1, 0.05]];
 
 //Create drop action
 private ["_dropActionID"];
-_dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 1.5, true, true, ""];
+_dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 10.8, true, true, ""];
 
 //Temp fix for stuck due to combat pace
 //Detect lack of movement and provide notice
