@@ -95,9 +95,10 @@ else
 	sleep 3;
 };
 
-//Handle bypassing Incapacitated based on downs per life
-//bug - should this be done in the HandleDamage EH before Incapacitated is even executed? Probably.
+//Handle bypassing Incapacitated based on downs per life, if applicable
+//bug - consider putting somewhere higher between here and the HandleDamage EH
 if (G_Revive_DownsPerLife > 0) then {
+	//Limited number of downs
 	//Add 1 to current down count
 	private _downCount = (_unit getVariable "G_Downs") + 1;
 	//Activate bypass if DownsPerLife is exceeded
@@ -518,7 +519,6 @@ else
 	if (isNull _rescuer) then {
 		_rescuer = _unit;
 	};
-	private _downs = _unit getVariable "G_Downs";
 	
 	//Announce revive
 	if (G_Revive_Messages > 0) then {
@@ -531,25 +531,26 @@ else
 	
 	//Display downs remaining for players
 	if (isPlayer _unit) then {
-		//Display text depending on downs remaining
+		private _downsRemaining = G_Revive_DownsPerLife - (_unit getVariable "G_Downs");
+		//Display text depending on use of down counter
 		if (G_Revive_DownsPerLife > 0) then {
-			//Down(s) remaining
+			//Limited number of downs
 			private _downsPlural = "downs";
-			if (_downs == 1) then {
+			if (_downsRemaining == 1) then {
 				_downsPlural = "down";
 			};
 			//Display text depending on if black screen is enabled
 			if (G_Revive_Black_Screen) then {
-				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downs, _downsPlural], "BLACK IN", 5]; 
+				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downsRemaining, _downsPlural], "BLACK IN", 5]; 
 			}
 			else
 			{
-				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downs, _downsPlural], "PLAIN", 1];
+				titleText [format["You have been revived by %1! You have %2 %3 remaining!", name _rescuer, _downsRemaining, _downsPlural], "PLAIN", 1];
 			};
 		}
 		else
 		{
-			//No downs remaining
+			//Unlimited downs
 			//Display text depending on if black screen is enabled
 			if (G_Revive_Black_Screen) then {
 				titleText [format["You have been revived by %1!",name _rescuer],"BLACK IN", 5]; 
