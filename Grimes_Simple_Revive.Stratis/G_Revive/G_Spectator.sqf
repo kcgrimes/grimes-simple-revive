@@ -1,9 +1,6 @@
 //Handle Spectator view
 //Local to _unit
-private ["_unit", "_respawnType"];
-//Define variables from onKilled
-_unit = _this select 0;
-_respawnType = _this select 1;
+params ["_unit", "_respawnType"];
 
 //Create parallel, infinite loop that prevents respawn
 [] spawn {

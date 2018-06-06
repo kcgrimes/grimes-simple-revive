@@ -59,7 +59,6 @@ G_fnc_Unit_Tag_Exec = {
 		
 		//Cycle through potential units
 		{
-			private ["_color"];
 			//Get distance to unit
 			private _unitDistance = _x distance player;
 			//Set alpha based on distance using yAlpha=-mx+b
@@ -71,6 +70,7 @@ G_fnc_Unit_Tag_Exec = {
 			};
 			
 			//Color based on status
+			private ["_color"];
 			if (((_isIncapacitated) || (!alive _x)) && (G_Revive_System)) then {
 				//Color red if incapacitated or dead
 				//bug - make this a setting?

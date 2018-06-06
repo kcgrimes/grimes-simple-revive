@@ -1,11 +1,8 @@
 //Manages unit that kills unit
 //Local to _unit
-private ["_unit", "_unitPreIncapSide", "_killer", "_noKiller"];
-_unit = _this select 0;
-_unitPreIncapSide = _this select 1;
-_killer = _this select 2;
+params ["_unit", "_unitPreIncapSide", "_killer"];
 
-_noKiller = false;
+private _noKiller = false;
 //If unit was killed by environment, exit
 if (isNull _killer) then {
 	_noKiller = true;
@@ -40,14 +37,13 @@ if (G_Revive_Messages > 0) then {
 };
 	
 //Check if teamkill (considering renegade)
-private ["_killer_lives"];
 if ([side _killer, _unitPreIncapSide] call BIS_fnc_sideIsFriendly) then {
 	//Is teamkill
 	//Handle life penalty if enabled
 	if (G_TK_Penalty != 0) then {
 		//Life penality exists for TK
 		//Add penalty (negative) to killer life count, not going below 0
-		_killer_lives = 0 max ((_killer getVariable "G_Lives") + G_TK_Penalty);
+		private _killer_lives = 0 max ((_killer getVariable "G_Lives") + G_TK_Penalty);
 		//Set new killer life count and broadcast
 		_killer setVariable ["G_Lives", _killer_lives, true];
 	};

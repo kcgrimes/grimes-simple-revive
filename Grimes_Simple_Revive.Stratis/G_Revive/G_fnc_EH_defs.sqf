@@ -7,8 +7,7 @@ G_Revive_objVars = ["G_Reviver", "G_Reviving", "G_Loaded"];
 
 //Define function to reset revive variables and broadcast them
 G_fnc_Revive_resetVariables = {
-	private ["_unit"];
-	_unit = _this;
+	params ["_unit"];
 	{
 		_unit setVariable [_x, false, true];
 	} forEach G_Revive_boolVars;
@@ -39,9 +38,7 @@ G_fnc_actionUnload = compile preprocessFileLineNumbers "G_Revive\G_Unload_Action
 G_fnc_actionDrop = compile preprocessFileLineNumbers "G_Revive\G_Drop_Action.sqf";
 G_fnc_actionSecure = {
 	//Local to executor
-	private ["_unit", "_rescuer"];
-	_target = _this select 0;
-	_executor = _this select 1;
+	params ["_target", "_executor"];
 	//Kill the target
 	_target setDamage 1;
 	//Execute "secured" animation
@@ -56,23 +53,21 @@ G_fnc_Revive_Actions_Cond = {
 
 //Define function to add all revive-related actions
 G_fnc_Revive_Actions = {
-	private ["_unit", "_reviveActionID", "_secureActionID", "_dragActionID", "_carryActionID", "_loadActionID"];
-	_unit = _this select 0;
-	_reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 11, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
+	params ["_unit"];
+	private _reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 11, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
-	_secureActionID = [_unit, format["<t color='%1'>Secure</t>", G_Revive_Action_Color], "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsEnemy))", "true", {}, {}, G_fnc_actionSecure, {}, [], 1.5, 11, true, false] call BIS_fnc_holdActionAdd;
-	_loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 10.9, true, true, "", format["(([_target, _this, 5] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
+	private _secureActionID = [_unit, format["<t color='%1'>Secure</t>", G_Revive_Action_Color], "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsEnemy))", "true", {}, {}, G_fnc_actionSecure, {}, [], 1.5, 11, true, false] call BIS_fnc_holdActionAdd;
+	private _loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 10.9, true, true, "", format["(([_target, _this, 5] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
-	_dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
-	_carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
+	private _dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
+	private _carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 };
 
 //Create server-side function for easier init of enabled systems on AI created post-init
 G_fnc_initNewAI = {
 	//Local to server
 	if (!G_isServer) exitWith {};
-	private ["_arrayNewAI"];
-	_arrayNewAI = _this;
+	params ["_arrayNewAI"];
 	//Init systems
 	{
 		[_x] remoteExec ["G_fnc_EH", 0, true];
@@ -82,8 +77,7 @@ G_fnc_initNewAI = {
 //Define function to create revive-oriented AI behavior
 G_fnc_Revive_AI_Behavior = {
 	//_unit is local
-	private ["_unit", "_rescueRoleArray", "_victim"];
-	_unit = _this select 0; 
+	params ["_unit"];
 	//bug - is true the right condition here?
 	while {true} do {
 		//Wait for AI to be local
@@ -91,8 +85,8 @@ G_fnc_Revive_AI_Behavior = {
 		//Wait to be called upon as reviver or guard
 		waitUntil {sleep 5; (((_unit getVariable "G_AI_rescueRole") select 0) != 0)};
 		//Execute appropriate behavior up to and including completing revive or guard function
-		_rescueRoleArray = _unit getVariable "G_AI_rescueRole";
-		_victim = (_unit getVariable "G_AI_rescueRole") select 1;
+		private _rescueRoleArray = _unit getVariable "G_AI_rescueRole";
+		private _victim = (_unit getVariable "G_AI_rescueRole") select 1;
 		private _rescuerVehicle = vehicle _unit;
 		//Allow AI to move more freely to victim, but still detect and engage enemies
 		_unit setBehaviour "SAFE";
@@ -103,8 +97,7 @@ G_fnc_Revive_AI_Behavior = {
 		if ((_rescueRoleArray select 0) == 1) then {
 			//AI is reviver
 			//Cycle behavior as long as victim is incapacitated and rescuer is not, and rescuer has role
-			private ["_distCount"];
-			_distCount = 0;
+			private _distCount = 0;
 			while {((!(_unit getVariable "G_Incapacitated")) && (alive _unit) && (_victim getVariable "G_Incapacitated") && (alive _victim) && ((_unit getVariable "G_AI_rescueRole") isEqualTo _rescueRoleArray))} do {
 				//Prevent AI from stopping
 				//bug - is this stop necessary?
@@ -250,9 +243,7 @@ G_fnc_Revive_AI_Behavior = {
 
 //Define function that handles Load/Unload of player
 G_fnc_moveInCargoToUnloadAction = {
-	private ["_unit", "_vehicle", "_unloadActionID"];
-	_unit = _this select 0;
-	_vehicle = _this select 1;
+	params ["_unit", "_vehicle"];
 	
 	if (local _unit) then {
 		[_unit, _vehicle] spawn {
@@ -270,15 +261,12 @@ G_fnc_moveInCargoToUnloadAction = {
 	};
 
 	//Add Unload action for unit to vehicle
-	_unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.9, true, true, "", "([side _this, side _target] call BIS_fnc_sideIsFriendly) && ((_target distance _this) < 5) && ((speed _target) < 1)"];
+	private _unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.9, true, true, "", "([side _this, side _target] call BIS_fnc_sideIsFriendly) && ((_target distance _this) < 5) && ((speed _target) < 1)"];
 	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	
 	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
 	[_unit, _vehicle, _unloadActionID] spawn {
-		private ["_unit", "_vehicle", "_unloadActionID"];
-		_unit = _this select 0;
-		_vehicle = _this select 1;
-		_unloadActionID = _this select 2;
+		params ["_unit", "_vehicle", "_unloadActionID"];
 		//Wait for unit to be unloaded or no longer incapacitated
 		waitUntil {sleep 0.3; ((vehicle _unit != _vehicle) || (isNull (_unit getVariable "G_Loaded")) || (!(_unit getVariable "G_Incapacitated")))};
 		
@@ -301,11 +289,10 @@ G_fnc_moveInCargoToUnloadAction = {
 
 G_fnc_menWithinRadius = {
 	params ["_centerObj", "_radius"];
-	private ["_arrayAll", "_arrayReturn"];
 	//Get array of all alive men and appropriate vehicles within defined radius of center object
-	_arrayAll = _centerObj nearEntities [["Man", "Car", "Tank", "Helicopter", "Plane", "Ship"], _radius];
+	private _arrayAll = _centerObj nearEntities [["Man", "Car", "Tank", "Helicopter", "Plane", "Ship"], _radius];
 	//Cycle through all objects and find the men to add to array of men to be returned
-	_arrayReturn = [];
+	private _arrayReturn = [];
 	{
 		//_x is object
 		//Determine how to handle alive object
@@ -335,11 +322,10 @@ if (G_isClient) then {
 	//Define function for "nearest rescuer" text
 	G_fnc_Dialog_Rescuer_Text = {
 		[_this select 0] spawn {
-			private ["_arrayDistance", "_unit0", "_unit1", "_unit2", "_unit3", "_unit4", "_text"];
 			//Continue cycling while player is incapacitated and dialog is open
 			while {((player getVariable "G_Incapacitated") && (dialog))} do {
 				//Get array of all "men" within 500m, including player and dead bodies
-				_arrayDistance = [];
+				private _arrayDistance = [];
 				{
 					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not incapacitated
 					if ((_x != player) && ([side _x, player getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(player getVariable "G_isRenegade") && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
@@ -349,11 +335,11 @@ if (G_isClient) then {
 				} forEach ([player, 500] call G_fnc_menWithinRadius);
 				
 				//Define empty variables for unit names
-				_unit0 = "";
-				_unit1 = "";
-				_unit2 = "";
-				_unit3 = "";
-				_unit4 = "";
+				private _unit0 = "";
+				private _unit1 = "";
+				private _unit2 = "";
+				private _unit3 = "";
+				private _unit4 = "";
 				
 				//Define unit variables with unit name and distanace if available
 				for "_i" from 0 to (((count _arrayDistance) - 1) min 4) do {
@@ -361,7 +347,7 @@ if (G_isClient) then {
 				};
 				
 				//Format text to be displayed
-				_text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
+				private _text = format["\n     Nearest Potential Rescuers:\n     %1\n     %2\n     %3\n     %4\n     %5", _unit0, _unit1, _unit2, _unit3, _unit4];
 				//Output nearest rescuers
 				((_this select 0) displayCtrl 1001) ctrlSetText _text;
 				//Update list every 5 seconds
@@ -372,7 +358,7 @@ if (G_isClient) then {
 	
 	//Define function for "downs/lives remaining" text
 	G_fnc_Dialog_Downs_Text = {
-		private ["_downs", "_lives", "_text"];
+		private ["_downs", "_lives"];
 		//If downs-per-life is limited, display remaining, otherwise text
 		if (G_Revive_DownsPerLife > 0) then {
 			//Subtract accrued number of downs from the limit to obtain remainder
@@ -392,7 +378,7 @@ if (G_isClient) then {
 			_lives = player getVariable "G_Lives";
 		};
 		//Format text to be displayed
-		_text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2", _downs, _lives];
+		private _text = format["\n\n            Downs Remaining: %1\n            Lives Remaining: %2", _downs, _lives];
 		//Display the "lives remaining" dialog"
 		((_this select 0) displayCtrl 1002) ctrlSetText _text;
 	};

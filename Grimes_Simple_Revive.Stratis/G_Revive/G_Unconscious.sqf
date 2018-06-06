@@ -1,7 +1,6 @@
 //Handle incapacitated state
 //Local to _unit
-private ["_unit"];
-_unit = _this;
+private _unit = _this;
 
 //If the unit is already incapacitated or is not local to the executer, and is not JIP, exit
 if (((_unit getVariable "G_Incapacitated") || !(local _unit)) && (!G_isJIP)) exitWith {};
@@ -25,18 +24,16 @@ _unit setVariable ["G_Incapacitated", true, true];
 
 //Add parallel delay to revive-related actions
 [_unit] spawn {
-	private ["_unit"];
-	_unit = _this select 0;
+	params ["_unit"];
 	sleep 2.5;
 	//Set unit as incapacitated and broadcast
 	_unit setVariable ["G_Dragged", false, true];
 };
 
 //Handle unit if inside vehicle
-private ["_bypass", "_vehicle"];
-_bypass = false;
+private _bypass = false;
 //If already Loaded, define vehicle that unit is in
-_vehicle = _unit getVariable "G_Loaded";
+private _vehicle = _unit getVariable "G_Loaded";
 if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
 	//Unit is incapacitated inside a vehicle
 	//If not yet Loaded, define vehicle that unit is going incapacitated in
@@ -151,18 +148,17 @@ if (isPlayer _unit) then {
 //Create incapacitated dialog for player
 if (isPlayer _unit) then {
 	[_unit] spawn {
-		private ["_unit", "_reviveDialog", "_timeDialog"], 
-		_unit = _this select 0;
+		params ["_unit"], 
 		//Wait a few seconds before opening dialog
 		sleep 3.25;
 		while {(_unit getVariable "G_Incapacitated")} do {
 			//Open dialog
-			_reviveDialog = createDialog "G_Revive_Dialog";
+			private _reviveDialog = createDialog "G_Revive_Dialog";
 			if (!G_Allow_GiveUp) then {
 				((findDisplay 474637) displayCtrl 1600) ctrlShow false;
 			};
 			//Wait for dialog to be open
-			_timeDialog = time + 5;
+			private _timeDialog = time + 5;
 			waitUntil {sleep 1; ((!isNull (findDisplay 474637)) || (time > _timeDialog))};
 			//Wait for dialog to be closed (by Escape)
 			waitUntil {sleep 1; !dialog};
@@ -193,13 +189,12 @@ sleep 2.5;
 
 //Execute AI tracking for AI's revive behavior
 [_unit] spawn {
-	private ["_unit", "_aiReviver", "_aiGuard"];
-	_unit = _this select 0;
+	params ["_unit"];
 	//Cycle through AI role assignments as long as unit is incapacitated
 	//bug - use of Call for Help concept, or keep it automatic?
 	//By default, reviver and guard are unassigned
-	_aiReviver = objNull;
-	_aiGuard = objNull;
+	private _aiReviver = objNull;
+	private _aiGuard = objNull;
 	while {(_unit getVariable "G_Incapacitated")} do {
 		//Only cycle for AI help if on ground or in stopped vehicle
 		while {((_unit getVariable "G_Incapacitated") && ((vehicle _unit == _unit) || (speed _unit < 1)))} do {
@@ -219,9 +214,8 @@ sleep 2.5;
 			};
 			
 			//Obtain array of potential rescuers from men within a certain distance
-			private ["_arrayPotentialRescuers", "_arrayPotentialRescuersCount"];
 			//Get array of all "men" within 500m, including player and dead bodies
-			_arrayPotentialRescuers = [];
+			private _arrayPotentialRescuers = [];
 			{
 				//Select unit that is not the downed unit, is not a player, is friendly, is not already rescuing someone, is alive, and is not incapacitated
 					//This system always runs with AI; players are not considered for roles
@@ -232,12 +226,11 @@ sleep 2.5;
 			} forEach ([_unit, 500] call G_fnc_menWithinRadius);
 
 			//Get slot for last potential rescuer
-			_arrayPotentialRescuersCount = (count _arrayPotentialRescuers) - 1;
+			private _arrayPotentialRescuersCount = (count _arrayPotentialRescuers) - 1;
 			
 			//Attempt to select closest (eligible) AI for reviver and broadcast variable so he comes
 			{
-				private ["_hasItem"];
-				_hasItem = 0;
+				private _hasItem = 0;
 				//Check if potential is eligible to revive based on setting; exit after code if they are the one
 				if (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) then {
 					//Unit able to revive
@@ -245,8 +238,7 @@ sleep 2.5;
 					if (G_Revive_Requirement > 0) then {
 						//1 or more FAK, or Medikit, is required
 						//Get array of rescuer's items
-						private ["_rescitemsArray"];
-						_rescitemsArray = items _x;
+						private _rescitemsArray = items _x;
 						//Handle Medikit
 						if ("Medikit" in (_rescitemsArray)) then {
 							//Has Medikit, so meet requirement
@@ -355,8 +347,7 @@ sleep 2.5;
 	};
 };
 
-private ["_bleedoutTimer"];
-_bleedoutTimer = G_Revive_bleedoutTime;
+private _bleedoutTimer = G_Revive_bleedoutTime;
 //Check if bleedout timer is unlimited
 if (_bleedoutTimer > -1) then {
 	//Bleedout timer is limited
@@ -369,11 +360,10 @@ if (_bleedoutTimer > -1) then {
 			_bleedoutTimer = _bleedoutTimer - 1;
 		};
 		//Handle vehicle if unit is in one
-		private ["_breakOut", "_vehicle"];
-		_breakOut = false;
+		private _breakOut = false;
 		if (!isNull (_unit getVariable "G_Loaded")) then {
 			//Unit in a vehicle
-			_vehicle = _unit getVariable "G_Loaded";
+			private _vehicle = _unit getVariable "G_Loaded";
 			if (!alive _vehicle) then {
 				//Vehicle is destroyed
 				if (G_Explosion_Eject_Occupants) then {
@@ -421,11 +411,10 @@ else
 	while {(_unit getVariable "G_Incapacitated") && (alive _unit) && (local _unit)} do 
 	{
 		//Handle vehicle if unit is in one
-		private ["_breakOut", "_vehicle"];
-		_breakOut = false;
+		private _breakOut = false;
 		if (!isNull (_unit getVariable "G_Loaded")) then {
 			//Unit in a vehicle
-			_vehicle = _unit getVariable "G_Loaded";
+			private _vehicle = _unit getVariable "G_Loaded";
 			if (!alive _vehicle) then {
 				//Vehicle is destroyed
 				if (G_Explosion_Eject_Occupants) then {
@@ -508,8 +497,7 @@ else
 		//Fix from BIS_fnc_reviveOnState for being revived while having no weapon or binocular
 		if ({currentWeapon _unit == _x} count ["", binocular _unit] > 0) then {
 			[_unit] spawn {
-				private ["_unit"];
-				_unit = _this select 0;
+				params ["_unit"];
 				sleep 0.1;
 				if ({currentWeapon _unit == _x} count ["", binocular _unit] > 0) then {
 					[_unit, "Civil"] remoteExec ["playAction", 0, true];
@@ -525,14 +513,13 @@ else
 	_unit enableAI "FSM";
 	//Allow unit to take damage
 	_unit allowDamage true;
-	private ["_rescuer", "_downs"];
-	_rescuer = _unit getVariable "G_Reviver";
+	private _rescuer = _unit getVariable "G_Reviver";
 	//If revived by script command, make rescuer self
 	//bug - better way to do this?
 	if (isNull _rescuer) then {
 		_rescuer = _unit;
 	};
-	_downs = _unit getVariable "G_Downs";
+	private _downs = _unit getVariable "G_Downs";
 	
 	//Announce revive
 	if (G_Revive_Messages > 0) then {
@@ -548,8 +535,7 @@ else
 		//Display text depending on downs remaining
 		if (G_Revive_DownsPerLife > 0) then {
 			//Down(s) remaining
-			private ["_downsPlural"];
-			_downsPlural = "downs";
+			private _downsPlural = "downs";
 			if (_downs == 1) then {
 				_downsPlural = "down";
 			};

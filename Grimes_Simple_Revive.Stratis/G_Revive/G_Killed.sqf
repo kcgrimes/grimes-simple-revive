@@ -1,9 +1,7 @@
 //Handle onKilled
 //Local to _unit
-
-private ["_unit", "_respawnType"];
-_unit = _this select 0;
-_respawnType = getNumber(missionConfigFile >> "respawn");
+params ["_unit"];
+private _respawnType = getNumber(missionConfigFile >> "respawn");
 
 //bug - No respawn timer for AI? Intended?
 //Ensure at least a 3 second respawn time to allow for code execution
@@ -22,11 +20,10 @@ if (!isNil "G_fnc_Custom_Exec_2") then {
 };
 
 //Handle life count if spawns are limited and this is not the initial spawn
-private ["_noLives", "_lives"];
-_noLives = false;
+private _noLives = false;
 if (!(G_Num_Respawns == -1)) then {
 	//Get life count
-	_lives = _unit getVariable "G_Lives";
+	private _lives = _unit getVariable "G_Lives";
 	//Remove one life from count
 	_lives = _lives - 1;
 	//Determine if no lives remain

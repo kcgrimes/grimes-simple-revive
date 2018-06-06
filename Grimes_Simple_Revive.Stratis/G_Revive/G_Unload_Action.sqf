@@ -1,9 +1,8 @@
 //Unload incapacitated
 //Local to executor (not _unit)
-private ["_vehicle", "_unloadActionID", "_unit"];
-_vehicle = _this select 0;
-_unloadActionID = _this select 2;
-_unit = _this select 3 select 0;
+private _vehicle = _this select 0;
+private _unloadActionID = _this select 2;
+private _unit = _this select 3 select 0;
 
 //Order unit to be out of vehicle
 [_unit] remoteExecCall ["unassignVehicle", _unit, true];

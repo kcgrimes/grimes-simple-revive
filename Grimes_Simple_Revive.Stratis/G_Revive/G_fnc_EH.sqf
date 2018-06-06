@@ -1,8 +1,6 @@
 //Universal EHs
 //Local to executor, not necessarily _unit
-
-private ["_unit"];
-_unit = _this select 0;
+params ["_unit"];
 
 //Add onKilled/onRespawn EH's early in case of respawnOnStart
 //Add onKilled EH to unit to handle life count
@@ -123,8 +121,7 @@ if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
 				//Whoever _unit is local to will execute Incapacitated state publically
 				if (local _unit) then {
 					_unit allowDamage false;
-					private ["_preIncapSide"];
-					_preIncapSide = side _unit;
+					private _preIncapSide = side _unit;
 					_unit spawn G_fnc_enterIncapacitatedState;
 					//Execute code for the killer
 					[_unit, _preIncapSide, _source] spawn G_fnc_onKill;
@@ -155,9 +152,10 @@ if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
 if (G_AI_Fixed_Spawn) then {
 	if (!isPlayer _unit) then {
 		_unit addEventHandler ["Respawn", {
+			params ["_unit"];
 			private ["_respawnPos"];
 			//Define AI's fixed respawn position based on side
-			switch (side (_this select 0)) do {
+			switch (side _unit) do {
 				case WEST: {
 					if (G_AI_Fixed_Spawn_WEST != "") then {
 						_respawnPos = getMarkerPos G_AI_Fixed_Spawn_WEST; 
@@ -180,9 +178,9 @@ if (G_AI_Fixed_Spawn) then {
 				};
 			};
 			//Wait until the unit is alive (has spawned)
-			waitUntil {alive (_this select 0)};
+			waitUntil {alive _unit};
 			//Immediatly move unit to desired respawn position
-			(_this select 0) setPos _respawnPos;
+			_unit setPos _respawnPos;
 		}];
 	};
 };

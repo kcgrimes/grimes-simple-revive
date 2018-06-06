@@ -25,10 +25,9 @@ if (G_Squad_Leader_Spawn) then {
 
 //If squad leader map marker is enabled, execute
 if (G_Squad_Leader_Marker) then {
-	private ["_squadLeader", "_squad_leader_mkr"];
-	_squadLeader = leader group player;
+	private _squadLeader = leader group player;
 	//Create marker for squad leader to always be used
-	_squad_leader_mkr = createMarkerLocal ["G_Squad_Leader_Mkr", getPos _squadLeader];
+	private _squad_leader_mkr = createMarkerLocal ["G_Squad_Leader_Mkr", getPos _squadLeader];
 	_squad_leader_mkr setMarkerColorLocal G_Squad_Leader_Mkr_Color;
 	_squad_leader_mkr setMarkerTextLocal G_Squad_Leader_Mkr_Text;
 	//Permanent parallel cycle of squad leader marker

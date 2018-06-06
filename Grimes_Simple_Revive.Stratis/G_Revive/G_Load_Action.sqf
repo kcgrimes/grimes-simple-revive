@@ -1,16 +1,12 @@
 //Load incapacitated
 //Local to _rescuer
-
-private ["_unit", "_rescuer", "_side", "_vehicle"];
-_unit = _this select 0;
-_rescuer = _this select 1;
+params ["_unit", "_rescuer"];
 
 //Select nearest vehicle, with 1m increased range from Action condition in case of movement during processing
-_vehicle = _unit nearEntities [G_Revive_Load_Types, 8] select 0;
+private _vehicle = _unit nearEntities [G_Revive_Load_Types, 8] select 0;
 
 //If MRVs are locked, prevent loading into enemy MRV
-private ["_breakOut"];
-_breakOut = false;
+private _breakOut = false;
 if ((G_Mobile_Respawn_Locked) && (!isNil {_vehicle getVariable "G_MRV_Logic"})) then {
 	//Is locked MRV, so check side
 	if ([side _rescuer, ((_vehicle getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsEnemy) then {

@@ -1,6 +1,5 @@
 ////Settings Validation
-private ["_validationFailed"];
-_validationFailed = [];
+private _validationFailed = [];
 //Generic
 if (typeName G_Briefing != "BOOL") then {_validationFailed pushBack "G_Briefing must be true/false!"};
 
@@ -101,8 +100,7 @@ if (!isDedicated) then {
 	//Done on all machines to prevent anyone from loading script
 if ((count _validationFailed) > 0) exitWith {
 	{
-		private ["_msg"];
-		_msg = format["G_Revive_Init ERROR: %1", _x];
+		private _msg = format["G_Revive_Init ERROR: %1", _x];
 		systemChat _msg;
 		diag_log _msg;
 	} forEach _validationFailed;
@@ -127,8 +125,7 @@ else
 
 //Define if PvP - Mission where there are more than one playable sides (PvP, TvT, etc.), as opposed to having players on only one side (CoOp, SP, etc.).
 //Check each side for "playable" slots, adding to array if they exist
-private ["_playableSideArray"];
-_playableSideArray = [];
+private _playableSideArray = [];
 {
 	if ((playableSlotsNumber _x) > 0) then {
 		_playableSideArray pushBack _x;

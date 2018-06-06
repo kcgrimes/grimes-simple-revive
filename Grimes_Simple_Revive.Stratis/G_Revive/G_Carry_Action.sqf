@@ -1,9 +1,6 @@
 //Carry
 //Local to _rescuer
-
-private ["_unit", "_rescuer"];
-_unit = _this select 0;
-_rescuer = _this select 1;
+params ["_unit", "_rescuer"];
 
 //Set carry-related variables and broadcast
 _unit setVariable ["G_Carried", true, true];
@@ -32,8 +29,7 @@ waitUntil {animationState _unit == "AinjPfalMstpSnonWnonDf_carried_dead"};
 _unit attachTo [_rescuer, [-0.2, 0.25, 0]];
 
 //Create drop action
-private ["_dropActionID"];
-_dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 10.8, true, true, ""];
+private _dropActionID = _rescuer addAction [format["<t color='%1'>Drop</t>", G_Revive_Action_Color], G_fnc_actionDrop, _unit, 10.8, true, true, ""];
 
 //Wait for Drop or someone to die
 waitUntil {sleep 0.1; (!(_unit getVariable "G_Carried") || !(alive _unit) || (_rescuer getVariable "G_Incapacitated"));};  

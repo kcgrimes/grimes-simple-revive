@@ -1,18 +1,14 @@
 //Reviver
 //Local to _rescuer
-
-private ["_unit", "_rescuer", "_hasItem"];
-_unit = _this select 0;
-_rescuer = _this select 1;
+params ["_unit", "_rescuer"];
 
 //Handle First Aid Kit (FAK) requirement if enabled
 	//Only for players here because an AI would have already done this
-_hasItem = 0;
+private _hasItem = 0;
 if ((isPlayer _rescuer) && (G_Revive_Requirement > 0)) then {
 	//1 or more FAK, or Medikit, is required
 	//Get array of rescuer's items
-	private ["_rescitemsArray"];
-	_rescitemsArray = items _rescuer;
+	private _rescitemsArray = items _rescuer;
 	//Handle Medikit
 	if ("Medikit" in (_rescitemsArray)) then {
 		//Has Medikit, so meet requirement
@@ -73,8 +69,7 @@ if (isPlayer _rescuer) then {
 }; 
 
 //Define what game time revive action should be completed
-private ["_endTime"];
-_endTime = time + G_Revive_actionTime;
+private _endTime = time + G_Revive_actionTime;
 //Until the end time is reached, make sure the revive animation continues to play as long as revive is not aborted and nobody is incapacitated/killed
 while {(time < _endTime) && (!isNull (_rescuer getVariable "G_Reviving")) && (alive _unit) && (!(_rescuer getVariable "G_Incapacitated")) && (alive _rescuer)} do {
 	//Execute revive animation
@@ -112,8 +107,7 @@ _rescuer setVariable ["G_Reviving", objNull, true];
 
 //Handle revive announcement depending on use of life rewarding system
 //Obtain number of lives (or determine if unlimited with -1)
-private ["_lives", "_livesPlural"];
-_lives = _rescuer getVariable "G_Lives";
+private _lives = _rescuer getVariable "G_Lives";
 if ((_lives >= 0) && (G_Revive_Reward > 0)) then {
 	//Limited lives
 	//+1 to life count
@@ -121,7 +115,7 @@ if ((_lives >= 0) && (G_Revive_Reward > 0)) then {
 	//Announce revive success life count for players
 	if (isPlayer _rescuer) then {
 		//Determine plurality
-		_livesPlural = "lives";
+		private _livesPlural = "lives";
 		if (_lives == 1) then {
 			_livesPlural = "life";
 		};
