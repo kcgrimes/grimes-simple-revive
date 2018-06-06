@@ -1,6 +1,6 @@
 //Handle incapacitated state
 //Local to _unit
-private _unit = _this;
+params ["_unit"];
 
 //If the unit is already incapacitated or is not local to the executer, and is not JIP, exit
 if (((_unit getVariable "G_Incapacitated") || !(local _unit)) && (!G_isJIP)) exitWith {};
@@ -30,8 +30,8 @@ _unit setVariable ["G_Incapacitated", true, true];
 	_unit setVariable ["G_Dragged", false, true];
 };
 
-//Handle unit if inside vehicle
 private _bypass = false;
+//Handle unit if inside vehicle
 //If already Loaded, define vehicle that unit is in
 private _vehicle = _unit getVariable "G_Loaded";
 if ((vehicle _unit != _unit) || (!isNull _vehicle)) then {
@@ -98,9 +98,8 @@ else
 //Handle bypassing Incapacitated based on downs per life
 //bug - should this be done in the HandleDamage EH before Incapacitated is even executed? Probably.
 if (G_Revive_DownsPerLife > 0) then {
-	private ["_downCount"];
 	//Add 1 to current down count
-	_downCount = (_unit getVariable "G_Downs") + 1;
+	private _downCount = (_unit getVariable "G_Downs") + 1;
 	//Activate bypass if DownsPerLife is exceeded
 	if (_downCount > G_Revive_DownsPerLife) exitWith {
 		_bypass = true;
