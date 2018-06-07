@@ -37,7 +37,7 @@ if (G_Revive_Messages > 0) then {
 };
 	
 //Check if teamkill (considering renegade)
-if ([side _killer, _unitPreIncapSide] call BIS_fnc_sideIsFriendly) then {
+if ([side _killer, _unitPreIncapSide] call BIS_fnc_areFriendly) then {
 	//Is teamkill
 	//Handle life penalty if enabled
 	if (G_TK_Penalty != 0) then {

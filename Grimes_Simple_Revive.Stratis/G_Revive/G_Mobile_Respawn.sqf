@@ -56,7 +56,7 @@ if (G_Revive_System) then {
 	//Common conditions for action when revive is enabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ([side _this, ((_target getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsFriendly))
+		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && !(_this getVariable "G_Dragged") && !(_this getVariable "G_Carried") && !(_this getVariable "G_Carrying") && !(_this getVariable "G_Dragging") && ([side _this, ((_target getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_areFriendly))
 	};
 }
 else
@@ -64,7 +64,7 @@ else
 	//Common conditions for action when revive is disabled
 	G_fnc_MRV_Common_actionCondition = {
 		params ["_target", "_this"];
-		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && ([side _this, ((_target getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsFriendly))
+		((alive _target) && ((_target distance _this) < 6) && (_target != _this) && ([side _this, ((_target getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_areFriendly))
 	};
 };
 
@@ -139,7 +139,7 @@ if (G_isServer) then {
 			//Obtain MRV logic from MRV
 			private _MRV_Logic = _MRV getVariable "G_MRV_Logic";
 			//If the MRV and unit side are different, prevent entry
-			if ([_MRV_Logic getVariable "G_Side", side _unit] call BIS_fnc_sideIsEnemy) then {
+			if !([_MRV_Logic getVariable "G_Side", side _unit] call BIS_fnc_areFriendly) then {
 				//Unit needs to be removed, so handle accordingly
 				//Handle MRV engine
 				private _fuel = fuel _MRV;
@@ -349,7 +349,7 @@ G_fnc_MRV_Marker_Creation = {
 	//Create local marker for each client if in PvP
 	if (G_PvP && G_isClient) then {
 		//Check if MRV is on player's side
-		if ([player getVariable "G_Side", _MRV_Logic getVariable "G_Side"] call BIS_fnc_sideIsFriendly) then {
+		if ([player getVariable "G_Side", _MRV_Logic getVariable "G_Side"] call BIS_fnc_areFriendly) then {
 			//MRV and player on same side, so create local marker
 			private _MRV_mkr = createMarkerLocal [format["G_MRV_mkr_%1", _MRV], getPos _MRV];
 			_MRV_mkr setMarkerColorLocal G_Mobile_Respawn_Mkr_Color;

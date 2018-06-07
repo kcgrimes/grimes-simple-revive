@@ -54,10 +54,10 @@ G_fnc_Revive_Actions_Cond = {
 //Define function to add all revive-related actions
 G_fnc_Revive_Actions = {
 	params ["_unit"];
-	private _reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 11, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
+	private _reviveActionID = _unit addAction [format["<t color='%1'>Revive</t>", G_Revive_Action_Color], G_fnc_actionRevive, [], 11, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_areFriendly) && !(_target getVariable ""G_isRenegade"") && (((typeOf _this) in G_Revive_Can_Revive) or ((count G_Revive_Can_Revive) == 0)))"];
 	_unit setUserActionText [_reviveActionID, format["<t color='%1'>Revive</t>", G_Revive_Action_Color], "", "<img image='\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_reviveMedic_ca.paa' size='3' shadow='2'/>"];
-	private _secureActionID = [_unit, format["<t color='%1'>Secure</t>", G_Revive_Action_Color], "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsEnemy))", "true", {}, {}, G_fnc_actionSecure, {}, [], 1.5, 11, true, false] call BIS_fnc_holdActionAdd;
-	private _loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 10.9, true, true, "", format["(([_target, _this, 5] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_sideIsFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
+	private _secureActionID = [_unit, format["<t color='%1'>Secure</t>", G_Revive_Action_Color], "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_secure_ca.paa", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && !([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_areFriendly))", "true", {}, {}, G_fnc_actionSecure, {}, [], 1.5, 11, true, false] call BIS_fnc_holdActionAdd;
+	private _loadActionID = _unit addAction [format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], G_fnc_actionLoad, [], 10.9, true, true, "", format["(([_target, _this, 5] call G_fnc_Revive_Actions_Cond) && ([side _this, ((crew _target) select 0) getVariable ""G_Side""] call BIS_fnc_areFriendly) && !(_target getVariable ""G_isRenegade"") && (count(_target nearEntities [%1, 7]) != 0))", G_Revive_Load_Types]]; 
 	_unit setUserActionText [_loadActionID, format["<t color='%1'>Load Into Vehicle</t>", G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	private _dragActionID = _unit addAction [format["<t color='%1'>Drag</t>", G_Revive_Action_Color], G_fnc_actionDrag, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
 	private _carryActionID = _unit addAction [format["<t color='%1'>Carry</t>", G_Revive_Action_Color], G_fnc_actionCarry, [], 10.8, true, true, "", "(([_target, _this, 2.45] call G_fnc_Revive_Actions_Cond) && ((eyePos _target select 2) > 0))"];
@@ -261,7 +261,7 @@ G_fnc_moveInCargoToUnloadAction = {
 	};
 
 	//Add Unload action for unit to vehicle
-	private _unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.9, true, true, "", "([side _this, side _target] call BIS_fnc_sideIsFriendly) && ((_target distance _this) < 5) && ((speed _target) < 1)"];
+	private _unloadActionID = _vehicle addAction [format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], G_fnc_actionUnload, [_unit], 10.9, true, true, "", "([side _this, side _target] call BIS_fnc_areFriendly) && ((_target distance _this) < 5) && ((speed _target) < 1)"];
 	_vehicle setUserActionText [_unloadActionID, format["<t color=""%2"">Unload %1</t>", name _unit, G_Revive_Action_Color], "", "<img image='\A3\ui_f\data\igui\cfg\actions\unloadIncapacitated_ca.paa' size='3' shadow='2'/>"];
 	
 	//Create parallel loop to handle Unload action if unit dies, and also if no longer loaded
@@ -328,7 +328,7 @@ if (G_isClient) then {
 				private _arrayDistance = [];
 				{
 					//Select unit that is not player, is friendly, can revive (or setting undefined), is alive, and is not incapacitated
-					if ((_x != player) && ([side _x, player getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(player getVariable "G_isRenegade") && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
+					if ((_x != player) && ([side _x, player getVariable "G_Side"] call BIS_fnc_areFriendly) && !(player getVariable "G_isRenegade") && (((typeOf _x) in G_Revive_Can_Revive) || ((count G_Revive_Can_Revive) == 0)) && (alive _x) && !(_x getVariable "G_Incapacitated")) then {
 						//Add to array with distance from player
 						_arrayDistance pushBack ([_x, ceil(_x distance player)]);
 					};
@@ -401,7 +401,7 @@ if (G_isClient && (difficultyOption "groupIndicators" != 0)) then {
 					//Revive-enabled unit, so check if within group marker range
 					if ((_x distance player) < 175) then {
 						//Close enough, so check if unit is friendly and incapacitated
-						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(_x getVariable "G_isRenegade") && (_x getVariable "G_Incapacitated")) then {
+						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_areFriendly) && !(_x getVariable "G_isRenegade") && (_x getVariable "G_Incapacitated")) then {
 							//Default to circular icon
 							private _icon = "\A3\Ui_f\data\IGUI\Cfg\Revive\overlayIcons\u100_ca.paa";
 							//If in player's group, use hexagonal icon

@@ -9,7 +9,7 @@ private _vehicle = _unit nearEntities [G_Revive_Load_Types, 8] select 0;
 private _breakOut = false;
 if ((G_Mobile_Respawn_Locked) && (!isNil {_vehicle getVariable "G_MRV_Logic"})) then {
 	//Is locked MRV, so check side
-	if ([side _rescuer, ((_vehicle getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_sideIsEnemy) then {
+	if !([side _rescuer, ((_vehicle getVariable "G_MRV_Logic") getVariable "G_Side")] call BIS_fnc_areFriendly) then {
 		//Not friendly, so break out and announce
 		_breakOut = true;
 		if (isPlayer _rescuer) then {

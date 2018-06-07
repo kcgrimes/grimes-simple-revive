@@ -37,7 +37,7 @@ G_fnc_Unit_Tag_Exec = {
 				//If option is not self, is not staying dead, and is friendly and not renegade, Draw
 				if ((_x != player) && ((lifeState _x) != "DEAD")) then {
 					if ((!isNil {_x getVariable "G_Side"}) && ((_x distance player) < G_Unit_Tag_Distance)) then {
-						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(_x getVariable "G_isRenegade")) then {
+						if (([_playerSide, _x getVariable "G_Side"] call BIS_fnc_areFriendly) && !(_x getVariable "G_isRenegade")) then {
 							_unitArray pushBack _x;
 						};
 					};
@@ -50,7 +50,7 @@ G_fnc_Unit_Tag_Exec = {
 			//If cursorTarget is a friendly unit that is not renegade and is close enough, Draw
 			if (cursorTarget isKindOf "Man") then {
 				if ((!isNil {cursorTarget getVariable "G_Side"}) && ((cursorTarget distance player) < G_Unit_Tag_Distance)) then {
-					if (([_playerSide, cursorTarget getVariable "G_Side"] call BIS_fnc_sideIsFriendly) && !(cursorTarget getVariable "G_isRenegade")) then {
+					if (([_playerSide, cursorTarget getVariable "G_Side"] call BIS_fnc_areFriendly) && !(cursorTarget getVariable "G_isRenegade")) then {
 						_unitArray pushBack cursorTarget;
 					};
 				};
