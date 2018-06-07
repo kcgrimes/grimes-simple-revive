@@ -485,3 +485,112 @@ if (G_isClient) then {
 		};
 	};
 };
+
+//Define server-only function for checking if all units on a side are down
+if (G_isServer) then {
+	//Prevent duplication of checks/actions
+	G_serverCheckingEnd = false;
+	G_fnc_serverCheckEndMission = {
+		params ["_unit"];
+		
+		//Quick check to see if unit has respawns remaining, and if so, no need to do full check
+		if ((_unit getVariable "G_Lives") > 0) exitWith {};
+		//This unit is out of the fight or close to it, so see about the side in a full check
+		
+		//Prevent duplication of checks/actions
+		if (G_serverCheckingEnd) exitWith {};
+		G_serverCheckingEnd = true;
+		
+		//Get side to check status on
+		_side = _unit getVariable "G_Side";
+		
+		//Create array of units remaining on subject side
+		private _sideUnitsRemaining = [];
+		{
+			//Only check based on units running scripts
+			if (!isNil {_x getVariable "G_Side"}) then {
+				//Check if unit is friendly
+				if ([_x getVariable "G_Side", _side] call BIS_fnc_areFriendly) then {
+					//Check if unit is dead and nonrespawnable
+					if ((lifeState _x) == "DEAD") exitWith {};
+					//Check if incapacitated unit is able to respawn
+					if (((lifeState _x) == "INCAPACITATED") && ((_x getVariable "G_Lives") == 0)) exitWith {};
+					//Add eligible unit 
+					_sideUnitsRemaining pushback _x;
+				};
+			};
+		} forEach (allUnits + allDeadMen);
+		
+		//If no friendly units remain, end the game for that side and see if game is over
+		if ((count _sideUnitsRemaining) == 0) then {
+			//Allow some time for failure to sink in
+			sleep 10;
+			//End mission locally for appropriate side
+			["END1", false] remoteExec ["BIS_fnc_endMission", _side, false];
+			
+			//Check if anyone else is fighting
+			private _stillFighting = true;
+			//Create baseline array of all sides
+			private _listSides = [WEST, EAST, RESISTANCE, CIVILIAN];
+			//Remove the side that just lost
+			_listSides = _listSides - [_side];
+			//Remove any sides without players on them
+			{
+				if ((_x countSide (allPlayers - entities "HeadlessClient_F")) == 0) then {
+					_listSides = _listSides - [_x];
+				};
+			} forEach _listSides;
+			switch (count _listSides) do {
+				case 0: { 
+					//If no other sides have players, no one is fighting
+					_stillFighting = false;
+				};
+				case 1: { 
+					//If one other side has players, they have won
+					//bug - what if they are fighting an AI side?
+					_stillFighting = false;
+				};
+				case 2: { 
+					//If two other sides have players, there may be fighting
+					//If the two sides are friendly, they have won
+					//bug - what if they are fighting an AI side?
+					if ([_listSides select 0, _listSides select 1] call BIS_fnc_areFriendly) then {
+						_stillFighting = false;
+					};				
+				};
+				case 3: { 
+					//If three other sides have players, there may be fighting
+					//If the three sides are friendly, they have won
+					//bug - what if they are fighting an AI side?
+					if (([_listSides select 0, _listSides select 1] call BIS_fnc_areFriendly) && ([_listSides select 0, _listSides select 2] call BIS_fnc_areFriendly) && ([_listSides select 1, _listSides select 2] call BIS_fnc_areFriendly)) then {
+						_stillFighting = false;
+					};	
+				};
+			};
+			
+			//Handle ending if no one is fighting
+			if !(_stillFighting) then {
+				//Remaining sides, if any, win
+				{
+					["END1", true] remoteExec ["BIS_fnc_endMission", _x, false];
+				} forEach _listSides;
+				
+				//Handle ending on dedicated server to ensure mission end
+				if (G_isDedicated) then {
+					[] spawn {
+						sleep 30;
+						forceEnd;
+						endMission "END1";
+					};
+				};
+				
+				//Wait through end of game
+				sleep 40;
+			};
+		};
+		
+		//Force delay between checking to avoid duplication
+		sleep 10;
+		G_serverCheckingEnd = false;
+	};
+};

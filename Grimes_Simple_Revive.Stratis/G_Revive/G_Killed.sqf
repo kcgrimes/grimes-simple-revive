@@ -34,6 +34,9 @@ if (!(G_Num_Respawns == -1)) then {
 	_unit setVariable ["G_Lives", _lives, true];
 };
 
+//Command server to check for all of a side being down/dead
+[_unit] remoteExec ["G_fnc_serverCheckEndMission", 2, false];
+
 //Handle unit if no lives remain
 if (_noLives) exitWith {
 	if (isPlayer _unit) then {

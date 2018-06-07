@@ -27,6 +27,7 @@ G_Explosion_Eject_Occupants = true; //Once the wreck of an exploded vehicle come
 G_Revive_Reward = 0; //0 = No lives rewarded for revive. 1 and up = number of lives rewarded for reviving. (CAN be a decimal)
 G_TK_Penalty = 0; //Amount of lives a Team Killer loses per team kill. Note, must be negative to be negative result (Ex. Value of -2 means 2 lives lost per TK) (CAN be a decimal)
 G_Revive_Messages = 1; //Chat messages upon incapacitation and revive. 0 = None. 1 = Friendly only. 2 = All.
+G_End_When_Side_Down = true; //true = When all units friendly to a side are incapacitated and/or unable to respawn the server will end the mission, false = server will not handle ending mission for side
 
 //Respawn/Initial Spawn
 G_Respawn_Button = true; //true = Respawn Button enabled, false = Respawn button disabled

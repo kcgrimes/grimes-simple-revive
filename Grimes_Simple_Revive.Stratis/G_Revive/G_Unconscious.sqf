@@ -124,6 +124,9 @@ if (_bypass) exitWith {
 	};
 };
 
+//Command server to check for all of a side being down/dead
+[_unit] remoteExec ["G_fnc_serverCheckEndMission", 2, false];
+
 //Handle addon radios if enabled
 if ((isPlayer _unit) && (G_Revive_addonRadio_muteTransmit || G_Revive_addonRadio_muteReceive)) then {
 	[true] spawn G_fnc_muteAddonRadio;
