@@ -7,7 +7,7 @@ player createDiaryRecord ["G_Revive", ["Credits",
 	<br/>
 	<br/>* Bohemia Interactive – For providing an amazing game and location for a fan base, in addition to provided assistance.
 	<br/>* BI Forum Users – For providing an active community for Arma assistance, feedback, and collaboration. 
-	<br/>    * Honorable Mention: norrin, brians200, Das Attorney, PtPau, Imperator_Pete, csk222, maximumvmo, pathfinder2, marcatore, Zio Sam, fortun, Ignotus17, Bunnylord, mech79, airfell, Droopypiles, doktorflan, runforrest, Ironman13, pvtdancer, avibird 1, Rockapes, fycj, Jnr4817, and any whom I have failed to mention.
+	<br/>    * Honorable Mention: norrin, brians200, Das Attorney, PtPau, Imperator_Pete, csk222, maximumvmo, pathfinder2, marcatore, Zio Sam, fortun, Ignotus17, Bunnylord, mech79, airfell, Droopypiles, doktorflan, runforrest, Ironman13, pvtdancer, avibird 1, Rockapes, fycj, Jnr4817, jeremyjhutton, and any whom I have failed to mention.
 	<br/>* 3rd Infantry Division – For providing everything that is indescribable in a single mention, but specifically for testing assistance.
 	<br/>    * Honorable Mention: Taylor, Ski, Foondle, Robertson, Townsend, and any whom I have failed to mention.
 	<br/>

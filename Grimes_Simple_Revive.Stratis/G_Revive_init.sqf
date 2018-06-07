@@ -1,7 +1,7 @@
 /*
 Author: KC Grimes
 Script: Grimes Simple Revive
-Version: V0.91
+Version: V0.92
 */
 ////Editable parameters, sorted by category and relevance - Please adjust values to suit your application.
 //Generic

@@ -559,9 +559,8 @@ if (G_isServer) then {
 					};				
 				};
 				case 3: { 
-					//If three other sides have players, there may be fighting
+					//If three other sides have players, there may be fighting (but only among players)
 					//If the three sides are friendly, they have won
-					//bug - what if they are fighting an AI side?
 					if (([_listSides select 0, _listSides select 1] call BIS_fnc_areFriendly) && ([_listSides select 0, _listSides select 2] call BIS_fnc_areFriendly) && ([_listSides select 1, _listSides select 2] call BIS_fnc_areFriendly)) then {
 						_stillFighting = false;
 					};	
