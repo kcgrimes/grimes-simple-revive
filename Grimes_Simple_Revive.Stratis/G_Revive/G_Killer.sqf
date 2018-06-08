@@ -12,7 +12,7 @@ if (_unit == _killer) then {
 	_noKiller = true;
 };
 //If killer does not have lives (is not a Man), no need to be here
-if ((typeName (_killer getVariable "G_Lives")) != "SCALAR") then {
+if !((_killer getVariable "G_Lives") isEqualType 1) then {
 	_noKiller = true;
 };
 

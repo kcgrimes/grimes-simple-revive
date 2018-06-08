@@ -1,56 +1,56 @@
 ////Settings Validation
 private _validationFailed = [];
 //Generic
-if (typeName G_Briefing != "BOOL") then {_validationFailed pushBack "G_Briefing must be true/false!"};
+if !(G_Briefing isEqualType true) then {_validationFailed pushBack "G_Briefing must be true/false!"};
 
 //Revive
-if (typeName G_Revive_System != "BOOL") then {_validationFailed pushBack "G_Revive_System must be true/false!"};
-if (typeName G_Revive_AI_Incapacitated != "ARRAY") then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be an array of sides!"};
+if !(G_Revive_System isEqualType true) then {_validationFailed pushBack "G_Revive_System must be true/false!"};
+if !(G_Revive_AI_Incapacitated isEqualType []) then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be an array of sides!"};
 {
-	if (typeName _x != "SIDE") then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be array containing only WEST, EAST, RESISTANCE, or CIVILIAN!"};
+	if !(_x isEqualType WEST) then {_validationFailed pushBack "G_Revive_AI_Incapacitated must be array containing only WEST, EAST, RESISTANCE, or CIVILIAN!"};
 } forEach G_Revive_AI_Incapacitated;
-if (typeName G_Revive_Unit_Exclusion != "ARRAY") then {_validationFailed pushBack "G_Revive_Unit_Exclusion must be an array of variable names of units!"};
+if !(G_Revive_Unit_Exclusion isEqualType []) then {_validationFailed pushBack "G_Revive_Unit_Exclusion must be an array of variable names of units!"};
 {
-	if (typeName _x != "OBJECT") then {_validationFailed pushBack "G_Revive_Unit_Exclusion must be array containing only variable names of units!"};
+	if !(_x isEqualType objNull) then {_validationFailed pushBack "G_Revive_Unit_Exclusion must be array containing only variable names of units!"};
 } forEach G_Revive_Unit_Exclusion;
-if ((typeName G_Revive_bleedoutTime != "SCALAR") || (G_Revive_bleedoutTime < -1)) then {_validationFailed pushBack "G_Revive_bleedoutTime must be a number greater than or equal to -1!"};
-if (typeName G_Allow_GiveUp != "BOOL") then {_validationFailed pushBack "G_Allow_GiveUp must be true/false!"};
-if ((typeName G_Revive_DownsPerLife != "SCALAR") || (G_Revive_DownsPerLife < 0)) then {_validationFailed pushBack "G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
-if (typeName G_Revive_addonRadio_muteTransmit != "BOOL") then {_validationFailed pushBack "G_Revive_addonRadio_muteTransmit must be true/false!"};
-if (typeName G_Revive_addonRadio_muteReceive != "BOOL") then {_validationFailed pushBack "G_Revive_addonRadio_muteReceive must be true/false!"};
-if (typeName G_Revive_Can_Revive != "ARRAY") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
+if !((G_Revive_bleedoutTime isEqualType 1) && (G_Revive_bleedoutTime >= -1)) then {_validationFailed pushBack "G_Revive_bleedoutTime must be a number greater than or equal to -1!"};
+if !(G_Allow_GiveUp isEqualType true) then {_validationFailed pushBack "G_Allow_GiveUp must be true/false!"};
+if !((G_Revive_DownsPerLife isEqualType 1) && (G_Revive_DownsPerLife >= 0)) then {_validationFailed pushBack "G_Revive_DownsPerLife must be an integer greater than or equal to 0!"};
+if !(G_Revive_addonRadio_muteTransmit isEqualType true) then {_validationFailed pushBack "G_Revive_addonRadio_muteTransmit must be true/false!"};
+if !(G_Revive_addonRadio_muteReceive isEqualType true) then {_validationFailed pushBack "G_Revive_addonRadio_muteReceive must be true/false!"};
+if !(G_Revive_Can_Revive isEqualType []) then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
 {
-	if (typeName _x != "STRING") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
+	if !(_x isEqualType "") then {_validationFailed pushBack "G_Revive_Can_Revive must be an array of classnames as strings!"};
 } forEach G_Revive_Can_Revive;
-if ((typeName G_Revive_actionTime != "SCALAR") || (G_Revive_actionTime < 0)) then {_validationFailed pushBack "G_Revive_actionTime must be an integer greater than or equal to 0!"};
-if ((typeName G_Revive_Requirement != "SCALAR") || (G_Revive_Requirement < 0)) then {_validationFailed pushBack "G_Revive_Requirement must be an integer greater than or equal to 0!"};
-if (typeName G_Revive_Black_Screen != "BOOL") then {_validationFailed pushBack "G_Revive_Black_Screen must be true/false!"};
-if (typeName G_Revive_Action_Color != "STRING") then {_validationFailed pushBack "G_Revive_Action_Color must be an HTML Color Code in string format."};
-if (typeName G_Revive_Load_Types != "ARRAY") then {_validationFailed pushBack "G_Revive_Load_Types must be an array of CfgVehicle types as strings!"};
+if !((G_Revive_actionTime isEqualType 1) && (G_Revive_actionTime >= 0)) then {_validationFailed pushBack "G_Revive_actionTime must be an integer greater than or equal to 0!"};
+if !((G_Revive_Requirement isEqualType 1) && (G_Revive_Requirement >= 0)) then {_validationFailed pushBack "G_Revive_Requirement must be an integer greater than or equal to 0!"};
+if !(G_Revive_Black_Screen isEqualType true) then {_validationFailed pushBack "G_Revive_Black_Screen must be true/false!"};
+if !(G_Revive_Action_Color isEqualType "") then {_validationFailed pushBack "G_Revive_Action_Color must be an HTML Color Code in string format."};
+if !(G_Revive_Load_Types isEqualType []) then {_validationFailed pushBack "G_Revive_Load_Types must be an array of CfgVehicle types as strings!"};
 {
-	if (typeName _x != "STRING") then {_validationFailed pushBack "G_Revive_Load_Types must be an array of CfgVehicle types as strings!"};
+	if !(_x isEqualType "") then {_validationFailed pushBack "G_Revive_Load_Types must be an array of CfgVehicle types as strings!"};
 } forEach G_Revive_Load_Types;
-if (typeName G_Eject_Occupants != "BOOL") then {_validationFailed pushBack "G_Eject_Occupants must be true/false!"};
-if (typeName G_Explosion_Eject_Occupants != "BOOL") then {_validationFailed pushBack "G_Explosion_Eject_Occupants must be true/false!"};
-if ((typeName G_Revive_Reward != "SCALAR") || (G_Revive_Reward < 0)) then {_validationFailed pushBack "G_Revive_Reward must be a number greater than or equal to 0!"};
-if ((typeName G_TK_Penalty != "SCALAR") || (G_TK_Penalty > 0)) then {_validationFailed pushBack "G_TK_Penalty must be a number less than or equal to 0!"};
-if ((typeName G_Revive_Messages != "SCALAR") || !((G_Revive_Messages > -1) && (G_Revive_Messages < 3))) then {_validationFailed pushBack "G_Revive_Messages must be defined as 0, 1, or 2!"};
-if (typeName G_End_When_Side_Down != "BOOL") then {_validationFailed pushBack "G_End_When_Side_Down must be true/false!"};
+if !(G_Eject_Occupants isEqualType true) then {_validationFailed pushBack "G_Eject_Occupants must be true/false!"};
+if !(G_Explosion_Eject_Occupants isEqualType true) then {_validationFailed pushBack "G_Explosion_Eject_Occupants must be true/false!"};
+if !((G_Revive_Reward isEqualType 1) && (G_Revive_Reward >= 0)) then {_validationFailed pushBack "G_Revive_Reward must be a number greater than or equal to 0!"};
+if !((G_TK_Penalty isEqualType 1) && (G_TK_Penalty >= 0)) then {_validationFailed pushBack "G_TK_Penalty must be a number less than or equal to 0!"};
+if !((G_Revive_Messages isEqualType 1) && ((G_Revive_Messages >= 0) && (G_Revive_Messages <= 2))) then {_validationFailed pushBack "G_Revive_Messages must be defined as 0, 1, or 2!"};
+if !(G_End_When_Side_Down isEqualType true) then {_validationFailed pushBack "G_End_When_Side_Down must be true/false!"};
 
 //Respawn/Initial Spawn
-if (typeName G_Respawn_Button != "BOOL") then {_validationFailed pushBack "G_Respawn_Button must be true/false!"};
-if ((typeName G_Respawn_Time != "SCALAR") || (G_Respawn_Time < 0)) then {_validationFailed pushBack "G_Respawn_Time must be a number greater than or equal to 0!"};
-if ((typeName G_Num_Respawns != "SCALAR") || (G_Num_Respawns < -1)) then {_validationFailed pushBack "G_Num_Respawns must be an integer greater than or equal to -1!"};
-if (typeName G_Spectator != "BOOL") then {_validationFailed pushBack "G_Spectator must be true/false!"};
-if (typeName G_Squad_Leader_Spawn != "BOOL") then {_validationFailed pushBack "G_Squad_Leader_Spawn must be true/false!"};
-if (typeName G_Squad_Leader_Marker != "BOOL") then {_validationFailed pushBack "G_Squad_Leader_Marker must be true/false!"};
-if ((typeName G_Squad_Leader_Mkr_Type != "STRING") || (typeName G_Squad_Leader_Mkr_Color != "STRING") || (typeName G_Squad_Leader_Mkr_Text != "STRING")) then {_validationFailed pushBack "G_Squad_Leader_Mkr_SETTINGHERE must all be strings except for Refresh. If not in use, still have empty quotes."};
-if ((typeName G_Squad_Leader_Mkr_Refresh != "SCALAR") || (G_Squad_Leader_Mkr_Refresh <= 0)) then {_validationFailed pushBack "G_Squad_Leader_Mkr_Refresh must be a number greater than 0!"};
-if (typeName G_AI_Fixed_Spawn != "BOOL") then {_validationFailed pushBack "G_AI_Fixed_Spawn must be true/false!"};
-if ((typeName G_AI_Fixed_Spawn_WEST != "STRING") || (typeName G_AI_Fixed_Spawn_EAST != "STRING") || (typeName G_AI_Fixed_Spawn_IND != "STRING") || (typeName G_AI_Fixed_Spawn_CIV != "STRING")) then {_validationFailed pushBack "G_AI_Fixed_Spawn_SIDEHERE must all be strings. If not in use, still have empty quotes ("""")."};
+if !(G_Respawn_Button isEqualType true) then {_validationFailed pushBack "G_Respawn_Button must be true/false!"};
+if !((G_Respawn_Time isEqualType 1) && (G_Respawn_Time >= 0)) then {_validationFailed pushBack "G_Respawn_Time must be a number greater than or equal to 0!"};
+if !((G_Num_Respawns isEqualType 1) && (G_Num_Respawns >= -1)) then {_validationFailed pushBack "G_Num_Respawns must be an integer greater than or equal to -1!"};
+if !(G_Spectator isEqualType true) then {_validationFailed pushBack "G_Spectator must be true/false!"};
+if !(G_Squad_Leader_Spawn isEqualType true) then {_validationFailed pushBack "G_Squad_Leader_Spawn must be true/false!"};
+if !(G_Squad_Leader_Marker isEqualType true) then {_validationFailed pushBack "G_Squad_Leader_Marker must be true/false!"};
+if !((G_Squad_Leader_Mkr_Type isEqualType "") && (G_Squad_Leader_Mkr_Color isEqualType "") && (G_Squad_Leader_Mkr_Text isEqualType "")) then {_validationFailed pushBack "G_Squad_Leader_Mkr_SETTINGHERE must all be strings except for Refresh. If not in use, still have empty quotes."};
+if !((G_Squad_Leader_Mkr_Refresh isEqualType 1) && (G_Squad_Leader_Mkr_Refresh >= 0)) then {_validationFailed pushBack "G_Squad_Leader_Mkr_Refresh must be a number greater than 0!"};
+if !(G_AI_Fixed_Spawn isEqualType true) then {_validationFailed pushBack "G_AI_Fixed_Spawn must be true/false!"};
+if !((G_AI_Fixed_Spawn_WEST isEqualType "") && (G_AI_Fixed_Spawn_EAST isEqualType "") && (G_AI_Fixed_Spawn_IND isEqualType "") && (G_AI_Fixed_Spawn_CIV isEqualType "")) then {_validationFailed pushBack "G_AI_Fixed_Spawn_SIDEHERE must all be strings. If not in use, still have empty quotes ("""")."};
 
 //Mobile Respawn Vehicle
-if ((typeName G_Mobile_Respawn_WEST != "ARRAY") || (typeName G_Mobile_Respawn_EAST != "ARRAY") || (typeName G_Mobile_Respawn_IND != "ARRAY") || (typeName G_Mobile_Respawn_CIV != "ARRAY")) then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be an array of vehicle names. If not in use, still have empty array ([])."};
+if !((G_Mobile_Respawn_WEST isEqualType []) && (G_Mobile_Respawn_EAST isEqualType []) && (G_Mobile_Respawn_IND isEqualType []) && (G_Mobile_Respawn_CIV isEqualType [])) then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be an array of vehicle names. If not in use, still have empty array ([])."};
 {
 	{
 		if (isNil {_x}) then {
@@ -58,39 +58,39 @@ if ((typeName G_Mobile_Respawn_WEST != "ARRAY") || (typeName G_Mobile_Respawn_EA
 		}
 		else
 		{
-			if (typeName _x != "OBJECT") then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be array containing only variable names of MRVs!"};
+			if !(_x isEqualType objNull) then {_validationFailed pushBack "G_Mobile_Respawn_SIDEHERE must be array containing only variable names of MRVs!"};
 		};
 	} forEach _x;
 } forEach [G_Mobile_Respawn_WEST, G_Mobile_Respawn_EAST, G_Mobile_Respawn_IND, G_Mobile_Respawn_CIV];
-if (typeName G_Mobile_Respawn_Locked != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Locked must be true/false!"};
-if (typeName G_Mobile_Respawn_Movable != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Movable must be true/false!"};
-if ((typeName G_Mobile_Respawn_Wreck != "SCALAR") || (G_Mobile_Respawn_Wreck < 0)) then {_validationFailed pushBack "G_Mobile_Respawn_Wreck must be a number greater than or equal to 0!"};
-if ((typeName G_Mobile_Respawn_RespTimer != "SCALAR") || (G_Mobile_Respawn_RespTimer < 0)) then {_validationFailed pushBack "G_Mobile_Respawn_RespTimer must be a number greater than or equal to 0!"};
-if (typeName G_Mobile_Respawn_Marker != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Marker must be true/false!"};
-if ((typeName G_Mobile_Respawn_Mkr_Type != "STRING") || (typeName G_Mobile_Respawn_Mkr_Color != "STRING") || (typeName G_Mobile_Respawn_Mkr_Text != "STRING")) then {_validationFailed pushBack "G_Mobile_Respawn_Mkr_SETTINGHERE must all be strings except for Refresh and Display. If not in use, still have empty quotes."};
-if ((typeName G_Mobile_Respawn_Mkr_Refresh != "SCALAR") || (G_Mobile_Respawn_Mkr_Refresh <= 0)) then {_validationFailed pushBack "G_Mobile_Respawn_Mkr_Refresh must be a number greater than 0!"};
-if (typeName G_Mobile_Respawn_Mkr_Display != "BOOL") then {_validationFailed pushBack "G_Mobile_Respawn_Mkr_Display must be true/false!"};
+if !(G_Mobile_Respawn_Locked isEqualType true) then {_validationFailed pushBack "G_Mobile_Respawn_Locked must be true/false!"};
+if !(G_Mobile_Respawn_Movable isEqualType true) then {_validationFailed pushBack "G_Mobile_Respawn_Movable must be true/false!"};
+if !((G_Mobile_Respawn_Wreck isEqualType 1) && (G_Mobile_Respawn_Wreck >= 0)) then {_validationFailed pushBack "G_Mobile_Respawn_Wreck must be a number greater than or equal to 0!"};
+if !((G_Mobile_Respawn_RespTimer isEqualType 1) && (G_Mobile_Respawn_RespTimer >= 0)) then {_validationFailed pushBack "G_Mobile_Respawn_RespTimer must be a number greater than or equal to 0!"};
+if !(G_Mobile_Respawn_Marker isEqualType true) then {_validationFailed pushBack "G_Mobile_Respawn_Marker must be true/false!"};
+if !((G_Mobile_Respawn_Mkr_Type isEqualType "") && (G_Mobile_Respawn_Mkr_Color isEqualType "") && (G_Mobile_Respawn_Mkr_Text isEqualType "")) then {_validationFailed pushBack "G_Mobile_Respawn_Mkr_SETTINGHERE must all be strings except for Refresh and Display. If not in use, still have empty quotes."};
+if !((G_Mobile_Respawn_Mkr_Refresh isEqualType 1) && (G_Mobile_Respawn_Mkr_Refresh > 0)) then {_validationFailed pushBack "G_Mobile_Respawn_Mkr_Refresh must be a number greater than 0!"};
+if !(G_Mobile_Respawn_Mkr_Display isEqualType true) then {_validationFailed pushBack "G_Mobile_Respawn_Mkr_Display must be true/false!"};
 
 //Unit "Tags"
-if (typeName G_Unit_Tag != "BOOL") then {_validationFailed pushBack "G_Unit_Tag must be true/false!"};
-if ((typeName G_Unit_Tag_Display != "SCALAR") || !((G_Unit_Tag_Display > -1) && (G_Unit_Tag_Display < 3))) then {_validationFailed pushBack "G_Unit_Tag_Display must be defined as 0, 1, or 2!"};
-if (typeName G_Unit_Tag_Display_Key != "SCALAR") then {_validationFailed pushBack "G_Unit_Tag_Display_Key must be an integer!"};
-if ((typeName G_Unit_Tag_Display_Time != "SCALAR") || (G_Unit_Tag_Display_Time <= 0)) then {_validationFailed pushBack "G_Unit_Tag_Display_Time must be a number greater than 0!"};
-if ((typeName G_Unit_Tag_Distance != "SCALAR") || (G_Unit_Tag_Distance <= 0)) then {_validationFailed pushBack "G_Unit_Tag_Distance must be a number greater than 0!"};
-if (typeName G_Unit_Tag_ShowDistance != "BOOL") then {_validationFailed pushBack "G_Unit_Tag_ShowDistance must be true/false!"};
-if (typeName G_Unit_Tag_Color != "ARRAY") then {_validationFailed pushBack "G_Unit_Tag_Color must be an array of 3 numbers from 0 to 1!"};
-if ((count G_Unit_Tag_Color) != 3) then {_validationFailed pushBack "G_Unit_Tag_Color must be an array of 3 numbers from 0 to 1!"};
+if !(G_Unit_Tag isEqualType true) then {_validationFailed pushBack "G_Unit_Tag must be true/false!"};
+if !((G_Unit_Tag_Display isEqualType 1) && ((G_Unit_Tag_Display >= 0) && (G_Unit_Tag_Display <= 2))) then {_validationFailed pushBack "G_Unit_Tag_Display must be defined as 0, 1, or 2!"};
+if !(G_Unit_Tag_Display_Key isEqualType 1) then {_validationFailed pushBack "G_Unit_Tag_Display_Key must be an integer!"};
+if !((G_Unit_Tag_Display_Time isEqualType 1) && (G_Unit_Tag_Display_Time > 0)) then {_validationFailed pushBack "G_Unit_Tag_Display_Time must be a number greater than 0!"};
+if !((G_Unit_Tag_Distance isEqualType 1) && (G_Unit_Tag_Distance > 0)) then {_validationFailed pushBack "G_Unit_Tag_Distance must be a number greater than 0!"};
+if !(G_Unit_Tag_ShowDistance isEqualType true) then {_validationFailed pushBack "G_Unit_Tag_ShowDistance must be true/false!"};
+if !(G_Unit_Tag_Color isEqualType []) then {_validationFailed pushBack "G_Unit_Tag_Color must be an array of 3 numbers from 0 to 1!"};
+if !((count G_Unit_Tag_Color) == 3) then {_validationFailed pushBack "G_Unit_Tag_Color must be an array of 3 numbers from 0 to 1!"};
 {
-	if ((typeName _x != "SCALAR") || !((_x >= 0) && (_x <= 1))) then {_validationFailed pushBack "G_Unit_Tag_Color must be an array of 3 numbers from 0 to 1!"};
+	if !((_x isEqualType 1) && ((_x >= 0) && (_x <= 1))) then {_validationFailed pushBack "G_Unit_Tag_Color must be an array of 3 numbers from 0 to 1!"};
 } forEach G_Unit_Tag_Color;
-if (typeName G_Unit_Tag_SquadColor != "ARRAY") then {_validationFailed pushBack "G_Unit_Tag_SquadColor must be an array of 3 numbers from 0 to 1!"};
-if ((count G_Unit_Tag_SquadColor) != 3) then {_validationFailed pushBack "G_Unit_Tag_SquadColor must be an array of 3 numbers from 0 to 1!"};
+if !(G_Unit_Tag_SquadColor isEqualType []) then {_validationFailed pushBack "G_Unit_Tag_SquadColor must be an array of 3 numbers from 0 to 1!"};
+if !((count G_Unit_Tag_SquadColor) == 3) then {_validationFailed pushBack "G_Unit_Tag_SquadColor must be an array of 3 numbers from 0 to 1!"};
 {
-	if ((typeName _x != "SCALAR") || !((_x >= 0) && (_x <= 1))) then {_validationFailed pushBack "G_Unit_Tag_SquadColor must be an array of 3 numbers from 0 to 1!"};
+	if !((_x isEqualType 1) && ((_x >= 0) && (_x <= 1))) then {_validationFailed pushBack "G_Unit_Tag_SquadColor must be an array of 3 numbers from 0 to 1!"};
 } forEach G_Unit_Tag_SquadColor;
 
 //Custom Executions
-if ((typeName G_Custom_Exec_1 != "STRING") || (typeName G_Custom_Exec_2 != "STRING") || (typeName G_Custom_Exec_3 != "STRING") || (typeName G_Custom_Exec_4 != "STRING") || (typeName G_Custom_Exec_5 != "STRING")) then {_validationFailed pushBack "G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
+if !((G_Custom_Exec_1 isEqualType "") && (G_Custom_Exec_2 isEqualType "") && (G_Custom_Exec_3 isEqualType "") && (G_Custom_Exec_4 isEqualType "") && (G_Custom_Exec_5 isEqualType "")) then {_validationFailed pushBack "G_Custom_Exec_# must all be strings. If not in use, still have empty quotes ("""")."};
 
 //Handle BIS Revive (only on client)
 if (!isDedicated) then {
