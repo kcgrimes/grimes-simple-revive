@@ -35,6 +35,7 @@ if (typeName G_Explosion_Eject_Occupants != "BOOL") then {_validationFailed push
 if ((typeName G_Revive_Reward != "SCALAR") || (G_Revive_Reward < 0)) then {_validationFailed pushBack "G_Revive_Reward must be a number greater than or equal to 0!"};
 if ((typeName G_TK_Penalty != "SCALAR") || (G_TK_Penalty > 0)) then {_validationFailed pushBack "G_TK_Penalty must be a number less than or equal to 0!"};
 if ((typeName G_Revive_Messages != "SCALAR") || !((G_Revive_Messages > -1) && (G_Revive_Messages < 3))) then {_validationFailed pushBack "G_Revive_Messages must be defined as 0, 1, or 2!"};
+if (typeName G_End_When_Side_Down != "BOOL") then {_validationFailed pushBack "G_End_When_Side_Down must be true/false!"};
 
 //Respawn/Initial Spawn
 if (typeName G_Respawn_Button != "BOOL") then {_validationFailed pushBack "G_Respawn_Button must be true/false!"};
