@@ -67,7 +67,11 @@ G_fnc_Revive_Actions = {
 G_fnc_initNewAI = {
 	//Local to server
 	if (!G_isServer) exitWith {};
-	params ["_arrayNewAI"];
+	private _arrayNewAI = _this;
+	//If param is not an array, it is single object, so make it array
+	if !(_arrayNewAI isEqualType []) then {
+		_arrayNewAI = [_arrayNewAI];
+	};
 	//Init systems
 	{
 		[_x] remoteExec ["G_fnc_EH", 0, true];

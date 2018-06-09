@@ -146,9 +146,10 @@ Functions:
 ```
 G_fnc_initNewAI
 Intended to execute the Revive and Unit Tags systems (if enabled) on units that lack these systems, particularly units created post-init.
-Parameter: Array - List of units to be added cycled through init
+Parameter: Array - List of units to be cycled through init; or use Object - Unit to be cycled through init
 Return: None
 Ex: [_unit1, _unit2] spawn G_fnc_initNewAI;
+Ex: _unit1 spawn G_fnc_initNewAI;
 ```
 ```
 G_fnc_enterIncapacitatedState
