@@ -89,51 +89,29 @@ if ((G_Revive_System) && (!(_unit in G_Revive_Unit_Exclusion))) then {
 	[	"HandleDamage",
 		{
 			//Local to executor, not necessarily _unit
-			private ["_unit", "_selections", "_getHit", "_selection", "_source", "_projectile", "_oldDmg", "_curDmg", "_newDmg"];
-			_unit = _this select 0;
-			//Define variables used to track what is damaged with how much damage, empty if undefined
-			_selections = _unit getVariable ["selections", []];
-			_getHit = _unit getVariable ["gethit", []];
-			//Define which part was damaged
-			_selection = _this select 1;
-			//Define who caused the damage
-			_source = _this select 3;
-			//Define what caused the damage
-			_projectile = _this select 4;
-			//Check if damaged part is tracked and already damaged
-			if !(_selection in _selections) then {
-				//Damaged part not tracked, not damaged yet
-				//Add damaged part to end of array
-				_selections set [count _selections, _selection];
-				//Add placeholder damage value to end of array
-				_getHit set [count _getHit, 0];
-			};
-			//Get position in both arrays for subject part
-			_i = _selections find _selection;
-			//Get previous damage value from array
-			_oldDmg = _getHit select _i;
-			//Get current/incoming damage value from EH
-			_curDmg = _this select 2;
-			//Check if damage is fatal
-			if (_curDmg >= 1) then {
-				//Damage is fatal, so make it just under fatal so unit is not actually killed
-				_newDmg = 0.99;
-				//Whoever _unit is local to will execute Incapacitated state publically
-				if (local _unit) then {
-					_unit allowDamage false;
-					private _preIncapSide = side _unit;
-					_unit spawn G_fnc_enterIncapacitatedState;
-					//Execute code for the killer
-					[_unit, _preIncapSide, _source] spawn G_fnc_onKill;
+			//Define unit, which part was damaged, the incoming damage value from the EH, and who caused the damage
+			params ["_unit", "_selection", "_curDmg", "_source"];
+			//Check if damage is to critical body part
+			if !(_selection in ["arms", "hands", "legs"]) then {
+				//Critical body part, so check if damage is fatal
+				if (_curDmg >= 1) then {
+					//Damage is fatal, so make it just under fatal so unit is not actually killed
+					private _newDmg = 0.99;
+					//Whoever _unit is local to will execute Incapacitated state publically
+					if (local _unit) then {
+						_unit allowDamage false;
+						_unit spawn G_fnc_enterIncapacitatedState;
+						//Execute code for the killer
+						[_unit, side _unit, _source] spawn G_fnc_onKill;
+					};
+					//Output new, non-fatal damage value
+					_newDmg;
+				}
+				else
+				{
+					//Damage is not fatal, handle normally without modification
+					_curDmg;
 				};
-				//Output new (total) damage value
-				_newDmg;
-			}
-			else
-			{
-				//Damage is not fatal, handle normally without modification
-				_getHit set [_i, _curDmg];
-				_curDmg;
 			};
 		}
 	];
